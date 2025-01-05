@@ -21,9 +21,7 @@ class CDPAutomation {
     }
 
     [string] SendCommand([string]$method, [hashtable]$params = @{}) {
-
-
-
+        # WebSocketメッセージ送信
         $this.MessageId++
         $message = @{
             id = $this.MessageId
@@ -34,6 +32,7 @@ class CDPAutomation {
         $buffer = [System.ArraySegment[byte]]::new($bytes)
         $this.webSocket.SendAsync($buffer, [System.Net.WebSockets.WebSocketMessageType]::Text, $true, [System.Threading.CancellationToken]::None).Wait()
 
+        # WebSocket応答受信
         $responseBuffer = New-Object byte[] 4096
         $responseSegment = [System.ArraySegment[byte]]::new($responseBuffer)
         $receiveTask = $this.WebSocket.ReceiveAsync($responseSegment, [Threading.CancellationToken]::None)
