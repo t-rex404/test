@@ -621,4 +621,93 @@ class EdgeDriver
     # 
     # 
     # 
+    function Get-ActiveWindowScreenshot ([string]$OutputPath = "ActiveWindowScreenshot.png")
+    {
+    
+        # Windows APIの定義
+        Add-Type -Namespace Win32 -Name GDI32 -MemberDefinition @"
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+    
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+    
+        public struct RECT {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+    "@
+    
+        Add-Type -Namespace Win32 -Name Drawing -MemberDefinition @"
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+    
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+    
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+    
+        [DllImport("gdi32.dll")]
+        public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+    
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+    
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteDC(IntPtr hdc);
+    
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hwnd);
+    
+        [DllImport("user32.dll")]
+        public static extern bool ReleaseDC(IntPtr hwnd, IntPtr hdc);
+    
+        public const int SRCCOPY = 0x00CC0020;
+    "@
+    
+        # アクティブウィンドウのハンドルを取得
+        $hWnd = [Win32.GDI32]::GetForegroundWindow()
+    
+        if (-not $hWnd) {
+            Write-Error "アクティブウィンドウが見つかりませんでした。"
+            return
+        }
+    
+        # アクティブウィンドウの位置とサイズを取得
+        $rect = New-Object Win32.GDI32+RECT
+        [Win32.GDI32]::GetWindowRect($hWnd, [ref]$rect) | Out-Null
+    
+        $width = $rect.Right - $rect.Left
+        $height = $rect.Bottom - $rect.Top
+    
+        if ($width -le 0 -or $height -le 0) {
+            Write-Error "ウィンドウサイズが無効です。"
+            return
+        }
+    
+        # デバイスコンテキストを取得
+        $windowDC = [Win32.Drawing]::GetDC($hWnd)
+        $memoryDC = [Win32.Drawing]::CreateCompatibleDC($windowDC)
+        $bitmap = [Win32.Drawing]::CreateCompatibleBitmap($windowDC, $width, $height)
+        [Win32.Drawing]::SelectObject($memoryDC, $bitmap) | Out-Null
+    
+        # ウィンドウの内容をキャプチャ
+        [Win32.Drawing]::BitBlt($memoryDC, 0, 0, $width, $height, $windowDC, 0, 0, [Win32.Drawing]::SRCCOPY)
+    
+        # スクリーンショットをファイルに保存
+        $image = [System.Drawing.Image]::FromHbitmap($bitmap)
+        $image.Save($OutputPath, [System.Drawing.Imaging.ImageFormat]::Png)
+        $image.Dispose()
+    
+        # リソースを解放
+        [Win32.Drawing]::DeleteObject($bitmap)
+        [Win32.Drawing]::DeleteDC($memoryDC)
+        [Win32.Drawing]::ReleaseDC($hWnd, $windowDC)
+    
+        Write-Host "アクティブウィンドウのスクリーンショットを保存しました: $OutputPath"
+    }
+        
 }
