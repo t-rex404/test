@@ -282,7 +282,7 @@ class EdgeDriver
         }
         else
         {
-            throw "$queryType による要素取得に失敗しました。element：$element"
+            throw "$query_type による要素取得に失敗しました。element：$element"
         }
     }
 
@@ -332,7 +332,7 @@ class EdgeDriver
         }
         else
         {
-            throw "$queryType による複数の要素取得に失敗しました。element：$element"
+            throw "$query_type による複数の要素取得に失敗しました。element：$element"
         }
     }
     
@@ -454,28 +454,28 @@ class EdgeDriver
     # ウィンドウサイズの変更(通常)
     [void] NormalWindow()
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1, bounds = @{windowState = 'normal'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'normal'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(最大化)
     [void] MaximizeWindow()
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1, bounds = @{windowState = 'maximized'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'maximized'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(最小化)
     [void] MinimizeWindow()
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1, bounds = @{windowState = 'minimized'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'minimized'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(フルスクリーン)
     [void] FullscreenWindow()
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1, bounds = @{windowState = 'fullscreen'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'fullscreen'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
@@ -489,13 +489,13 @@ class EdgeDriver
     # ブラウザの履歴中の前のページに戻る
     [void] GoBack()
     {
-        $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = -1; })
+        $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = -1 })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
     # ブラウザの履歴中の次のページに進む
     [void] GoForward()
     {
-        $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = 1; })
+        $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = 1 })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
