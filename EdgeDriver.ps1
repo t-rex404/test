@@ -23,13 +23,13 @@ class EdgeDriver
         }
 
         # Edgeをデバッグモードで開く
-        $edge_exe_process = Start-Process -FilePath $edge_exe_path -ArgumentList '--remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=C:\temp\UserDataDirectory\' -PassThru
+        $edge_exe_process = Start-Process -FilePath $edge_exe_path -ArgumentList '--remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=C:\temp\UserDataDirectoryForEdge\' -PassThru
             # 引数の意味
             # --remote-debugging-port=9222 : デバッグ用 WebSocket をポート 9222 で有効化。
             # --disable-popup-blocking     : パップアップを無効化。
             # --no-first-run               : 最初の起動を無効化。
-            # --user-data-dir              : ユーザーデータを指定。
             # --disable-fre                : フリを無効化。
+            # --user-data-dir              : ユーザーデータを指定。
         $this.edge_exe_process_id = $edge_exe_process.Id
 
         # デバッグ対象のWebSocket URLを取得(タブ情報を取得)
