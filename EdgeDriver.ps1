@@ -78,7 +78,7 @@ class EdgeDriver
     }
 
     # WebSocketメッセージ送信
-    [void] SendWebSocketMessage($method, $params = @{})
+    [void] SendWebSocketMessage([string]$method, [hashtable]$params = @{})
     {
         try
         {
@@ -125,11 +125,11 @@ class EdgeDriver
                 $receive_task.Wait()
                 $response_json = [System.Text.Encoding]::UTF8.GetString($buffer, 0, $receive_task.Result.Count)
                 write-host '<<<<<<受信内容:'$response_json
-                $response_json_object = ConvertForm-Json $response_json
+                $response_json_object = ConvertFrom-Json $response_json
                 # 受信時には、送信に対する受信だけでなく、ブラウザからのイベント通知も受信する可能性がある
                 # イベント通知の場合、response_jsonにidが含まれないため、idの有無で送信に対する受信なのかイベントの通知なのかを判断する
                 # 注意：送信に成功しても、もし送信したJsonに不備がある場合、response_jsonにidが含まれない
-                if (response_json_object.id -eq $this.message_id)
+                if ($response_json_object.id -eq $this.message_id)
                 {
                     return $response_json
                 }
