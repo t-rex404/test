@@ -664,7 +664,7 @@ class EdgeDriver
                 $bitmap = [Capture]::CaptureActiveWindow()
 
                 # スクリーンショットをファイルに保存
-                $bitmap.Save("active_window_screenshot.png", [System.Drawing.Imaging.ImageFormat]::Png)
+                $bitmap.Save($save_path, [System.Drawing.Imaging.ImageFormat]::Png)
 
                 # リソースを解放
                 $bitmap.Dispose()
