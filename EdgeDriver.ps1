@@ -290,35 +290,35 @@ class EdgeDriver
     [hashtable] FindElementByXPath([string]$xpath)
     {
         $expression = "document.evaluate('$xpath', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue"
-        return = $this.FindElementGeneric($expression, 'XPath', $xpath)
+        return $this.FindElementGeneric($expression, 'XPath', $xpath)
     }
 
     # class属性で要素を検索
     [hashtable] FindElementByClassName([string]$class_name)
     {
         $expression = "document.getElementsByClassName('$class_name')"
-        return = $this.FindElementGeneric($expression, 'ClassName', $class_name)
+        return $this.FindElementGeneric($expression, 'ClassName', $class_name)
     }
 
     # id属性で要素を検索
     [hashtable] FindElementById([string]$id)
     {
         $expression = "document.getElementById('$id')"
-        return = $this.FindElementGeneric($expression, 'Id', $id)
+        return $this.FindElementGeneric($expression, 'Id', $id)
     }
 
     # name属性で要素を検索
     [hashtable] FindElementByName([string]$name)
     {
         $expression = "document.getElementsByName('$name')"
-        return = $this.FindElementGeneric($expression, 'Name', $name)
+        return $this.FindElementGeneric($expression, 'Name', $name)
     }
 
     # tag名で要素を検索
     [hashtable] FindElementByTagName([string]$tag_name)
     {
         $expression = "document.getElementsByTagName('$tag_name')"
-        return = $this.FindElementGeneric($expression, 'TagName', $tag_name)
+        return $this.FindElementGeneric($expression, 'TagName', $tag_name)
     }
 
     # JavaScriptで複数の要素を検索
