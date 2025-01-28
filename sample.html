@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォームオブジェクトサンプル</title>
+</head>
+<body>
+    <h1>フォームオブジェクトサンプル</h1>
+    <form action="#" method="post">
+        <!-- テキストボックス系 -->
+        <h2>テキストボックス</h2>
+        <label>テキストボックス: <input type="text" name="textbox"></label><br>
+        <label>パスワードボックス: <input type="password" name="password"></label><br>
+        <label>テキストエリア:</label><br>
+        <textarea name="textarea" rows="4" cols="40"></textarea><br>
+
+        <!-- 選択・チェック系 -->
+        <h2>選択・チェック系</h2>
+        <label>チェックボックス1: <input type="checkbox" name="checkbox1"></label><br>
+        <label>チェックボックス2: <input type="checkbox" name="checkbox2"></label><br>
+        <label>ラジオボタン1: <input type="radio" name="radio" value="option1"></label><br>
+        <label>ラジオボタン2: <input type="radio" name="radio" value="option2"></label><br>
+        <label>ドロップダウンリスト:</label>
+        <select name="dropdown">
+            <option value="option1">選択肢1</option>
+            <option value="option2">選択肢2</option>
+            <option value="option3">選択肢3</option>
+        </select><br>
+
+        <!-- ボタン系 -->
+        <h2>ボタン系</h2>
+        <button type="button">通常ボタン</button><br>
+        <input type="submit" value="送信ボタン"><br>
+        <input type="reset" value="リセットボタン"><br>
+
+        <!-- その他の項目 -->
+        <h2>その他</h2>
+        <label>ファイル選択ボックス: <input type="file" name="file"></label><br>
+        <label>スライダー: <input type="range" name="range" min="0" max="100"></label><br>
+        <label>日付入力: <input type="date" name="date"></label><br>
+        <label>色選択ボックス: <input type="color" name="color"></label><br>
+    </form>
+</body>
+</html>
