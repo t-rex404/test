@@ -63,13 +63,9 @@ class EdgeDriver
         $this.message_id = 0
 
         # 利用可能なタブ情報を取得
-        #$this.SendWebSocketMessage('Target.setDiscoverTargets', @{ discover = $true })
-        #$this.ReceiveWebSocketMessage()
         $this.DiscoverTargets()
 
         # タブをアクティブにする
-        #$this.SendWebSocketMessage('Target.attachToTarget', @{targetId = $web_socket_target_id})
-        #$this.ReceiveWebSocketMessage()
         $this.SetActiveTab($web_socket_target_id)
 
         # デバッグモードを有効化
@@ -181,9 +177,13 @@ class EdgeDriver
         # 利用可能なタブ情報を取得
         $this.DiscoverTargets()
 
+        # JavaScript実行環境を有効化し、`document` オブジェクトにアクセスできるようにする
+        # 結果の返却は不要であるため、returnByValueをfalseに設定
         $this.SendWebSocketMessage('Runtime.enable', @{ expression = 'document;'; returnByValue = $false; })
         $this.ReceiveWebSocketMessage() | Out-Null
 
+        # 現在のページのDOMツリーを取得し、documentノード直下の要素まで取得
+        # depth = 1 は、最上位の子要素（例えば<html>や<body>）までを対象とする
         $this.SendWebSocketMessage('DOM.getDocument', @{ depth = 1; })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
@@ -204,21 +204,23 @@ class EdgeDriver
         if ($this.edge_exe_process_id) {
             Stop-Process -Id $this.edge_exe_process_id -Force
         }
-    }    
+    }
+
+    # 新しいタブやページが開かれた際に、そのターゲット情報を自動で検出できるようにする
+    # discover = $true でターゲットの発見機能を有効にする
+    [string] DiscoverTargets()
+    {
+        $this.SendWebSocketMessage('Target.setDiscoverTargets', @{ discover = $true })
+        return ($this.ReceiveWebSocketMessage() | ConvertFrom-Json).result.targetId
+    }
     
-    # 利用可能なタブ情報を取得
+    # 現在開かれているすべてのターゲット（タブやページ）の情報を取得
+    # ターゲットには、タブのID、URL、タイトル、タイプなどが含まれる
     [hashtable] GetAvailableTabs()
     {
         $this.SendWebSocketMessage('Target.getTargets', @{})
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
         return $response_json.result
-    }
-
-    # 利用可能なタブ情報を取得
-    [void] DiscoverTargets()
-    {
-        $this.SendWebSocketMessage('Target.setDiscoverTargets', @{ discover = $true })
-        $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # タブをアクティブにする
@@ -294,9 +296,9 @@ class EdgeDriver
     }
 
     # class属性で要素を検索
-    [hashtable] FindElementByClassName([string]$class_name)
+    [hashtable] FindElementByClassName([string]$class_name, [int]$index = 0)
     {
-        $expression = "document.getElementsByClassName('$class_name')"
+        $expression = "document.getElementsByClassName('$class_name')[$index]"
         return $this.FindElementGeneric($expression, 'ClassName', $class_name)
     }
 
@@ -308,16 +310,16 @@ class EdgeDriver
     }
 
     # name属性で要素を検索
-    [hashtable] FindElementByName([string]$name)
+    [hashtable] FindElementByName([string]$name, [int]$index = 0)
     {
-        $expression = "document.getElementsByName('$name')"
+        $expression = "document.getElementsByName('$name')[$index]"
         return $this.FindElementGeneric($expression, 'Name', $name)
     }
 
     # tag名で要素を検索
-    [hashtable] FindElementByTagName([string]$tag_name)
+    [hashtable] FindElementByTagName([string]$tag_name, [int]$index = 0)
     {
-        $expression = "document.getElementsByTagName('$tag_name')"
+        $expression = "document.getElementsByTagName('$tag_name')[$index]"
         return $this.FindElementGeneric($expression, 'TagName', $tag_name)
     }
 
@@ -326,9 +328,11 @@ class EdgeDriver
     {
         $this.SendWebSocketMessage('Runtime.evaluate', @{ expression = $expression })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-        if ($response_json.result.result.objectIds.Count -eq 0)
+        #if ($response_json.result.result.objectIds.Count -eq 0)
+        if ($response_json.result.result.value -gt 0)
         {
-            return @{ nodeId = $response_json.result.result.objectIds; query_type = $query_type; element = $element }
+            #return @{ nodeId = $response_json.result.result.objectIds; query_type = $query_type; element = $element }
+            return @{ count = $response_json.result.result.value; query_type = $query_type; element = $element }
         }
         else
         {
@@ -336,31 +340,61 @@ class EdgeDriver
         }
     }
     
+    <#
     # XPathで複数の要素を検索
     [array] FindElementsByXPath([string]$xpath)
     {
         $expression = "...document.evaluate('$xpath', document, null, XPathResult.ANY_TYPE, null).iterateNext().outerHTML"
         return $this.FindElementsGeneric($expression, 'XPath', $xpath)
     }
+    #>
+
     # class属性で複数の要素を検索
     [array] FindElementsByClassName([string]$class_name)
     {
-        $expression = "...document.getElementsByClassName('$class_name').map(e => e.outerHTML)"
-        return $this.FindElementsGeneric($expression, 'ClassName', $class_name)
+        #$expression = "...document.getElementsByClassName('$class_name').map(e => e.outerHTML)"
+        #return $this.FindElementsGeneric($expression, 'ClassName', $class_name)
+        $expression = "document.getElementsByClassName('$class_name').length"
+        $element_count = $this.FindElementGeneric($expression, 'ClassName', $class_name).count
+
+        $element_list = [System.Collections.ArrayList]::new()
+        for ($i = 0; $i -lt $element_count; $i++)
+        {
+            $element_list.add($this.FindElementByClassName($class_name, $i))
+        }
+        return $element_list
     }
 
     # name属性で複数の要素を検索
     [array] FindElementsByName([string]$name)
     {
-        $expression = "...document.getElementsByName('$name').map(e => e.outerHTML)"
-        return $this.FindElementsGeneric($expression, 'Name', $name)
+        #$expression = "...document.getElementsByName('$name').map(e => e.outerHTML)"
+        #return $this.FindElementsGeneric($expression, 'Name', $name)
+        $expression = "document.getElementsByName('$name').length"
+        $element_count = $this.FindElementGeneric($expression, 'Name', $name).count
+
+        $element_list = [System.Collections.ArrayList]::new()
+        for ($i = 0; $i -lt $element_count; $i++)
+        {
+            $element_list.add($this.FindElementByName($name, $i))
+        }
+        return $element_list
     }
 
     # tag名で複数の要素を検索
     [array] FindElementsByTagName([string]$tag_name)
     {
-        $expression = "...document.getElementsByTagName('$tag_name').map(e => e.outerHTML)"
-        return $this.FindElementsGeneric($expression, 'TagName', $tag_name)
+        #$expression = "...document.getElementsByTagName('$tag_name').map(e => e.outerHTML)"
+        #return $this.FindElementsGeneric($expression, 'TagName', $tag_name)
+        $expression = "document.getElementsByTagName('$tag_name').length"
+        $element_count = $this.FindElementGeneric($expression, 'TagName', $tag_name).count        
+        
+        $element_list = [System.Collections.ArrayList]::new()
+        for ($i = 0; $i -lt $element_count; $i++)
+        {
+            $element_list.add($this.FindElementByTagName($tag_name, $i))
+        }
+        return $element_list
     }
 
     # 要素のテキストを取得
@@ -445,44 +479,44 @@ class EdgeDriver
 
 
     # ウィンドウサイズの変更
-    [void] ResizeWindow([int]$width, [int]$height)
+    [void] ResizeWindow([int]$width, [int]$height, [int]$windowHandle = 1)
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{width = $width; height = $height} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = $windowHandle; bounds = @{width = $width; height = $height} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(通常)
-    [void] NormalWindow()
+    [void] NormalWindow([int]$windowHandle = 1)
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'normal'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = $windowHandle; bounds = @{windowState = 'normal'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(最大化)
-    [void] MaximizeWindow()
+    [void] MaximizeWindow([int]$windowHandle = 1)
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'maximized'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = $windowHandle; bounds = @{windowState = 'maximized'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(最小化)
-    [void] MinimizeWindow()
+    [void] MinimizeWindow([int]$windowHandle = 1)
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'minimized'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = $windowHandle; bounds = @{windowState = 'minimized'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウサイズの変更(フルスクリーン)
-    [void] FullscreenWindow()
+    [void] FullscreenWindow([int]$windowHandle = 1)
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{windowState = 'fullscreen'} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = $windowHandle; bounds = @{windowState = 'fullscreen'} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ウィンドウ位置の変更
-    [void] MoveWindow([int]$x, [int]$y)
+    [void] MoveWindow([int]$x, [int]$y, [int]$windowHandle = 1)
     {
-        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = 1; bounds = @{left = $x; top = $y} })
+        $this.SendWebSocketMessage('Browser.setWindowBounds', @{ windowId = $windowHandle; bounds = @{left = $x; top = $y} })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
@@ -555,11 +589,11 @@ class EdgeDriver
 
     # 作成中
     # スクリーンショットを取得（フルスクリーンショット、アクティブウィンドウスクリーンショット、フルページスクリーンショット、ビューポートスクリーンショット、指定要素のスクリーンショット）
-    [string] GetScreenshot($type = 'fullPage', $element = $null, $save_path = '.\screenshot.png')
+    [void] GetScreenshot($type = 'fullPage', $save_path = '.\screenshot.png')
     {
         switch ($type)
         {
-            'fullPage'
+            'fullScreen'
             {
                 # フルスクリーンキャプチャはOSベースで取得
                 Add-Type -AssemblyName System.Windows.Forms
@@ -571,43 +605,111 @@ class EdgeDriver
                 $bitmap.Save($save_path, [System.Drawing.Imaging.ImageFormat]::Png)
                 Write-Host 'フルスクリーンショットを保存しました：' $save_path
 
-
+                # リソースを解放
+                $bitmap.Dispose()
+                
                 #$this.SendWebSocketMessage('Page.captureScreenshot', @{ }) 
                 #$response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
                 #return $response_json.result.data
             }
             'active'
             {
-                $this.SendWebSocketMessage('Page.captureScreenshot', @{ })
-                $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-                return $response_json.result.data
+                Add-Type @"
+                using System;
+                using System.Runtime.InteropServices;
+                using System.Drawing;
+
+                public class Capture
+                {
+                    [DllImport("user32.dll")]
+                    public static extern IntPtr GetForegroundWindow();
+
+                    [DllImport("user32.dll")]
+                    public static extern bool GetWindowRect(IntPtr hwnd, ref RECT rect);
+
+                    [DllImport("user32.dll")]
+                    public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, int nFlags);
+
+                    [StructLayout(LayoutKind.Sequential)]
+                    public struct RECT
+                    {
+                        public int Left;
+                        public int Top;
+                        public int Right;
+                        public int Bottom;
+                    }
+
+                    public static Bitmap CaptureActiveWindow()
+                    {
+                        IntPtr hwnd = GetForegroundWindow();
+                        RECT rect = new RECT();
+                        GetWindowRect(hwnd, ref rect);
+
+                        int width = rect.Right - rect.Left;
+                        int height = rect.Bottom - rect.Top;
+
+                        Bitmap bmp = new Bitmap(width, height);
+                        Graphics g = Graphics.FromImage(bmp);
+                        IntPtr hdc = g.GetHdc();
+                        PrintWindow(hwnd, hdc, 0);
+                        g.ReleaseHdc(hdc);
+                        g.Dispose();
+
+                        return bmp;
+                    }
+                }
+"@
+
+                # アクティブウィンドウのスクリーンショットをキャプチャ
+                $bitmap = [Capture]::CaptureActiveWindow()
+
+                # スクリーンショットをファイルに保存
+                $bitmap.Save("active_window_screenshot.png", [System.Drawing.Imaging.ImageFormat]::Png)
+
+                # リソースを解放
+                $bitmap.Dispose()
+
             }
             'fullPage'
             {
                 # ページ全体のスクリーンショット
 
-                $this.SendWebSocketMessage('Page.captureScreenshot', @{ })
+                $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; captureBeyondViewport = $true })
                 $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-                return $response_json.result.data
+
+                # 受信したBase64エンコードされた画像データをBase64デコードして保存
+                $image_data_base64 = $response_json.result.data
+
+                # Base64エンコードされた画像データをバイト配列に変換
+                $image_data_bytes = [System.Convert]::FromBase64String($image_data_base64)
+
+                # バイト配列をファイルに書き込む
+                [System.IO.File]::WriteAllBytes($save_path, $image_data_bytes)
             }
             'viewPort'
             {
-                $this.SendWebSocketMessage('Page.captureScreenshot', @{ })
+                $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; captureBeyondViewport = $false })
                 $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-                return $response_json.result.data
+
+                # 受信したBase64エンコードされた画像データをBase64デコードして保存
+                $image_data_base64 = $response_json.result.data
+
+                # Base64エンコードされた画像データをバイト配列に変換
+                $image_data_bytes = [System.Convert]::FromBase64String($image_data_base64)
+
+                # バイト配列をファイルに書き込む
+                [System.IO.File]::WriteAllBytes($save_path, $image_data_bytes)
             }
+            <#
             'element'
             {
                 $this.SendWebSocketMessage('Page.captureScreenshot', @{ })
                 $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
                 return $response_json.result.data
             }
-            condition {  }
-            Default {}
+            #>
         }
-        $this.SendWebSocketMessage('Page.captureScreenshot', @{ })
-        $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-        return $response_json.result.data
+        
     }
     # 
     # 
@@ -621,93 +723,5 @@ class EdgeDriver
     # 
     # 
     # 
-    function Get-ActiveWindowScreenshot ([string]$OutputPath = "ActiveWindowScreenshot.png")
-    {
-    
-        # Windows APIの定義
-        Add-Type -Namespace Win32 -Name GDI32 -MemberDefinition @"
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
-    
-        [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
-    
-        public struct RECT {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
-    "@
-    
-        Add-Type -Namespace Win32 -Name Drawing -MemberDefinition @"
-        [DllImport("gdi32.dll")]
-        public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-    
-        [DllImport("gdi32.dll")]
-        public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
-    
-        [DllImport("gdi32.dll")]
-        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-    
-        [DllImport("gdi32.dll")]
-        public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
-    
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-    
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteDC(IntPtr hdc);
-    
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetDC(IntPtr hwnd);
-    
-        [DllImport("user32.dll")]
-        public static extern bool ReleaseDC(IntPtr hwnd, IntPtr hdc);
-    
-        public const int SRCCOPY = 0x00CC0020;
-    "@
-    
-        # アクティブウィンドウのハンドルを取得
-        $hWnd = [Win32.GDI32]::GetForegroundWindow()
-    
-        if (-not $hWnd) {
-            Write-Error "アクティブウィンドウが見つかりませんでした。"
-            return
-        }
-    
-        # アクティブウィンドウの位置とサイズを取得
-        $rect = New-Object Win32.GDI32+RECT
-        [Win32.GDI32]::GetWindowRect($hWnd, [ref]$rect) | Out-Null
-    
-        $width = $rect.Right - $rect.Left
-        $height = $rect.Bottom - $rect.Top
-    
-        if ($width -le 0 -or $height -le 0) {
-            Write-Error "ウィンドウサイズが無効です。"
-            return
-        }
-    
-        # デバイスコンテキストを取得
-        $windowDC = [Win32.Drawing]::GetDC($hWnd)
-        $memoryDC = [Win32.Drawing]::CreateCompatibleDC($windowDC)
-        $bitmap = [Win32.Drawing]::CreateCompatibleBitmap($windowDC, $width, $height)
-        [Win32.Drawing]::SelectObject($memoryDC, $bitmap) | Out-Null
-    
-        # ウィンドウの内容をキャプチャ
-        [Win32.Drawing]::BitBlt($memoryDC, 0, 0, $width, $height, $windowDC, 0, 0, [Win32.Drawing]::SRCCOPY)
-    
-        # スクリーンショットをファイルに保存
-        $image = [System.Drawing.Image]::FromHbitmap($bitmap)
-        $image.Save($OutputPath, [System.Drawing.Imaging.ImageFormat]::Png)
-        $image.Dispose()
-    
-        # リソースを解放
-        [Win32.Drawing]::DeleteObject($bitmap)
-        [Win32.Drawing]::DeleteDC($memoryDC)
-        [Win32.Drawing]::ReleaseDC($hWnd, $windowDC)
-    
-        Write-Host "アクティブウィンドウのスクリーンショットを保存しました: $OutputPath"
-    }
         
 }
