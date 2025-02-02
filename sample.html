@@ -4,25 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>フォームオブジェクトサンプル</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, textarea, button {
+            margin-top: 5px;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>フォームオブジェクトサンプル</h1>
-    <form action="#" method="post">
+    <form id="sampleForm" action="#" method="post">
         <!-- テキストボックス系 -->
         <h2>テキストボックス</h2>
-        <label>テキストボックス: <input type="text" name="textbox"></label><br>
-        <label>パスワードボックス: <input type="password" name="password"></label><br>
-        <label>テキストエリア:</label><br>
-        <textarea name="textarea" rows="4" cols="40"></textarea><br>
+        <label for="textbox">テキストボックス:</label>
+        <input type="text" id="textbox" class="input-text" name="textbox"><br>
+
+        <label for="password">パスワードボックス:</label>
+        <input type="password" id="password" class="input-password" name="password"><br>
+
+        <label for="textarea">テキストエリア:</label>
+        <textarea id="textarea" class="input-textarea" name="textarea" rows="4" cols="40"></textarea><br>
 
         <!-- 選択・チェック系 -->
         <h2>選択・チェック系</h2>
-        <label>チェックボックス1: <input type="checkbox" name="checkbox1"></label><br>
-        <label>チェックボックス2: <input type="checkbox" name="checkbox2"></label><br>
-        <label>ラジオボタン1: <input type="radio" name="radio" value="option1"></label><br>
-        <label>ラジオボタン2: <input type="radio" name="radio" value="option2"></label><br>
-        <label>ドロップダウンリスト:</label>
-        <select name="dropdown">
+        <label for="checkbox1">
+            <input type="checkbox" id="checkbox1" class="input-checkbox" name="checkbox1"> チェックボックス1
+        </label>
+        <label for="checkbox2">
+            <input type="checkbox" id="checkbox2" class="input-checkbox" name="checkbox2"> チェックボックス2
+        </label>
+
+        <label>
+            <input type="radio" id="radio1" class="input-radio" name="radio" value="option1"> ラジオボタン1
+        </label>
+        <label>
+            <input type="radio" id="radio2" class="input-radio" name="radio" value="option2"> ラジオボタン2
+        </label>
+
+        <label for="dropdown">ドロップダウンリスト:</label>
+        <select id="dropdown" class="input-select" name="dropdown">
             <option value="option1">選択肢1</option>
             <option value="option2">選択肢2</option>
             <option value="option3">選択肢3</option>
@@ -30,16 +69,42 @@
 
         <!-- ボタン系 -->
         <h2>ボタン系</h2>
-        <button type="button">通常ボタン</button><br>
-        <input type="submit" value="送信ボタン"><br>
-        <input type="reset" value="リセットボタン"><br>
+        <button type="button" id="normalButton" class="btn">通常ボタン</button><br>
+        <input type="submit" id="submitButton" class="btn-submit" value="送信ボタン"><br>
+        <input type="reset" id="resetButton" class="btn-reset" value="リセットボタン"><br>
+
+        <!-- 新しいウィンドウを開くボタン -->
+        <button type="button" id="openWindowButton" class="btn">新しいウィンドウを開く</button><br>
+
+        <!-- 新しいタブを開くボタン -->
+        <button type="button" id="openTabButton" class="btn">新しいタブを開く</button><br>
 
         <!-- その他の項目 -->
         <h2>その他</h2>
-        <label>ファイル選択ボックス: <input type="file" name="file"></label><br>
-        <label>スライダー: <input type="range" name="range" min="0" max="100"></label><br>
-        <label>日付入力: <input type="date" name="date"></label><br>
-        <label>色選択ボックス: <input type="color" name="color"></label><br>
+        <label for="file">ファイル選択ボックス:</label>
+        <input type="file" id="file" class="input-file" name="file"><br>
+
+        <label for="range">スライダー:</label>
+        <input type="range" id="range" class="input-range" name="range" min="0" max="100"><br>
+
+        <label for="date">日付入力:</label>
+        <input type="date" id="date" class="input-date" name="date"><br>
+
+        <label for="color">色選択ボックス:</label>
+        <input type="color" id="color" class="input-color" name="color"><br>
     </form>
+
+    <script>
+        // 新しいウィンドウを開く
+        document.getElementById("openWindowButton").addEventListener("click", function() {
+            //window.open("https://www.example.com", "newWindow", "width=800,height=600");
+            window.open("https://www.example.com", "newWindow", "width=800,height=600");
+        });
+
+        // 新しいタブを開く
+        document.getElementById("openTabButton").addEventListener("click", function() {
+            window.open("https://www.example.com", "_blank");
+        });
+    </script>
 </body>
 </html>
