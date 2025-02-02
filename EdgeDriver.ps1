@@ -1,64 +1,24 @@
+. $PSScriptRoot\Common.ps1
+. $PSScriptRoot\WebDriver.ps1
+
 class EdgeDriver
 {
-    [int]$edge_exe_process_id
+    [string]$browser_user_data_dir
+    [int]$browser_exe_process_id
     [System.Net.WebSockets.ClientWebSocket]$web_socket
     [int]$message_id
 
     EdgeDriver()
     {
-        # Edgeの実行ファイルのパスを取得
-        $edge_exe_reg_key = 'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe\'
-        try
-        {
-            # Edgeの実行ファイルのパスを取得
-            $edge_exe_path = Get-ItemPropertyValue -Path $edge_exe_reg_key -Name '(default)'
-            if (-not $edge_exe_path)
-            {
-                throw 'Edge実行ファイルが見つかりませんでした。Edgeのインストール状況を確認してください。'
-            }
-        }
-        catch
-        {
-            throw 'Edgeのパスが見つかりませんでした。エラーメッセージ：' + $_
-        }
+        write-host 'EdgeDriver.ps1:'$PSScriptRoot
+        # Edge起動
+        $this.StartBrowser()
 
-        # Edgeをデバッグモードで開く
-        $edge_exe_process = Start-Process -FilePath $edge_exe_path -ArgumentList '--remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=C:\temp\UserDataDirectoryForEdge\' -PassThru
-            # 引数の意味
-            # --remote-debugging-port=9222 : デバッグ用 WebSocket をポート 9222 で有効化。
-            # --disable-popup-blocking     : パップアップを無効化。
-            # --no-first-run               : 最初の起動を無効化。
-            # --disable-fre                : フリを無効化。
-            # --user-data-dir              : ユーザーデータを指定。
-        $this.edge_exe_process_id = $edge_exe_process.Id
-
-        # デバッグ対象のWebSocket URLを取得(タブ情報を取得)
-        $tabs = Invoke-RestMethod -Uri 'http://localhost:9222/json' -Erroraction Stop
-        if (-not $tabs) { throw 'タブ情報を取得できません。' }
-
-        $web_socket_debugger_url = ''
-        $web_socket_target_id    = ''
-
-        # 「新しいタブ」を選択
-        foreach ($tab in $tabs)
-        {
-            if ($tab.title -like '新しいタブ' -and $tab.type -like 'page')
-            {
-                $web_socket_debugger_url = $tab.webSocketDebuggerUrl
-                $web_socket_target_id    = $tab.id
-                break
-            }
-        }
-
-        if (-not $web_socket_debugger_url -or -not $web_socket_target_id)
-        {
-            throw 'タブ情報を取得できません。'
-        }
-
-        # WebSocket接続の準備
-        $this.web_socket = [System.Net.WebSockets.ClientWebSocket]::new()
-        $uri = [System.Uri]::new($web_socket_debugger_url)
-        $this.web_socket.ConnectAsync($uri, [System.Threading.CancellationToken]::None).Wait()
+        # タブ情報を取得
+        $tab_infomation = $this.GetTabInfomation()
+        
+        # WebSocket接続
+        $this.GetWebSocketInfomation($tab_infomation.webSocketDebuggerUrl)
 
         $this.message_id = 0
 
@@ -66,11 +26,116 @@ class EdgeDriver
         $this.DiscoverTargets()
 
         # タブをアクティブにする
-        $this.SetActiveTab($web_socket_target_id)
+        $this.SetActiveTab($tab_infomation.id)
 
         # デバッグモードを有効化
         $this.SendWebSocketMessage('Emulation.setEmulatedMedia', @{ media = 'screen' })
         $this.ReceiveWebSocketMessage() | Out-Null
+    }
+
+    # ブラウザ起動
+    [void] StartBrowser()
+    {
+        # ブラウザの実行ファイルのパスを取得
+        $browser_exe_reg_key = 'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe\'
+        try
+        {
+            # ブラウザの実行ファイルのパスを取得
+            $browser_exe_path = Get-ItemPropertyValue -Path $browser_exe_reg_key -Name '(default)'
+            if (-not $browser_exe_path)
+            {
+                throw 'ブラウザ実行ファイルが見つかりませんでした。使用するブラウザのインストール状況を確認してください。'
+            }
+        }
+        catch
+        {
+            throw '使用するブラウザのパスが見つかりませんでした。エラーメッセージ：' + $_
+        }
+        $url = 'about:blank'
+        $this.browser_user_data_dir = 'C:\temp\UserDataDirectoryForEdge\'
+        #$argument_list = '--remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=' + $this.browser_user_data_dir
+        $argument_list = '--new-window ' + $url + ' --remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=' + $this.browser_user_data_dir
+        # ブラウザをデバッグモードで開く
+        #$browser_exe_process = Start-Process -FilePath $browser_exe_path -ArgumentList '--remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=C:\temp\UserDataDirectoryForEdge\' -PassThru
+        $browser_exe_process = Start-Process -FilePath $browser_exe_path -ArgumentList $argument_list -PassThru
+            # 引数の意味
+            # --remote-debugging-port=9222 : デバッグ用 WebSocket をポート 9222 で有効化。
+            # --disable-popup-blocking     : パップアップを無効化。
+            # --no-first-run               : 最初の起動を無効化。
+            # --disable-fre                : フリを無効化。
+            # --user-data-dir              : ユーザーデータを指定(別のプロファイルを指定)（既存のブラウザに影響を与えないようにするため）。
+        $this.browser_exe_process_id = $browser_exe_process.Id
+    }
+
+    # タブ情報を取得
+    [Object] GetTabInfomation()
+    {
+        # デバッグ対象のWebSocket URLを取得(タブ情報を取得)
+        $tabs = Invoke-RestMethod -Uri 'http://localhost:9222/json' -Erroraction Stop
+        if (-not $tabs) { throw 'タブ情報を取得できません。' }
+
+        Write-Host 'タブ情報を取得します。::' $($tabs.count)
+        #$web_socket_debugger_url = ''
+        #$web_socket_target_id    = ''
+
+        $tab = $null
+        # 「新しいタブ」を選択
+        foreach ($tab in $tabs)
+        {
+            write-host 'tab.title = '$($tab.title)
+            write-host 'tab.type = '$($tab.type)
+            write-host $($tab.GetType().FullName)
+            #if ($tab.title -like '新しいタブ' -and $tab.type -like 'page')
+            if ($tab.title -like 'about:blank' -and $tab.type -like 'page')
+            {
+                #$web_socket_debugger_url = $tab.webSocketDebuggerUrl
+                #$web_socket_target_id    = $tab.id
+                #break
+                return $tab
+                break
+            }
+        }
+        write-host 'test'
+        #throw 'タブ情報を取得できません。'
+        if ($tab.title -like 'about:blank' -and $tab.type -like 'page')
+        {
+            return $tab
+        }
+        else
+        {
+            throw 'タブ情報を取得できません。'
+        }
+    }
+    
+    # WebSocket接続
+    [void] GetWebSocketInfomation([string]$web_socket_debugger_url)
+    {
+        $retry_count = 3
+        $retry_delay = 2  # 秒
+        for ($i = 0; $i -lt $retry_count; $i++)
+        {
+            try
+            {
+                # WebSocket接続の準備
+                $this.web_socket = [System.Net.WebSockets.ClientWebSocket]::new()
+                $uri = [System.Uri]::new($web_socket_debugger_url)
+                $this.web_socket.ConnectAsync($uri, [System.Threading.CancellationToken]::None).Wait()
+                break
+            }
+            catch
+            {
+                if ($i -lt $retry_count - 1)
+                {
+                    #write-host 'WebSocket接続に失敗しました。再試行します。'
+                    Write-Host "WebSocket接続に失敗しました。再試行します... ($($i+1)/$retry_count)"
+                    Start-Sleep -Seconds $retry_delay
+                }
+                else
+                {
+                    throw 'WebSocket接続に失敗しました。'
+                }
+            }
+        }
     }
 
     # WebSocketメッセージ送信
@@ -78,7 +143,12 @@ class EdgeDriver
     {
         try
         {
-            #write-host 'SendWebSocketMessage_try'
+            if ($this.web_socket.State -ne [System.Net.WebSockets.WebSocketState]::Open)
+            {
+                #throw 'WebSocketは開いていません。'
+                throw 'WebSocketが切断されています。Edgeの状態を確認してください。'
+            }
+            
             # WebSocketメッセージ送信メッセージ作成
             $this.message_id++
             $message = @{
@@ -95,7 +165,9 @@ class EdgeDriver
         catch
         {
             Write-Host 'SendWebSocketMessage_catch'
-            throw 'WebSocketメッセージ送信に失敗しました。エラーメッセージ：' + $_
+            LogError 1004 "WebSocket メッセージ送信エラー: $($_.Exception.Message)"
+            #throw 'WebSocketメッセージ送信に失敗しました。エラーメッセージ：' + $_
+            throw
         }
     }
 
@@ -104,8 +176,13 @@ class EdgeDriver
     {
         try
         {
-            #write-host 'ReceiveWebSocketMessage_try'
+            if ($this.web_socket.State -ne [System.Net.WebSockets.WebSocketState]::Open)
+            {
+                #throw 'WebSocketは開いていません。'
+                throw 'WebSocketが切断されています。Edgeの状態を確認してください。'
+            }
             $timeout = [datetime]::Now.AddSeconds(10)
+
             # WebSocketメッセージ受信
             $responce_result = $false
             $response_json   = $null
@@ -113,14 +190,35 @@ class EdgeDriver
             {
                 if ([datetime]::Now -gt $timeout)
                 {
+                    #LogError 9999, 'WebSocketメッセージの受信がタイムアウトしました。'
                     throw 'WebSocketメッセージの受信がタイムアウトしました。'
                 }
-                $buffer = New-Object byte[] 4096
+                #$buffer = New-Object byte[] 4096
+                #$buffer = New-Object byte[] 8192                
+                $buffer = New-Object byte[] 16384
+                #$buffer = New-Object byte[] 32768
+                #$buffer = New-Object byte[] 65536
                 $segment = [System.ArraySegment[byte]]::new($buffer)
                 $receive_task = $this.web_socket.ReceiveAsync($segment, [System.Threading.CancellationToken]::None)
                 $receive_task.Wait()
                 $response_json = [System.Text.Encoding]::UTF8.GetString($buffer, 0, $receive_task.Result.Count)
                 write-host '<<<<<<受信内容:'$response_json
+                try
+                {
+                    $response_json_object = ConvertFrom-Json $response_json
+                    # 受信時には、送信に対する受信だけでなく、ブラウザからのイベント通知も受信する可能性がある
+                    # イベント通知の場合、response_jsonにidが含まれないため、idの有無で送信に対する受信なのかイベントの通知なのかを判断する
+                    # 注意：送信に成功しても、もし送信したJsonに不備がある場合、response_jsonにidが含まれない
+                    if ($response_json_object.id -eq $this.message_id)
+                    {
+                        return $response_json
+                    }
+                }
+                catch
+                {
+                    write-host '受信内容をJSON化できませんでした。'$response_json
+                }
+                <#
                 $response_json_object = ConvertFrom-Json $response_json
                 # 受信時には、送信に対する受信だけでなく、ブラウザからのイベント通知も受信する可能性がある
                 # イベント通知の場合、response_jsonにidが含まれないため、idの有無で送信に対する受信なのかイベントの通知なのかを判断する
@@ -129,13 +227,16 @@ class EdgeDriver
                 {
                     return $response_json
                 }
+                #>
             }
         }
         catch
         {
             Write-Host 'ReceiveWebSocketMessage_catch'
             $response_json = $null
-            throw 'WebSocketメッセージの受信に失敗しました。エラーメッセージ：' + $_
+            LogError 1005 "WebSocket メッセージ受信エラー: $($_.Exception.Message)"
+            #throw 'WebSocketメッセージの受信に失敗しました。エラーメッセージ：' + $_
+            throw
         }
         return $response_json
     }
@@ -191,12 +292,13 @@ class EdgeDriver
     # ウィンドウを閉じる
     [void] CloseWindow()
     {
-        $this.SendWebSocketMessage('Browser.close', @{})
+        $this.SendWebSocketMessage('Browser.close', @{ })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # WebSocketを閉じる
-    [void] Dispose() {
+    [void] Dispose()
+    {
         if ($this.web_socket -and $this.web_socket.State -eq [System.Net.WebSockets.WebSocketState]::Open) {
             $this.web_socket.CloseAsync('NormalClosure', 'Closing', [System.Threading.CancellationToken]::None).Wait()
             $this.web_socket.Dispose()
@@ -218,7 +320,7 @@ class EdgeDriver
     # ターゲットには、タブのID、URL、タイトル、タイプなどが含まれる
     [hashtable] GetAvailableTabs()
     {
-        $this.SendWebSocketMessage('Target.getTargets', @{})
+        $this.SendWebSocketMessage('Target.getTargets', @{ })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
         return $response_json.result
     }
@@ -226,20 +328,21 @@ class EdgeDriver
     # タブをアクティブにする
     [void] SetActiveTab($tab_id)
     {
-        $this.SendWebSocketMessage('Target.attachToTarget', @{targetId = $tab_id})
+        $this.SendWebSocketMessage('Target.attachToTarget', @{ targetId = $tab_id })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # タブを閉じる
     [void] CloseTab($tab_id)
     {
-        $this.SendWebSocketMessage('Target.detachFromTarget', @{targetId = $tab_id})
+        $this.SendWebSocketMessage('Target.detachFromTarget', @{ targetId = $tab_id })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # ページイベント有効化
-    [void] EnablePageEvents() {
-        $this.SendWebSocketMessage('Page.enable', @{})
+    [void] EnablePageEvents()
+    {
+        $this.SendWebSocketMessage('Page.enable', @{ })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
@@ -355,7 +458,7 @@ class EdgeDriver
         #$expression = "...document.getElementsByClassName('$class_name').map(e => e.outerHTML)"
         #return $this.FindElementsGeneric($expression, 'ClassName', $class_name)
         $expression = "document.getElementsByClassName('$class_name').length"
-        $element_count = $this.FindElementGeneric($expression, 'ClassName', $class_name).count
+        $element_count = $this.FindElementsGeneric($expression, 'ClassName', $class_name).count
 
         $element_list = [System.Collections.ArrayList]::new()
         for ($i = 0; $i -lt $element_count; $i++)
@@ -371,7 +474,7 @@ class EdgeDriver
         #$expression = "...document.getElementsByName('$name').map(e => e.outerHTML)"
         #return $this.FindElementsGeneric($expression, 'Name', $name)
         $expression = "document.getElementsByName('$name').length"
-        $element_count = $this.FindElementGeneric($expression, 'Name', $name).count
+        $element_count = $this.FindElementsGeneric($expression, 'Name', $name).count
 
         $element_list = [System.Collections.ArrayList]::new()
         for ($i = 0; $i -lt $element_count; $i++)
@@ -387,7 +490,7 @@ class EdgeDriver
         #$expression = "...document.getElementsByTagName('$tag_name').map(e => e.outerHTML)"
         #return $this.FindElementsGeneric($expression, 'TagName', $tag_name)
         $expression = "document.getElementsByTagName('$tag_name').length"
-        $element_count = $this.FindElementGeneric($expression, 'TagName', $tag_name).count        
+        $element_count = $this.FindElementsGeneric($expression, 'TagName', $tag_name).count        
         
         $element_list = [System.Collections.ArrayList]::new()
         for ($i = 0; $i -lt $element_count; $i++)
@@ -593,6 +696,7 @@ class EdgeDriver
     {
         switch ($type)
         {
+            <#
             'fullScreen'
             {
                 # フルスクリーンキャプチャはOSベースで取得
@@ -612,6 +716,8 @@ class EdgeDriver
                 #$response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
                 #return $response_json.result.data
             }
+            #>
+            <#
             'active'
             {
                 Add-Type @"
@@ -670,6 +776,7 @@ class EdgeDriver
                 $bitmap.Dispose()
 
             }
+            #>
             'fullPage'
             {
                 # ページ全体のスクリーンショット
@@ -725,3 +832,15 @@ class EdgeDriver
     # 
         
 }
+
+function LogError([int]$error_code, [string]$message)
+{
+    #$log_file = 'C:\temp\EdgeDriver_Error.log'
+    $log_file = '.\EdgeDriver_Error.log'
+    $error_message = $(Get-Date).ToString('yyyy/MM/dd HH:mm:ss') + ' ERROR_CODE:' + $error_code + ' ERROR_MESSAGE:' + $message
+    #Add-Content -Path $log_file -Value $error_message
+    $error_message | Out-File -Append -FilePath $log_file
+    Write-Error $error_message
+}
+
+write-host 'EdgeDriver Imported test end'
