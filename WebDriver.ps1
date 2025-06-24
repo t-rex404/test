@@ -627,7 +627,7 @@ class WebDriver
 
     # 作成中
     # スクリーンショットを取得（フルスクリーンショット、アクティブウィンドウスクリーンショット、フルページスクリーンショット、ビューポートスクリーンショット、指定要素のスクリーンショット）
-    [void] GetScreenshot($type = 'fullPage', $save_path = '.\screenshot.png')
+    [void] GetScreenshot([string]$type, [string]$save_path)
     {
         switch ($type)
         {
