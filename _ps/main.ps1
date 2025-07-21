@@ -59,7 +59,7 @@ Function Main()
                     $element = $driver.FindElementByXpath($xpath_0)
                     if ($element)
                     {
-                        $medium_text = $driver.GetElementText($element)
+                        $medium_text = $driver.GetElementText($element.nodeId)
                         #write-host $medium_text
                     
                         for ($j = 1; $j -lt 10000; $j++)
@@ -80,9 +80,9 @@ Function Main()
                             $element = $driver.FindElementByXpath($xpath_1)
                             if ($element)
                             {
-                                $minor_text = $driver.GetElementText($element)
+                                $minor_text = $driver.GetElementText($element.nodeId)
                                 #write-host "$medium_text; $minor_text"
-                                #$driver.ClickElement($element)
+                                #$driver.ClickElement($element.nodeId)
                             }
                             $count++
                             for ($k = 2; $k -lt 10000; $k++)
@@ -100,13 +100,13 @@ Function Main()
                                     break
                                 }
                                 $element = $driver.FindElementByXpath($xpath_2)
-                                if ($element)
+                                if ($element.nodeId)
                                 {
-                                    $minor2_text = $driver.GetElementText($element)
+                                    $minor2_text = $driver.GetElementText($element.nodeId)
                                     write-host "$($major_list[$x]),$medium_text,$minor_text,$minor2_text"
-                                    $question_link = $driver.GetHrefFromAnchor($element)
+                                    $question_link = $driver.GetHrefFromAnchor($element.nodeId)
                                     $driver.Navigate($question_link)
-                                    #$driver.ClickElement($element)
+                                    #$driver.ClickElement($element.nodeId)
 
                                     <#
                                     if ($x -eq 3)
@@ -129,7 +129,7 @@ Function Main()
                                         $element = $driver.FindElementByXpath($xpath_3)
                                         if ($element)
                                         {
-                                            $question_text = $driver.GetElementText($element)
+                                            $question_text = $driver.GetElementText($element.nodeId)
                                             $file_path = '.\kihonjoho.csv'
                                             Out-File -Append -FilePath $file_path -InputObject "$($major_list[$x]),$medium_text,$minor_text,$minor2_text,$question_text" -encoding utf8
                                             $driver.Navigate($url_list[$x])
@@ -165,16 +165,16 @@ Function Main()
                                         $explanation_png_path = ".\_png\explanation\$explanation_png_file"
 
                                         $element = $driver.FindElementByXpath($question_xpath_3)
-                                        $driver.GetScreenshotObjectId($element, $question_png_path)
+                                        $driver.GetScreenshotObjectId($element.nodeId, $question_png_path)
 
                                         $element = $driver.FindElementByXpath($choices_xpath_3)
-                                        $driver.GetScreenshotObjectId($element, $choices_png_path)
+                                        $driver.GetScreenshotObjectId($element.nodeId, $choices_png_path)
 
                                         $element = $driver.FindElementByXpath($explanation_xpath_3)
-                                        $driver.GetScreenshotObjectId($element, $explanation_png_path)
+                                        $driver.GetScreenshotObjectId($element.nodeId, $explanation_png_path)
 
                                         $element = $driver.FindElementByXpath($answer_xpath_3)
-                                        $answer_text = $driver.GetElementText($element)
+                                        $answer_text = $driver.GetElementText($element.nodeId)
                                     }
 
                                     $file_path = '.\kihonjoho.csv'

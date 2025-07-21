@@ -806,14 +806,6 @@ class WebDriver
                 # バイト配列をファイルに書き込む
                 [System.IO.File]::WriteAllBytes($save_path, $image_data_bytes)
             }
-            <#
-            'element'
-            {
-                $this.SendWebSocketMessage('Page.captureScreenshot', @{ })
-                $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-                return $response_json.result.data
-            }
-            #>
             default
             {
                 Write-Error 'スクリーンショットのタイプを指定してください。'
@@ -839,12 +831,6 @@ class WebDriver
         }
 
         $content_box = $response.result.model.content
-        <#
-        $x = [Math]::Min($content_box[0], $content_box[2], $content_box[4], $content_box[6])
-        $y = [Math]::Min($content_box[1], $content_box[3], $content_box[5], $content_box[7])
-        $width = [Math]::Abs($content_box[2] - $content_box[0])
-        $height = [Math]::Abs($content_box[3] - $content_box[1])
-        #>
 
         # 座標をグループ化（x, yペアで分ける）
         $points = @()
@@ -867,6 +853,58 @@ class WebDriver
 
         # スクリーンショットをClip付きで取得
         $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; clip = @{ x = $x; y = $y; width = $width; height = $height; scale = 1 } })
+        $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+
+        # 受信したBase64エンコードされた画像データをBase64デコードして保存
+        $image_data_base64 = $response_json.result.data
+
+        # Base64エンコードされた画像データをバイト配列に変換
+        $image_data_bytes = [System.Convert]::FromBase64String($image_data_base64)
+
+        # バイト配列をファイルに書き込む
+        [System.IO.File]::WriteAllBytes($save_path, $image_data_bytes)
+    }
+
+    # スクリーンショットを取得（指定要素のスクリーンショット）
+    [void] GetScreenshotObjectIds([string[]]$object_ids, [string]$save_path)
+    {
+        $x_list = @()
+        $y_list = @()
+
+        foreach ($object_id in $object_ids)
+        {
+            # 要素を可視にする
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
+            $this.ReceiveWebSocketMessage() | Out-Null
+
+            #ボックスモデル取得
+            $this.SendWebSocketMessage('DOM.getBoxModel', @{ objectId = $object_id })
+            $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+
+            if (-not $response.result.model.content)
+            {
+                throw "ボックスモデルの取得に失敗しました（objectId: $object_id）"
+            }
+
+            $content_box = $response.result.model.content
+            for ($i = 0; $i -lt $content_box.Count; $i += 2)
+            {
+                $x_list += $content_box[$i]
+                $y_list += $content_box[$i + 1]
+            }
+        }
+
+        # 全要素の合成矩形を計算
+        $x_min = [Math]::Floor(($x_list | Measure-Object -Minimum).Minimum)
+        $y_min = [Math]::Floor(($y_list | Measure-Object -Minimum).Minimum)
+        $x_max = [Math]::Ceiling(($x_list | Measure-Object -Maximum).Maximum)
+        $y_max = [Math]::Ceiling(($y_list | Measure-Object -Maximum).Maximum)
+
+        $width  = $x_max - $x_min
+        $height = $y_max - $y_min
+
+        # スクリーンショット（clip付き）
+        $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; clip = @{ x = $x_min; y = $y_min; width = $width; height = $height; scale = 1 } })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
 
         # 受信したBase64エンコードされた画像データをBase64デコードして保存
