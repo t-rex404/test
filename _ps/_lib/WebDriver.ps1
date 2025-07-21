@@ -491,91 +491,91 @@ class WebDriver
 
 
     # 要素のテキストを取得
-    [string] GetElementText([hashtable]$element)
+    [string] GetElementText([string]$object_id)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function() { return this.textContent; }" })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { return this.textContent; }" })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
         return $response_json.result.result.value
     }
 
     # 要素にテキストを入力
-    [void] SetElementText([hashtable]$element, [string]$text)
+    [void] SetElementText([string]$object_id, [string]$text)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(value) { this.value = value; this.dispatchEvent(new Event('input')); }"; arguments = @(@{ value = $text }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(value) { this.value = value; this.dispatchEvent(new Event('input')); }"; arguments = @(@{ value = $text }) })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # 要素をクリック
-    [void] ClickElement([hashtable]$element)
+    [void] ClickElement([string]$object_id)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function() { this.click(); }" })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.click(); }" })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # 要素の属性を取得
-    [string] GetElementAttribute([hashtable]$element, [string]$attribute)
+    [string] GetElementAttribute([string]$object_id, [string]$attribute)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(name) { return this.getAttribute(name); }"; arguments = @(@{ value = $attribute }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(name) { return this.getAttribute(name); }"; arguments = @(@{ value = $attribute }) })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
         return $response_json.result.result.value
     }
 
     # 要素の属性を設定
-    [void] SetElementAttribute([hashtable]$element, [string]$attribute, [string]$value)
+    [void] SetElementAttribute([string]$object_id, [string]$attribute, [string]$value)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(name, value) { this.setAttribute(name, value); }"; arguments = @(@{ value = $attribute }, @{ value = $value }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(name, value) { this.setAttribute(name, value); }"; arguments = @(@{ value = $attribute }, @{ value = $value }) })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # アンカータグのhrefを取得
-    [string] GetHrefFromAnchor([hashtable]$element)
+    [string] GetHrefFromAnchor([string]$object_id)
     {
     $functionDeclaration = "function() { return this.href; }"
-    $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = $functionDeclaration; returnByValue = $true })
+    $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = $functionDeclaration; returnByValue = $true })
     $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
     return $response.result.result.value
     }
 
     # 要素のCSSプロパティを取得
-    [string] GetElementCssProperty([hashtable]$element, [string]$property)
+    [string] GetElementCssProperty([string]$object_id, [string]$property)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(name) { return window.getComputedStyle(this).getPropertyValue(name); }"; arguments = @(@{ value = $property }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(name) { return window.getComputedStyle(this).getPropertyValue(name); }"; arguments = @(@{ value = $property }) })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
         return $response_json.result.result.value
     }
 
     # 要素のCSSプロパティを設定
-    [void] SetElementCssProperty([hashtable]$element, [string]$property, [string]$value)
+    [void] SetElementCssProperty([string]$object_id, [string]$property, [string]$value)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(name, value) { this.style.setProperty(name, value); }"; arguments = @(@{ value = $property }, @{ value = $value }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(name, value) { this.style.setProperty(name, value); }"; arguments = @(@{ value = $property }, @{ value = $value }) })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # セレクトタグのオプションをインデックス番号から選択
-    [void] SelectOptionByIndex([hashtable]$element, [int]$index)
+    [void] SelectOptionByIndex([string]$object_id, [int]$index)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(index) { this.selectedIndex = index; this.dispatchEvent(new Event('change')); }"; arguments = @(@{ value = $index }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(index) { this.selectedIndex = index; this.dispatchEvent(new Event('change')); }"; arguments = @(@{ value = $index }) })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # セレクトタグのオプションをテキストを指定して選択
-    [void] SelectOptionByText([hashtable]$element, [string]$text)
+    [void] SelectOptionByText([string]$object_id, [string]$text)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function(text) { for (let option of this.options) { if (option.text === text) { option.selected = true; this.dispatchEvent(new Event('change')); break; } } }"; arguments = @(@{ value = $text }) })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(text) { for (let option of this.options) { if (option.text === text) { option.selected = true; this.dispatchEvent(new Event('change')); break; } } }"; arguments = @(@{ value = $text }) })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # セレクトタグを未選択にする
-    [void] DeselectAllOptions([hashtable]$element)
+    [void] DeselectAllOptions([string]$object_id)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function() { for (let option of this.options) { option.selected = false; } this.dispatchEvent(new Event('change')); }" })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { for (let option of this.options) { option.selected = false; } this.dispatchEvent(new Event('change')); }" })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
     # 要素に入力された値をクリア
-    [void] ClearElement([hashtable]$element)
+    [void] ClearElement([string]$object_id)
     {
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function() { this.value = ''; }" })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.value = ''; }" })
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
@@ -823,14 +823,14 @@ class WebDriver
     }
 
     # スクリーンショットを取得（指定要素のスクリーンショット）
-    [void] GetScreenshotObjectId([hashtable]$element, [string]$save_path)
+    [void] GetScreenshotObjectId([string]$object_id, [string]$save_path)
     {
         # スクロールして要素を可視化（必要に応じて）
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $element.nodeId; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
+        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
         $this.ReceiveWebSocketMessage() | Out-Null
 
         # 要素の位置とサイズを取得
-        $this.SendWebSocketMessage('DOM.getBoxModel', @{ objectId = $element.nodeId })
+        $this.SendWebSocketMessage('DOM.getBoxModel', @{ objectId = $object_id })
         $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
 
         if (-not $response.result)
