@@ -230,6 +230,25 @@ class WebDriver
         $this.ReceiveWebSocketMessage() | Out-Null
     }
 
+    # 広告の読み込み待機
+    [void] WaitForAdToLoad()
+    {
+        $timeout = [datetime]::Now.AddSeconds(60)
+        while ([datetime]::Now -lt $timeout)
+        {
+            $this.SendWebSocketMessage('Runtime.evaluate', @{ expression = "document.querySelector('.ad, .adsbygoogle, .banner, .popup') !== null"; returnByValue = $true })
+            $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            $loaded = $response_json.result.result.value
+            if ($loaded -eq $true)
+            {
+                #Write-Host "広告が読み込まれました。"
+                return
+            }
+            Start-Sleep -Milliseconds 500
+        }
+        throw "広告の読み込みを待機中にタイムアウトしました。"
+    }
+
     # ウィンドウを閉じる
     [void] CloseWindow()
     {
@@ -817,9 +836,9 @@ class WebDriver
     # スクリーンショットを取得（指定要素のスクリーンショット）
     [void] GetScreenshotObjectId([string]$object_id, [string]$save_path)
     {
-        # スクロールして要素を可視化（必要に応じて）
-        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
-        $this.ReceiveWebSocketMessage() | Out-Null
+        ## スクロールして要素を可視化（必要に応じて）
+        #$this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
+        #$this.ReceiveWebSocketMessage() | Out-Null
 
         # 要素の位置とサイズを取得
         $this.SendWebSocketMessage('DOM.getBoxModel', @{ objectId = $object_id })
@@ -843,16 +862,16 @@ class WebDriver
         $x_list = $points | ForEach-Object { $_[0] }
         $y_list = $points | ForEach-Object { $_[1] }
 
-        $x = [Math]::Floor(($x_list | Measure-Object -Minimum).Minimum)
-        $y = [Math]::Floor(($y_list | Measure-Object -Minimum).Minimum)
+        $x_min = [Math]::Floor(($x_list | Measure-Object -Minimum).Minimum)
+        $y_min = [Math]::Floor(($y_list | Measure-Object -Minimum).Minimum)
         $x_max = [Math]::Ceiling(($x_list | Measure-Object -Maximum).Maximum)
         $y_max = [Math]::Ceiling(($y_list | Measure-Object -Maximum).Maximum)
 
-        $width  = $x_max - $x
-        $height = $y_max - $y
+        $width  = $x_max - $x_min
+        $height = $y_max - $y_min
 
         # スクリーンショットをClip付きで取得
-        $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; clip = @{ x = $x; y = $y; width = $width; height = $height; scale = 1 } })
+        $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; clip = @{ x = $x_min; y = $y_min; width = $width; height = $height; scale = 1 }; captureBeyondViewport = $true })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
 
         # 受信したBase64エンコードされた画像データをBase64デコードして保存
@@ -873,11 +892,11 @@ class WebDriver
 
         foreach ($object_id in $object_ids)
         {
-            # 要素を可視にする
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
-            $this.ReceiveWebSocketMessage() | Out-Null
+            ## スクロールして要素を可視化（必要に応じて）
+            #$this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.scrollIntoViewIfNeeded(true); }" })
+            #$this.ReceiveWebSocketMessage() | Out-Null
 
-            #ボックスモデル取得
+            # 要素の位置とサイズを取得
             $this.SendWebSocketMessage('DOM.getBoxModel', @{ objectId = $object_id })
             $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
 
@@ -904,7 +923,7 @@ class WebDriver
         $height = $y_max - $y_min
 
         # スクリーンショット（clip付き）
-        $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; clip = @{ x = $x_min; y = $y_min; width = $width; height = $height; scale = 1 } })
+        $this.SendWebSocketMessage('Page.captureScreenshot', @{ format = 'png'; quality = 100; clip = @{ x = $x_min; y = $y_min; width = $width; height = $height; scale = 1 }; captureBeyondViewport = $true })
         $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
 
         # 受信したBase64エンコードされた画像データをBase64デコードして保存

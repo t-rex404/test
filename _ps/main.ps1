@@ -34,6 +34,7 @@ Function Main()
             #$driver = [EdgeDriver]::new
             $driver = New-Object -TypeName 'EdgeDriver'
 
+            $driver.MaximizeWindow(1)
             for ($x = 0; $x -lt $url_list.count; $x++)
             {
                 #write-host 'Navigate'
@@ -106,6 +107,7 @@ Function Main()
                                     write-host "$($major_list[$x]),$medium_text,$minor_text,$minor2_text"
                                     $question_link = $driver.GetHrefFromAnchor($element.nodeId)
                                     $driver.Navigate($question_link)
+                                    $driver.WaitForAdToLoad()
                                     #$driver.ClickElement($element.nodeId)
 
                                     <#
@@ -178,7 +180,7 @@ Function Main()
                                     }
 
                                     $file_path = '.\kihonjoho.csv'
-                                    Out-File -Append -FilePath $file_path -InputObject "$($major_list[$x]),$medium_text,$minor_text,$minor2_text,$question_png_file,$choices_png_file,$answer_text,$explanation_png_file" -encoding utf8
+                                    Out-File -Append -FilePath $file_path -InputObject "$($major_list[$x]),$medium_text,$minor_text,$minor2_text,$question_link,$question_png_file,$choices_png_file,$answer_text,$explanation_png_file" -encoding utf8
                                     $driver.Navigate($url_list[$x])
                                 }
                             }
