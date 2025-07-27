@@ -1,0 +1,21 @@
+[2024/01/15 14:34:15], ERROR_CODE:TEST001, ERROR_MESSAGE:テスト用のエラーメッセージ
+詳細情報:
+- エラーコード: TEST001
+- エラーメッセージ: テスト用のエラーメッセージ
+- タイムスタンプ: 2024/01/15 14:34:15
+- PowerShellバージョン: 5.1.19041.3693
+- OS: Microsoft Windows 10.0.19045
+- 実行ユーザー: Administrator
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: TestModule
+
+[2024/01/15 14:34:16], ERROR_CODE:COMMON001, ERROR_MESSAGE:共通エラーハンドリングテスト
+詳細情報:
+- エラーコード: COMMON001
+- エラーメッセージ: 共通エラーハンドリングテスト
+- タイムスタンプ: 2024/01/15 14:34:16
+- PowerShellバージョン: 5.1.19041.3693
+- OS: Microsoft Windows 10.0.19045
+- 実行ユーザー: Administrator
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: Common 

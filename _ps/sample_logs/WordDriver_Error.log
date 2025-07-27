@@ -1,0 +1,35 @@
+[2024/01/15 14:33:25], ERROR_CODE:4001, ERROR_MESSAGE:WordDriver初期化エラー
+詳細情報:
+- エラーコード: 4001
+- エラーメッセージ: WordDriver初期化エラー
+- エラータイトル: WordDriver初期化エラー
+- タイムスタンプ: 2024/01/15 14:33:25
+- PowerShellバージョン: 5.1.19041.3693
+- OS: Microsoft Windows 10.0.19045
+- 実行ユーザー: Administrator
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WordDriver
+
+[2024/01/15 14:33:26], ERROR_CODE:4003, ERROR_MESSAGE:Wordドキュメント保存エラー
+詳細情報:
+- エラーコード: 4003
+- エラーメッセージ: Wordドキュメント保存エラー
+- エラータイトル: Wordドキュメント保存エラー
+- タイムスタンプ: 2024/01/15 14:33:26
+- PowerShellバージョン: 5.1.19041.3693
+- OS: Microsoft Windows 10.0.19045
+- 実行ユーザー: Administrator
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WordDriver
+
+[2024/01/15 14:33:27], ERROR_CODE:4008, ERROR_MESSAGE:Word画像追加エラー
+詳細情報:
+- エラーコード: 4008
+- エラーメッセージ: Word画像追加エラー
+- エラータイトル: Word画像追加エラー
+- タイムスタンプ: 2024/01/15 14:33:27
+- PowerShellバージョン: 5.1.19041.3693
+- OS: Microsoft Windows 10.0.19045
+- 実行ユーザー: Administrator
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WordDriver 
