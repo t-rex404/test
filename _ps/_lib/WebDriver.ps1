@@ -2734,11 +2734,7 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function(keys) { this.focus(); this.value = keys; this.dispatchEvent(new Event('input')); this.dispatchEvent(new Event('change')); }"; 
-                arguments = @(@{ value = $keys }) 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(keys) { this.focus(); this.value = keys; this.dispatchEvent(new Event('input')); this.dispatchEvent(new Event('change')); }"; arguments = @(@{ value = $keys }) })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2809,11 +2805,7 @@ class WebDriver
 
             $key_code = $key_map[$special_key]
             
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function(key) { this.focus(); this.dispatchEvent(new KeyboardEvent('keydown', {key: key})); this.dispatchEvent(new KeyboardEvent('keyup', {key: key})); }"; 
-                arguments = @(@{ value = $key_code }) 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(key) { this.focus(); this.dispatchEvent(new KeyboardEvent('keydown', {key: key})); this.dispatchEvent(new KeyboardEvent('keyup', {key: key})); }"; arguments = @(@{ value = $key_code }) })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2848,10 +2840,7 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function() { this.dispatchEvent(new MouseEvent('mouseenter')); this.dispatchEvent(new MouseEvent('mouseover')); }" 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.dispatchEvent(new MouseEvent('mouseenter')); this.dispatchEvent(new MouseEvent('mouseover')); }" })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2882,10 +2871,7 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function() { this.dispatchEvent(new MouseEvent('dblclick')); }" 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.dispatchEvent(new MouseEvent('dblclick')); }" })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2916,10 +2902,7 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function() { this.dispatchEvent(new MouseEvent('contextmenu')); }" 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.dispatchEvent(new MouseEvent('contextmenu')); }" })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2954,11 +2937,7 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function(checked) { this.checked = checked; this.dispatchEvent(new Event('change')); }"; 
-                arguments = @(@{ value = $checked }) 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function(checked) { this.checked = checked; this.dispatchEvent(new Event('change')); }"; arguments = @(@{ value = $checked }) })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2989,10 +2968,7 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
-                objectId = $object_id; 
-                functionDeclaration = "function() { this.checked = true; this.dispatchEvent(new Event('change')); }" 
-            })
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ objectId = $object_id; functionDeclaration = "function() { this.checked = true; this.dispatchEvent(new Event('change')); }" })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)

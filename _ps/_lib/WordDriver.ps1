@@ -133,13 +133,18 @@ class WordDriver
     }
 
     # 見出しを追加
-    [void] AddHeading([string]$text, [int]$level = 1)
+    [void] AddHeading([string]$text, [int]$level)
     {
         try
         {
             if ([string]::IsNullOrEmpty($text))
             {
                 throw "見出しテキストが指定されていません。"
+            }
+
+            if ($level -eq $null)
+            {
+                $level = 1
             }
 
             if ($level -lt 1 -or $level -gt 9)
@@ -195,13 +200,18 @@ class WordDriver
     }
 
     # 表を追加
-    [void] AddTable([object[,]]$data, [string]$title = "")
+    [void] AddTable([object[,]]$data, [string]$title)
     {
         try
         {
             if (-not $data)
             {
                 throw "テーブルデータが指定されていません。"
+            }
+
+            if ([string]::IsNullOrEmpty($title))
+            {
+                throw "テーブルタイトルが指定されていません。"
             }
 
             if (-not $this.is_initialized)
@@ -331,13 +341,18 @@ class WordDriver
     }
 
     # フォントを設定
-    [void] SetFont([string]$font_name, [int]$font_size = 12)
+    [void] SetFont([string]$font_name, [int]$font_size)
     {
         try
         {
             if ([string]::IsNullOrEmpty($font_name))
             {
                 throw "フォント名が指定されていません。"
+            }
+
+            if ($font_size -eq $null)
+            {
+                $font_size = 10.5
             }
 
             if ($font_size -le 0)
