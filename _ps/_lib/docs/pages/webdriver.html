@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebDriver.ps1 - PowerShell _lib ライブラリ ドキュメント</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>WebDriver.ps1</h1>
+            <p>Webブラウザの自動操作を提供する基本クラス</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="nav-breadcrumb">
+            <a href="../index.html">ホーム</a> &gt; WebDriver.ps1
+        </div>
+
+        <!-- 戻るボタン -->
+        <a href="../index.html" class="back-button">← ホームに戻る</a>
+
+        <!-- 検索機能 -->
+        <div class="search-container" id="searchContainer">
+            <input type="text" id="searchBox" class="search-box" placeholder="検索したい内容を入力してください... (Ctrl+K でフォーカス)">
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- 概要 -->
+        <div class="detail-page">
+            <h2>概要</h2>
+            <p>WebDriverクラスは、Webブラウザの自動操作を提供する基本クラスです。Chrome、Edgeブラウザの制御、要素検索、操作機能を統合的に管理します。</p>
+            <p style="margin: 10px 0; font-size: 12px; color: #999; cursor: pointer; text-align: center; border: 1px dashed #ccc; padding: 5px; border-radius: 3px;" onclick="window.open('../pages/invader-game.html', '_blank')" title="隠しコマンド">🔍 詳細なデバッグ情報を確認</p>
+            
+            <div class="info-box">
+                <h3>主要機能</h3>
+                <ul>
+                    <li><strong>ブラウザ制御:</strong> ブラウザの起動、終了、プロセス管理</li>
+                    <li><strong>WebSocket通信:</strong> ブラウザとの双方向通信</li>
+                    <li><strong>要素検索:</strong> CSS、XPath、JavaScriptによる要素検索</li>
+                    <li><strong>要素操作:</strong> クリック、テキスト入力、属性操作</li>
+                    <li><strong>ナビゲーション:</strong> ページ遷移、履歴操作</li>
+                    <li><strong>待機処理:</strong> 要素の表示待機、条件待機</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 初期化とセットアップ -->
+        <div class="detail-page">
+            <h2>初期化とセットアップ</h2>
+            
+            <h3>コンストラクタ</h3>
+            <div class="code-block">
+                <pre># WebDriverの初期化
+$webDriver = [WebDriver]::new()</pre>
+            </div>
+
+            <h3>StartBrowser メソッド</h3>
+            <div class="code-block">
+                <pre># ブラウザを起動
+$webDriver.StartBrowser($browser_exe_path, $browser_user_data_dir)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$browser_exe_path</code>: ブラウザの実行ファイルパス</li>
+                <li><code>$browser_user_data_dir</code>: ユーザーデータディレクトリ</li>
+            </ul>
+            <p><strong>機能:</strong> ブラウザをデバッグモードで起動し、プロセスIDを保存します。</p>
+
+            <h3>GetTabInfomation メソッド</h3>
+            <div class="code-block">
+                <pre># タブ情報を取得
+$tabInfo = $webDriver.GetTabInfomation()</pre>
+            </div>
+            <p><strong>戻り値:</strong> タブ情報オブジェクト（webSocketDebuggerUrl、id、title等）</p>
+            <p><strong>機能:</strong> about:blankタブの情報を取得します。</p>
+
+            <h3>GetWebSocketInfomation メソッド</h3>
+            <div class="code-block">
+                <pre># WebSocket接続を確立
+$webDriver.GetWebSocketInfomation($web_socket_debugger_url)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$web_socket_debugger_url</code>: WebSocketデバッガーURL</li>
+            </ul>
+            <p><strong>機能:</strong> ブラウザとのWebSocket接続を確立します。</p>
+
+            <h3>SendWebSocketMessage メソッド</h3>
+            <div class="code-block">
+                <pre># WebSocketメッセージを送信
+$webDriver.SendWebSocketMessage($method, $params)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$method</code>: 実行するメソッド名</li>
+                <li><code>$params</code>: パラメータのハッシュテーブル</li>
+            </ul>
+
+            <h3>ReceiveWebSocketMessage メソッド</h3>
+            <div class="code-block">
+                <pre># WebSocketメッセージを受信
+$response = $webDriver.ReceiveWebSocketMessage()</pre>
+            </div>
+            <p><strong>戻り値:</strong> JSON形式のレスポンス文字列</p>
+            <p><strong>機能:</strong> ブラウザからのレスポンスを受信します。</p>
+        </div>
+
+        <!-- ナビゲーション機能 -->
+        <div class="detail-page">
+            <h2>ナビゲーション機能</h2>
+            
+            <h3>Navigate メソッド</h3>
+            <div class="code-block">
+                <pre># 指定したURLに移動
+$webDriver.Navigate($url)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$url</code>: 移動先のURL</li>
+            </ul>
+
+            <h3>WaitForAdToLoad メソッド</h3>
+            <div class="code-block">
+                <pre># 広告読み込み完了まで待機
+$webDriver.WaitForAdToLoad()</pre>
+            </div>
+            <p><strong>機能:</strong> 広告の読み込みが完了するまで待機します。</p>
+
+            <h3>GoBack メソッド</h3>
+            <div class="code-block">
+                <pre># ブラウザ履歴を戻る
+$webDriver.GoBack()</pre>
+            </div>
+
+            <h3>GoForward メソッド</h3>
+            <div class="code-block">
+                <pre># ブラウザ履歴を進む
+$webDriver.GoForward()</pre>
+            </div>
+
+            <h3>Refresh メソッド</h3>
+            <div class="code-block">
+                <pre># ページを更新
+$webDriver.Refresh()</pre>
+            </div>
+
+            <h3>WaitForPageLoad メソッド</h3>
+            <div class="code-block">
+                <pre># ページロード完了まで待機
+$webDriver.WaitForPageLoad($timeout_seconds)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$timeout_seconds</code>: タイムアウト秒数（デフォルト: 60）</li>
+            </ul>
+        </div>
+
+        <!-- ウィンドウ・タブ操作 -->
+        <div class="detail-page">
+            <h2>ウィンドウ・タブ操作</h2>
+            
+            <h3>CloseWindow メソッド</h3>
+            <div class="code-block">
+                <pre># ウィンドウを閉じる
+$webDriver.CloseWindow()</pre>
+            </div>
+
+            <h3>DiscoverTargets メソッド</h3>
+            <div class="code-block">
+                <pre># ターゲットを発見
+$targets = $webDriver.DiscoverTargets()</pre>
+            </div>
+            <p><strong>戻り値:</strong> ターゲット情報の文字列</p>
+
+            <h3>GetAvailableTabs メソッド</h3>
+            <div class="code-block">
+                <pre># 利用可能なタブを取得
+$tabs = $webDriver.GetAvailableTabs()</pre>
+            </div>
+            <p><strong>戻り値:</strong> タブ情報のハッシュテーブル</p>
+
+            <h3>SetActiveTab メソッド</h3>
+            <div class="code-block">
+                <pre># タブをアクティブにする
+$webDriver.SetActiveTab($tab_id)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$tab_id</code>: タブID</li>
+            </ul>
+
+            <h3>CloseTab メソッド</h3>
+            <div class="code-block">
+                <pre># タブを閉じる
+$webDriver.CloseTab($tab_id)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$tab_id</code>: タブID</li>
+            </ul>
+
+            <h3>EnablePageEvents メソッド</h3>
+            <div class="code-block">
+                <pre># ページイベントを有効化
+$webDriver.EnablePageEvents()</pre>
+            </div>
+
+            <h3>ウィンドウ操作メソッド</h3>
+            <div class="code-block">
+                <pre># ウィンドウサイズ変更
+$webDriver.ResizeWindow($width, $height, $windowHandle)
+
+# ウィンドウを通常サイズに
+$webDriver.NormalWindow($windowHandle)
+
+# ウィンドウを最大化
+$webDriver.MaximizeWindow($windowHandle)
+
+# ウィンドウを最小化
+$webDriver.MinimizeWindow($windowHandle)
+
+# ウィンドウをフルスクリーンに
+$webDriver.FullscreenWindow($windowHandle)
+
+# ウィンドウを移動
+$webDriver.MoveWindow($x, $y, $windowHandle)</pre>
+            </div>
+
+            <h3>ウィンドウ情報取得メソッド</h3>
+            <div class="code-block">
+                <pre># ウィンドウハンドルを取得
+$handle = $webDriver.GetWindowHandle()
+
+# 複数ウィンドウハンドルを取得
+$handles = $webDriver.GetWindowHandles()
+
+# ウィンドウサイズを取得
+$size = $webDriver.GetWindowSize()</pre>
+            </div>
+        </div>
+
+        <!-- 要素検索機能 -->
+        <div class="detail-page">
+            <h2>要素検索機能</h2>
+            
+            <h3>FindElement メソッド</h3>
+            <div class="code-block">
+                <pre># CSSセレクタで要素を検索
+$element = $webDriver.FindElement($selector)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$selector</code>: CSSセレクタ</li>
+            </ul>
+            <p><strong>戻り値:</strong> 要素情報のハッシュテーブル</p>
+
+            <h3>FindElements メソッド</h3>
+            <div class="code-block">
+                <pre># CSSセレクタで複数要素を検索
+$elements = $webDriver.FindElements($selector)</pre>
+            </div>
+            <p><strong>戻り値:</strong> 要素情報の配列</p>
+
+            <h3>FindElementGeneric メソッド</h3>
+            <div class="code-block">
+                <pre># JavaScriptで要素を検索
+$element = $webDriver.FindElementGeneric($expression, $query_type, $element)</pre>
+            </div>
+
+            <h3>FindElementsGeneric メソッド</h3>
+            <div class="code-block">
+                <pre># JavaScriptで複数要素を検索
+$elements = $webDriver.FindElementsGeneric($expression, $query_type, $element)</pre>
+            </div>
+
+            <h3>特定セレクタによる検索</h3>
+            <div class="code-block">
+                <pre># XPathで要素を検索
+$elements = $webDriver.FindElementsByXPath($xpath)
+
+# クラス名で要素を検索
+$elements = $webDriver.FindElementsByClassName($class_name)
+
+# 名前で要素を検索
+$elements = $webDriver.FindElementsByName($name)
+
+# タグ名で要素を検索
+$elements = $webDriver.FindElementsByTagName($tag_name)</pre>
+            </div>
+
+            <h3>要素存在確認メソッド</h3>
+            <div class="code-block">
+                <pre># JavaScriptで要素存在確認
+$exists = $webDriver.IsExistsElementGeneric($expression, $query_type, $element)
+
+# XPathで要素存在確認
+$exists = $webDriver.IsExistsElementByXPath($xpath)
+
+# クラス名で要素存在確認
+$exists = $webDriver.IsExistsElementByClassName($class_name, $index)
+
+# IDで要素存在確認
+$exists = $webDriver.IsExistsElementById($id)
+
+# 名前で要素存在確認
+$exists = $webDriver.IsExistsElementByName($name, $index)
+
+# タグ名で要素存在確認
+$exists = $webDriver.IsExistsElementByTagName($tag_name, $index)</pre>
+            </div>
+
+            <h3>要素待機メソッド</h3>
+            <div class="code-block">
+                <pre># 要素の表示を待機
+$webDriver.WaitForElementVisible($selector, $timeout_seconds)
+
+# 要素のクリック可能性を待機
+$webDriver.WaitForElementClickable($selector, $timeout_seconds)
+
+# カスタム条件を待機
+$webDriver.WaitForCondition($javascript_condition, $timeout_seconds)</pre>
+            </div>
+        </div>
+
+        <!-- 要素操作機能 -->
+        <div class="detail-page">
+            <h2>要素操作機能</h2>
+            
+            <h3>テキスト操作</h3>
+            <div class="code-block">
+                <pre># 要素のテキストを取得
+$text = $webDriver.GetElementText($object_id)
+
+# 要素にテキストを設定
+$webDriver.SetElementText($object_id, $text)
+
+# 要素をクリア
+$webDriver.ClearElement($object_id)</pre>
+            </div>
+
+            <h3>マウス操作</h3>
+            <div class="code-block">
+                <pre># 要素をクリック
+$webDriver.ClickElement($object_id)
+
+# ダブルクリック
+$webDriver.DoubleClick($object_id)
+
+# 右クリック
+$webDriver.RightClick($object_id)
+
+# マウスホバー
+$webDriver.MouseHover($object_id)</pre>
+            </div>
+
+            <h3>キーボード操作</h3>
+            <div class="code-block">
+                <pre># キーを送信
+$webDriver.SendKeys($object_id, $keys)
+
+# 特殊キーを送信
+$webDriver.SendSpecialKey($object_id, $special_key)</pre>
+            </div>
+
+            <h3>属性・CSS操作</h3>
+            <div class="code-block">
+                <pre># 要素の属性を取得
+$attribute = $webDriver.GetElementAttribute($object_id, $attribute)
+
+# 要素の属性を設定
+$webDriver.SetElementAttribute($object_id, $attribute, $value)
+
+# href属性を取得
+$href = $webDriver.GetHrefFromAnchor($object_id)
+
+# CSSプロパティを取得
+$cssValue = $webDriver.GetElementCssProperty($object_id, $property)
+
+# CSSプロパティを設定
+$webDriver.SetElementCssProperty($object_id, $property, $value)</pre>
+            </div>
+
+            <h3>フォーム操作</h3>
+            <div class="code-block">
+                <pre># オプションをインデックスで選択
+$webDriver.SelectOptionByIndex($object_id, $index)
+
+# オプションをテキストで選択
+$webDriver.SelectOptionByText($object_id, $text)
+
+# 全オプションを未選択
+$webDriver.DeselectAllOptions($object_id)
+
+# チェックボックスを設定
+$webDriver.SetCheckbox($object_id, $checked)
+
+# ラジオボタンを選択
+$webDriver.SelectRadioButton($object_id)
+
+# ファイルをアップロード
+$webDriver.UploadFile($object_id, $file_path)</pre>
+            </div>
+        </div>
+
+        <!-- 情報取得機能 -->
+        <div class="detail-page">
+            <h2>情報取得機能</h2>
+            
+            <h3>ページ情報取得</h3>
+            <div class="code-block">
+                <pre># 現在のURLを取得
+$url = $webDriver.GetUrl()
+
+# ページタイトルを取得
+$title = $webDriver.GetTitle()
+
+# ページのソースコードを取得
+$source = $webDriver.GetSourceCode()</pre>
+            </div>
+        </div>
+
+        <!-- スクリーンショット機能 -->
+        <div class="detail-page">
+            <h2>スクリーンショット機能</h2>
+            
+            <h3>GetScreenshot メソッド</h3>
+            <div class="code-block">
+                <pre># スクリーンショットを取得
+$webDriver.GetScreenshot($type, $save_path)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$type</code>: スクリーンショットタイプ</li>
+                <li><code>$save_path</code>: 保存パス</li>
+            </ul>
+
+            <h3>GetScreenshotObjectId メソッド</h3>
+            <div class="code-block">
+                <pre># 特定要素のスクリーンショットを取得
+$webDriver.GetScreenshotObjectId($object_id, $save_path)</pre>
+            </div>
+
+            <h3>GetScreenshotObjectIds メソッド</h3>
+            <div class="code-block">
+                <pre># 複数要素のスクリーンショットを取得
+$webDriver.GetScreenshotObjectIds($object_ids, $save_path)</pre>
+            </div>
+        </div>
+
+        <!-- JavaScript実行機能 -->
+        <div class="detail-page">
+            <h2>JavaScript実行機能</h2>
+            
+            <h3>ExecuteScript メソッド</h3>
+            <div class="code-block">
+                <pre># JavaScriptを実行
+$result = $webDriver.ExecuteScript($script)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$script</code>: 実行するJavaScriptコード</li>
+            </ul>
+            <p><strong>戻り値:</strong> 実行結果オブジェクト</p>
+
+            <h3>ExecuteScriptAsync メソッド</h3>
+            <div class="code-block">
+                <pre># JavaScriptを非同期実行
+$webDriver.ExecuteScriptAsync($script)</pre>
+            </div>
+        </div>
+
+        <!-- ストレージ操作機能 -->
+        <div class="detail-page">
+            <h2>ストレージ操作機能</h2>
+            
+            <h3>クッキー操作</h3>
+            <div class="code-block">
+                <pre># クッキーを取得
+$cookie = $webDriver.GetCookie($name)
+
+# クッキーを設定
+$webDriver.SetCookie($name, $value, $domain, $path, $expires_days)
+
+# クッキーを削除
+$webDriver.DeleteCookie($name)
+
+# 全クッキーを削除
+$webDriver.ClearAllCookies()</pre>
+            </div>
+
+            <h3>ローカルストレージ操作</h3>
+            <div class="code-block">
+                <pre># ローカルストレージから取得
+$value = $webDriver.GetLocalStorage($key)
+
+# ローカルストレージに設定
+$webDriver.SetLocalStorage($key, $value)
+
+# ローカルストレージから削除
+$webDriver.RemoveLocalStorage($key)
+
+# ローカルストレージをクリア
+$webDriver.ClearLocalStorage()</pre>
+            </div>
+        </div>
+
+        <!-- リソース管理 -->
+        <div class="detail-page">
+            <h2>リソース管理</h2>
+            
+            <h3>Dispose メソッド</h3>
+            <div class="code-block">
+                <pre># リソースを解放
+$webDriver.Dispose()</pre>
+            </div>
+            <p><strong>機能:</strong> WebSocket接続を閉じ、ブラウザプロセスを終了します。</p>
+
+            <div class="warning-box">
+                <h3>重要</h3>
+                <p>WebDriverオブジェクトを使用後は必ずDispose()メソッドを呼び出してリソースを解放してください。</p>
+            </div>
+        </div>
+
+        <!-- エラーハンドリング -->
+        <div class="detail-page">
+            <h2>エラーハンドリング</h2>
+            
+            <p>WebDriverクラスでは、体系的なエラーコードを使用してエラーを管理しています。</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード範囲</th>
+                            <th>カテゴリ</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1001-1010</td>
+                            <td>初期化・接続関連</td>
+                            <td>WebDriver初期化、ブラウザ起動、WebSocket接続に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1011-1020</td>
+                            <td>ナビゲーション関連</td>
+                            <td>ページ遷移、履歴操作、待機処理に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1021-1040</td>
+                            <td>要素検索関連</td>
+                            <td>要素検索、存在確認、待機処理に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1051-1070</td>
+                            <td>要素操作関連</td>
+                            <td>テキスト操作、マウス操作、キーボード操作、フォーム操作に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1071-1080</td>
+                            <td>ウィンドウ・タブ操作</td>
+                            <td>ウィンドウ操作、タブ操作に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1091-1100</td>
+                            <td>情報取得関連</td>
+                            <td>URL、タイトル、ソースコード取得に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1101-1110</td>
+                            <td>スクリーンショット関連</td>
+                            <td>スクリーンショット取得に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1111-1120</td>
+                            <td>JavaScript実行関連</td>
+                            <td>JavaScript実行に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1121-1130</td>
+                            <td>ストレージ操作関連</td>
+                            <td>クッキー、ローカルストレージ操作に関するエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 使用例 -->
+        <div class="detail-page">
+            <h2>完全な使用例</h2>
+            
+            <div class="code-block">
+                <pre># WebDriverの初期化
+$webDriver = [WebDriver]::new()
+
+try {
+    # ブラウザを起動
+    $webDriver.StartBrowser("C:\Program Files\Google\Chrome\Application\chrome.exe", "C:\temp\chrome_profile")
+    
+    # タブ情報を取得
+    $tabInfo = $webDriver.GetTabInfomation()
+    
+    # WebSocket接続を確立
+    $webDriver.GetWebSocketInfomation($tabInfo.webSocketDebuggerUrl)
+    
+    # タブをアクティブにする
+    $webDriver.SetActiveTab($tabInfo.id)
+    
+    # ページイベントを有効化
+    $webDriver.EnablePageEvents()
+    
+    # ページに移動
+    $webDriver.Navigate("https://example.com")
+    
+    # ページロードを待機
+    $webDriver.WaitForPageLoad()
+    
+    # 要素を検索
+    $element = $webDriver.FindElement("#search-input")
+    
+    # テキストを入力
+    $webDriver.SetElementText($element.objectId, "検索キーワード")
+    
+    # 要素をクリック
+    $webDriver.ClickElement($element.objectId)
+    
+    # スクリーンショットを取得
+    $webDriver.GetScreenshot("png", "C:\temp\screenshot.png")
+    
+    Write-Host "操作が完了しました。"
+}
+catch {
+    Write-Error "エラーが発生しました: $($_.Exception.Message)"
+}
+finally {
+    # リソースを解放
+    $webDriver.Dispose()
+}</pre>
+            </div>
+        </div>
+
+        <!-- トラブルシューティング -->
+        <div class="detail-page">
+            <h2>トラブルシューティング</h2>
+            
+            <div class="info-box">
+                <h3>よくある問題と解決方法</h3>
+                
+                <h4>1. ブラウザが起動しない</h4>
+                <ul>
+                    <li>ブラウザの実行ファイルパスが正しいか確認</li>
+                    <li>ブラウザがインストールされているか確認</li>
+                    <li>ポート9222が使用可能か確認</li>
+                </ul>
+                
+                <h4>2. WebSocket接続エラー</h4>
+                <ul>
+                    <li>ブラウザがデバッグモードで起動しているか確認</li>
+                    <li>ファイアウォールの設定を確認</li>
+                    <li>ネットワーク接続を確認</li>
+                </ul>
+                
+                <h4>3. 要素が見つからない</h4>
+                <ul>
+                    <li>ページの読み込み完了を待機</li>
+                    <li>セレクタが正しいか確認</li>
+                    <li>要素が動的に生成される場合は待機処理を追加</li>
+                </ul>
+                
+                <h4>4. メモリリーク</h4>
+                <ul>
+                    <li>必ずDispose()メソッドを呼び出す</li>
+                    <li>try-finallyブロックを使用</li>
+                    <li>長時間実行時は定期的にリソースを解放</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- パフォーマンス最適化 -->
+        <div class="detail-page">
+            <h2>パフォーマンス最適化</h2>
+            
+            <div class="info-box">
+                <h3>最適化のポイント</h3>
+                
+                <h4>1. 要素検索の最適化</h4>
+                <ul>
+                    <li>IDセレクタを優先使用（最も高速）</li>
+                    <li>CSSセレクタを適切に使用</li>
+                    <li>XPathは必要最小限に</li>
+                </ul>
+                
+                <h4>2. 待機処理の最適化</h4>
+                <ul>
+                    <li>固定のSleepは避け、条件待機を使用</li>
+                    <li>適切なタイムアウト値を設定</li>
+                    <li>不要な待機を削除</li>
+                </ul>
+                
+                <h4>3. リソース管理</h4>
+                <ul>
+                    <li>使用後は即座にDispose()を呼び出し</li>
+                    <li>複数のブラウザインスタンスは必要最小限に</li>
+                    <li>メモリ使用量を監視</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/search.js"></script>
+</body>
+</html> 

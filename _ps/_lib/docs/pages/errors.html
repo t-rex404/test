@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エラー管理モジュール - PowerShell _lib ライブラリ ドキュメント</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>エラー管理モジュール</h1>
+            <p>各ドライバー専用のエラー管理モジュール群</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="nav-breadcrumb">
+            <a href="../index.html">ホーム</a> &gt; エラー管理モジュール
+        </div>
+
+        <!-- 戻るボタン -->
+        <a href="../index.html" class="back-button">← ホームに戻る</a>
+
+        <!-- 検索機能 -->
+        <div class="search-container" id="searchContainer">
+            <input type="text" id="searchBox" class="search-box" placeholder="検索したい内容を入力してください... (Ctrl+K でフォーカス)">
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- 概要 -->
+        <div class="detail-page">
+            <h2>概要</h2>
+            <p>このライブラリでは、各ドライバー専用のエラー管理モジュールを提供し、体系的なエラーコードとログ機能で問題の特定と解決を支援します。</p>
+            
+            <div class="info-box">
+                <h3>エラー管理の特徴</h3>
+                <ul>
+                    <li><strong>体系的なエラーコード:</strong> カテゴリ別に整理されたエラーコード</li>
+                    <li><strong>詳細なログ機能:</strong> タイムスタンプ付きのエラーログ</li>
+                    <li><strong>デバッグ情報:</strong> 実行環境情報を含む詳細ログ</li>
+                    <li><strong>専用ログファイル:</strong> ドライバー別のログファイル</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- エラー管理モジュール一覧 -->
+        <div class="detail-page">
+            <h2>エラー管理モジュール一覧</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>モジュール名</th>
+                            <th>対象ドライバー</th>
+                            <th>エラーコード範囲</th>
+                            <th>ログファイル</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>WebDriverErrors.ps1</td>
+                            <td>WebDriver</td>
+                            <td>1001-1130</td>
+                            <td>WebDriver_Error.log</td>
+                        </tr>
+                        <tr>
+                            <td>ChromeDriverErrors.ps1</td>
+                            <td>ChromeDriver</td>
+                            <td>3001-3005</td>
+                            <td>ChromeDriver_Error.log</td>
+                        </tr>
+                        <tr>
+                            <td>EdgeDriverErrors.ps1</td>
+                            <td>EdgeDriver</td>
+                            <td>2001-2005</td>
+                            <td>EdgeDriver_Error.log</td>
+                        </tr>
+                        <tr>
+                            <td>WordDriverErrors.ps1</td>
+                            <td>WordDriver</td>
+                            <td>4001-4016</td>
+                            <td>WordDriver_Error.log</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- WebDriverErrors -->
+        <div class="detail-page">
+            <h2>WebDriverErrors.ps1</h2>
+            <p>WebDriverクラス専用のエラー管理モジュールです。</p>
+            
+            <h3>エラーコード一覧</h3>
+            
+            <h4>初期化・接続関連エラー (1001-1010)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1001</td>
+                            <td>INIT_ERROR</td>
+                            <td>WebDriver初期化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1002</td>
+                            <td>BROWSER_START_ERROR</td>
+                            <td>ブラウザ起動エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1003</td>
+                            <td>TAB_INFO_ERROR</td>
+                            <td>タブ情報取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1004</td>
+                            <td>WEBSOCKET_CONNECTION_ERROR</td>
+                            <td>WebSocket接続エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1005</td>
+                            <td>WEBSOCKET_SEND_ERROR</td>
+                            <td>WebSocketメッセージ送信エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1006</td>
+                            <td>WEBSOCKET_RECEIVE_ERROR</td>
+                            <td>WebSocketメッセージ受信エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1007</td>
+                            <td>DISPOSE_ERROR</td>
+                            <td>Disposeエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>ナビゲーション関連エラー (1011-1020)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1011</td>
+                            <td>NAVIGATION_ERROR</td>
+                            <td>ページ遷移エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1012</td>
+                            <td>GO_BACK_ERROR</td>
+                            <td>ブラウザ履歴移動エラー (戻る)</td>
+                        </tr>
+                        <tr>
+                            <td>1013</td>
+                            <td>GO_FORWARD_ERROR</td>
+                            <td>ブラウザ履歴移動エラー (進む)</td>
+                        </tr>
+                        <tr>
+                            <td>1014</td>
+                            <td>REFRESH_ERROR</td>
+                            <td>ブラウザ更新エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1015</td>
+                            <td>WAIT_FOR_PAGE_LOAD_ERROR</td>
+                            <td>ページロード待機エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1016</td>
+                            <td>AD_LOAD_WAIT_ERROR</td>
+                            <td>広告読み込み待機エラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>要素検索関連エラー (1021-1040)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1021</td>
+                            <td>FIND_ELEMENT_ERROR</td>
+                            <td>要素検索エラー (CSS)</td>
+                        </tr>
+                        <tr>
+                            <td>1022</td>
+                            <td>FIND_ELEMENT_GENERIC_ERROR</td>
+                            <td>要素検索エラー (JavaScript)</td>
+                        </tr>
+                        <tr>
+                            <td>1023</td>
+                            <td>FIND_ELEMENT_XPATH_ERROR</td>
+                            <td>要素検索エラー (XPath)</td>
+                        </tr>
+                        <tr>
+                            <td>1024</td>
+                            <td>FIND_ELEMENT_CLASSNAME_ERROR</td>
+                            <td>要素検索エラー (ClassName)</td>
+                        </tr>
+                        <tr>
+                            <td>1025</td>
+                            <td>FIND_ELEMENT_ID_ERROR</td>
+                            <td>要素検索エラー (Id)</td>
+                        </tr>
+                        <tr>
+                            <td>1026</td>
+                            <td>FIND_ELEMENT_NAME_ERROR</td>
+                            <td>要素検索エラー (Name)</td>
+                        </tr>
+                        <tr>
+                            <td>1027</td>
+                            <td>FIND_ELEMENT_TAGNAME_ERROR</td>
+                            <td>要素検索エラー (TagName)</td>
+                        </tr>
+                        <tr>
+                            <td>1028</td>
+                            <td>FIND_ELEMENTS_ERROR</td>
+                            <td>複数要素検索エラー (CSS)</td>
+                        </tr>
+                        <tr>
+                            <td>1029</td>
+                            <td>FIND_ELEMENTS_GENERIC_ERROR</td>
+                            <td>複数要素検索エラー (JavaScript)</td>
+                        </tr>
+                        <tr>
+                            <td>1030</td>
+                            <td>FIND_ELEMENTS_BY_CLASSNAME_ERROR</td>
+                            <td>複数要素検索エラー (ClassName)</td>
+                        </tr>
+                        <tr>
+                            <td>1031</td>
+                            <td>FIND_ELEMENTS_BY_NAME_ERROR</td>
+                            <td>複数要素検索エラー (Name)</td>
+                        </tr>
+                        <tr>
+                            <td>1032</td>
+                            <td>FIND_ELEMENTS_BY_TAGNAME_ERROR</td>
+                            <td>複数要素検索エラー (TagName)</td>
+                        </tr>
+                        <tr>
+                            <td>1033</td>
+                            <td>IS_EXISTS_ELEMENT_GENERIC_ERROR</td>
+                            <td>要素存在確認エラー (JavaScript)</td>
+                        </tr>
+                        <tr>
+                            <td>1034</td>
+                            <td>IS_EXISTS_ELEMENT_XPATH_ERROR</td>
+                            <td>XPath要素存在確認エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1035</td>
+                            <td>IS_EXISTS_ELEMENT_CLASSNAME_ERROR</td>
+                            <td>ClassName要素存在確認エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1036</td>
+                            <td>IS_EXISTS_ELEMENT_ID_ERROR</td>
+                            <td>Id要素存在確認エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1037</td>
+                            <td>IS_EXISTS_ELEMENT_NAME_ERROR</td>
+                            <td>Name要素存在確認エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1038</td>
+                            <td>IS_EXISTS_ELEMENT_TAGNAME_ERROR</td>
+                            <td>TagName要素存在確認エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1039</td>
+                            <td>WAIT_FOR_ELEMENT_VISIBLE_ERROR</td>
+                            <td>要素表示待機エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1040</td>
+                            <td>WAIT_FOR_ELEMENT_CLICKABLE_ERROR</td>
+                            <td>要素クリック可能性待機エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1041</td>
+                            <td>WAIT_FOR_CONDITION_ERROR</td>
+                            <td>カスタム条件待機エラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>要素操作関連エラー (1051-1070)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1051</td>
+                            <td>GET_ELEMENT_TEXT_ERROR</td>
+                            <td>要素テキスト取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1052</td>
+                            <td>SET_ELEMENT_TEXT_ERROR</td>
+                            <td>要素テキスト設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1053</td>
+                            <td>CLEAR_ELEMENT_ERROR</td>
+                            <td>要素クリアエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1054</td>
+                            <td>CLICK_ELEMENT_ERROR</td>
+                            <td>要素クリックエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1055</td>
+                            <td>DOUBLE_CLICK_ERROR</td>
+                            <td>ダブルクリックエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1056</td>
+                            <td>RIGHT_CLICK_ERROR</td>
+                            <td>右クリックエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1057</td>
+                            <td>MOUSE_HOVER_ERROR</td>
+                            <td>マウスホバーエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1058</td>
+                            <td>SEND_KEYS_ERROR</td>
+                            <td>キーボード入力エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1059</td>
+                            <td>SEND_SPECIAL_KEY_ERROR</td>
+                            <td>特殊キー送信エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1060</td>
+                            <td>GET_ELEMENT_ATTRIBUTE_ERROR</td>
+                            <td>要素属性取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1061</td>
+                            <td>SET_ELEMENT_ATTRIBUTE_ERROR</td>
+                            <td>要素属性設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1062</td>
+                            <td>GET_ELEMENT_CSS_PROPERTY_ERROR</td>
+                            <td>CSSプロパティ取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1063</td>
+                            <td>SET_ELEMENT_CSS_PROPERTY_ERROR</td>
+                            <td>CSSプロパティ設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1064</td>
+                            <td>GET_HREF_ERROR</td>
+                            <td>href取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1065</td>
+                            <td>SELECT_OPTION_BY_INDEX_ERROR</td>
+                            <td>オプション選択エラー (インデックス)</td>
+                        </tr>
+                        <tr>
+                            <td>1066</td>
+                            <td>SELECT_OPTION_BY_TEXT_ERROR</td>
+                            <td>オプション選択エラー (テキスト)</td>
+                        </tr>
+                        <tr>
+                            <td>1067</td>
+                            <td>DESELECT_ALL_OPTIONS_ERROR</td>
+                            <td>オプション未選択エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1068</td>
+                            <td>SET_CHECKBOX_ERROR</td>
+                            <td>チェックボックス設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1069</td>
+                            <td>SELECT_RADIO_BUTTON_ERROR</td>
+                            <td>ラジオボタン選択エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1070</td>
+                            <td>UPLOAD_FILE_ERROR</td>
+                            <td>ファイルアップロードエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>ウィンドウ・タブ操作関連エラー (1071-1080)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1071</td>
+                            <td>RESIZE_WINDOW_ERROR</td>
+                            <td>ウィンドウリサイズエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1072</td>
+                            <td>NORMAL_WINDOW_ERROR</td>
+                            <td>ウィンドウ状態変更エラー (通常)</td>
+                        </tr>
+                        <tr>
+                            <td>1073</td>
+                            <td>MAXIMIZE_WINDOW_ERROR</td>
+                            <td>ウィンドウ状態変更エラー (最大化)</td>
+                        </tr>
+                        <tr>
+                            <td>1074</td>
+                            <td>MINIMIZE_WINDOW_ERROR</td>
+                            <td>ウィンドウ状態変更エラー (最小化)</td>
+                        </tr>
+                        <tr>
+                            <td>1075</td>
+                            <td>FULLSCREEN_WINDOW_ERROR</td>
+                            <td>ウィンドウ状態変更エラー (フルスクリーン)</td>
+                        </tr>
+                        <tr>
+                            <td>1076</td>
+                            <td>MOVE_WINDOW_ERROR</td>
+                            <td>ウィンドウ移動エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1077</td>
+                            <td>CLOSE_WINDOW_ERROR</td>
+                            <td>ウィンドウを閉じるエラー</td>
+                        </tr>
+                        <tr>
+                            <td>1078</td>
+                            <td>GET_WINDOW_HANDLE_ERROR</td>
+                            <td>ウィンドウハンドル取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1079</td>
+                            <td>GET_WINDOW_HANDLES_ERROR</td>
+                            <td>複数ウィンドウハンドル取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1080</td>
+                            <td>GET_WINDOW_SIZE_ERROR</td>
+                            <td>ウィンドウサイズ取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1081</td>
+                            <td>DISCOVER_TARGETS_ERROR</td>
+                            <td>ターゲット発見エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1082</td>
+                            <td>GET_AVAILABLE_TABS_ERROR</td>
+                            <td>タブ情報取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1083</td>
+                            <td>SET_ACTIVE_TAB_ERROR</td>
+                            <td>タブアクティブ化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1084</td>
+                            <td>CLOSE_TAB_ERROR</td>
+                            <td>タブ切断エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1085</td>
+                            <td>ENABLE_PAGE_EVENTS_ERROR</td>
+                            <td>ページイベント有効化エラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>情報取得関連エラー (1091-1100)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1091</td>
+                            <td>GET_URL_ERROR</td>
+                            <td>URL取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1092</td>
+                            <td>GET_TITLE_ERROR</td>
+                            <td>タイトル取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1093</td>
+                            <td>GET_SOURCE_CODE_ERROR</td>
+                            <td>ソースコード取得エラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>スクリーンショット関連エラー (1101-1110)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1101</td>
+                            <td>SCREENSHOT_ERROR</td>
+                            <td>スクリーンショット取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1102</td>
+                            <td>SCREENSHOT_OBJECT_ERROR</td>
+                            <td>要素スクリーンショット取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1103</td>
+                            <td>SCREENSHOT_OBJECTS_ERROR</td>
+                            <td>複数要素スクリーンショット取得エラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>JavaScript実行関連エラー (1111-1120)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1111</td>
+                            <td>EXECUTE_SCRIPT_ERROR</td>
+                            <td>JavaScript実行エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1112</td>
+                            <td>EXECUTE_SCRIPT_ASYNC_ERROR</td>
+                            <td>JavaScript非同期実行エラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>ストレージ操作関連エラー (1121-1130)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1121</td>
+                            <td>GET_COOKIE_ERROR</td>
+                            <td>クッキー取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1122</td>
+                            <td>SET_COOKIE_ERROR</td>
+                            <td>クッキー設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1123</td>
+                            <td>DELETE_COOKIE_ERROR</td>
+                            <td>クッキー削除エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1124</td>
+                            <td>CLEAR_ALL_COOKIES_ERROR</td>
+                            <td>全クッキー削除エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1125</td>
+                            <td>GET_LOCAL_STORAGE_ERROR</td>
+                            <td>ローカルストレージ取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1126</td>
+                            <td>SET_LOCAL_STORAGE_ERROR</td>
+                            <td>ローカルストレージ設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1127</td>
+                            <td>REMOVE_LOCAL_STORAGE_ERROR</td>
+                            <td>ローカルストレージ削除エラー</td>
+                        </tr>
+                        <tr>
+                            <td>1128</td>
+                            <td>CLEAR_LOCAL_STORAGE_ERROR</td>
+                            <td>ローカルストレージクリアエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ChromeDriverErrors -->
+        <div class="detail-page">
+            <h2>ChromeDriverErrors.ps1</h2>
+            <p>ChromeDriverクラス専用のエラー管理モジュールです。</p>
+            
+            <h3>エラーコード一覧</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>3001</td>
+                            <td>INIT_ERROR</td>
+                            <td>ChromeDriver初期化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>3002</td>
+                            <td>EXECUTABLE_PATH_ERROR</td>
+                            <td>Chrome実行ファイルパス取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>3003</td>
+                            <td>USER_DATA_DIR_ERROR</td>
+                            <td>ユーザーデータディレクトリ作成エラー</td>
+                        </tr>
+                        <tr>
+                            <td>3004</td>
+                            <td>DEBUG_MODE_ERROR</td>
+                            <td>デバッグモード有効化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>3005</td>
+                            <td>DISPOSE_ERROR</td>
+                            <td>ChromeDriver Disposeエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EdgeDriverErrors -->
+        <div class="detail-page">
+            <h2>EdgeDriverErrors.ps1</h2>
+            <p>EdgeDriverクラス専用のエラー管理モジュールです。</p>
+            
+            <h3>エラーコード一覧</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2001</td>
+                            <td>INIT_ERROR</td>
+                            <td>EdgeDriver初期化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2002</td>
+                            <td>EXECUTABLE_PATH_ERROR</td>
+                            <td>Edge実行ファイルパス取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2003</td>
+                            <td>USER_DATA_DIR_ERROR</td>
+                            <td>ユーザーデータディレクトリ作成エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2004</td>
+                            <td>DEBUG_MODE_ERROR</td>
+                            <td>デバッグモード有効化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2005</td>
+                            <td>DISPOSE_ERROR</td>
+                            <td>EdgeDriver Disposeエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- WordDriverErrors -->
+        <div class="detail-page">
+            <h2>WordDriverErrors.ps1</h2>
+            <p>WordDriverクラス専用のエラー管理モジュールです。</p>
+            
+            <h3>エラーコード一覧</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>4001</td>
+                            <td>INIT_ERROR</td>
+                            <td>WordDriver初期化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4002</td>
+                            <td>TEMP_DIR_ERROR</td>
+                            <td>一時ディレクトリ作成エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4003</td>
+                            <td>WORD_APP_ERROR</td>
+                            <td>Wordアプリケーション初期化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4004</td>
+                            <td>NEW_DOCUMENT_ERROR</td>
+                            <td>新規ドキュメント作成エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4005</td>
+                            <td>ADD_TEXT_ERROR</td>
+                            <td>テキスト追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4006</td>
+                            <td>ADD_HEADING_ERROR</td>
+                            <td>見出し追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4007</td>
+                            <td>ADD_PARAGRAPH_ERROR</td>
+                            <td>段落追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4008</td>
+                            <td>ADD_TABLE_ERROR</td>
+                            <td>表追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4009</td>
+                            <td>ADD_IMAGE_ERROR</td>
+                            <td>画像追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4010</td>
+                            <td>ADD_PAGE_BREAK_ERROR</td>
+                            <td>ページ区切り追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4011</td>
+                            <td>ADD_TOC_ERROR</td>
+                            <td>目次追加エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4012</td>
+                            <td>SAVE_ERROR</td>
+                            <td>ドキュメント保存エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4013</td>
+                            <td>UPDATE_TOC_ERROR</td>
+                            <td>目次更新エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4014</td>
+                            <td>OPEN_DOCUMENT_ERROR</td>
+                            <td>ドキュメントオープンエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4015</td>
+                            <td>SET_FONT_ERROR</td>
+                            <td>フォント設定エラー</td>
+                        </tr>
+                        <tr>
+                            <td>4016</td>
+                            <td>DISPOSE_ERROR</td>
+                            <td>WordDriver Disposeエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- エラーハンドリング実装例 -->
+        <div class="detail-page">
+            <h2>エラーハンドリング実装例</h2>
+            
+            <h3>基本的なエラーハンドリング</h3>
+            <div class="code-block">
+                <pre># WebDriverの使用例
+try {
+    $webDriver = [WebDriver]::new()
+    $webDriver.StartBrowser($browserPath, $userDataDir)
+    
+    # 操作を実行
+    $webDriver.Navigate("https://example.com")
+    
+} catch {
+    # エラーが発生した場合
+    Write-Error "WebDriverエラー: $($_.Exception.Message)"
+    
+} finally {
+    # リソースを解放
+    if ($webDriver) {
+        $webDriver.Dispose()
+    }
+}</pre>
+            </div>
+
+            <h3>ChromeDriverの使用例</h3>
+            <div class="code-block">
+                <pre># ChromeDriverの使用例
+try {
+    $chromeDriver = [ChromeDriver]::new()
+    
+    # 操作を実行
+    $chromeDriver.Navigate("https://example.com")
+    
+} catch {
+    # エラーが発生した場合
+    Write-Error "ChromeDriverエラー: $($_.Exception.Message)"
+    
+} finally {
+    # リソースを解放
+    if ($chromeDriver) {
+        $chromeDriver.Dispose()
+    }
+}</pre>
+            </div>
+
+            <h3>WordDriverの使用例</h3>
+            <div class="code-block">
+                <pre># WordDriverの使用例
+try {
+    $wordDriver = [WordDriver]::new()
+    
+    # 操作を実行
+    $wordDriver.AddText("Hello, World!")
+    $wordDriver.SaveDocument("C:\output\document.docx")
+    
+} catch {
+    # エラーが発生した場合
+    Write-Error "WordDriverエラー: $($_.Exception.Message)"
+    
+} finally {
+    # リソースを解放
+    if ($wordDriver) {
+        $wordDriver.Dispose()
+    }
+}</pre>
+            </div>
+        </div>
+
+        <!-- エラーログ分析 -->
+        <div class="detail-page">
+            <h2>エラーログ分析</h2>
+            
+            <h3>ログファイルの形式</h3>
+            <div class="code-block">
+                <pre># ログエントリの例
+[2024/01/15 14:30:25], ERROR_CODE:1002, ERROR_TITLE:ブラウザ起動エラー, ERROR_MESSAGE:指定されたブラウザの実行ファイルが見つかりません: C:\Program Files\Chrome\chrome.exe
+
+詳細情報:
+- エラーコード: 1002
+- エラータイトル: ブラウザ起動エラー
+- エラーメッセージ: 指定されたブラウザの実行ファイルが見つかりません: C:\Program Files\Chrome\chrome.exe
+- タイムスタンプ: 2024/01/15 14:30:25
+- PowerShellバージョン: 5.1.19041.1
+- OS: Microsoft Windows NT 10.0.19041.0
+- 実行ユーザー: Administrator
+- 実行パス: C:\scripts
+- モジュール: WebDriver</pre>
+            </div>
+
+            <h3>ログ分析のポイント</h3>
+            <div class="info-box">
+                <h3>分析のポイント</h3>
+                <ul>
+                    <li><strong>エラーコード:</strong> エラーの種類を特定</li>
+                    <li><strong>タイムスタンプ:</strong> エラーの発生時刻</li>
+                    <li><strong>実行環境:</strong> PowerShellバージョン、OS情報</li>
+                    <li><strong>実行パス:</strong> スクリプトの実行場所</li>
+                    <li><strong>ユーザー:</strong> 実行ユーザーの権限</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- デバッグ支援 -->
+        <div class="detail-page">
+            <h2>デバッグ支援</h2>
+            
+            <h3>ログファイルの場所</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ドライバー</th>
+                            <th>ログファイル名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>WebDriver</td>
+                            <td>WebDriver_Error.log</td>
+                            <td>WebDriver関連のエラーログ</td>
+                        </tr>
+                        <tr>
+                            <td>ChromeDriver</td>
+                            <td>ChromeDriver_Error.log</td>
+                            <td>ChromeDriver関連のエラーログ</td>
+                        </tr>
+                        <tr>
+                            <td>EdgeDriver</td>
+                            <td>EdgeDriver_Error.log</td>
+                            <td>EdgeDriver関連のエラーログ</td>
+                        </tr>
+                        <tr>
+                            <td>WordDriver</td>
+                            <td>WordDriver_Error.log</td>
+                            <td>WordDriver関連のエラーログ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>デバッグのベストプラクティス</h3>
+            <div class="info-box">
+                <h3>デバッグのポイント</h3>
+                <ul>
+                    <li><strong>ログファイルの監視:</strong> 実行中にログファイルを確認</li>
+                    <li><strong>エラーコードの特定:</strong> エラーコードから問題を特定</li>
+                    <li><strong>環境情報の確認:</strong> PowerShellバージョン、OS情報を確認</li>
+                    <li><strong>権限の確認:</strong> 実行ユーザーの権限を確認</li>
+                    <li><strong>パスの確認:</strong> ファイルパスやディレクトリの存在確認</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ベストプラクティス -->
+        <div class="detail-page">
+            <h2>エラーハンドリングのベストプラクティス</h2>
+            
+            <div class="info-box">
+                <h3>推奨事項</h3>
+                
+                <h4>1. 適切なエラーハンドリング</h4>
+                <ul>
+                    <li>try-catch-finallyブロックを使用</li>
+                    <li>リソースの適切な解放</li>
+                    <li>エラーメッセージの詳細化</li>
+                </ul>
+                
+                <h4>2. ログの活用</h4>
+                <ul>
+                    <li>エラーログの定期的な確認</li>
+                    <li>ログファイルのローテーション</li>
+                    <li>重要なエラーの監視</li>
+                </ul>
+                
+                <h4>3. 環境の確認</h4>
+                <ul>
+                    <li>前提条件の確認</li>
+                    <li>権限の確認</li>
+                    <li>依存関係の確認</li>
+                </ul>
+                
+                <h4>4. テストの実施</h4>
+                <ul>
+                    <li>単体テストの実行</li>
+                    <li>統合テストの実行</li>
+                    <li>エラーケースのテスト</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/search.js"></script>
+</body>
+</html> 

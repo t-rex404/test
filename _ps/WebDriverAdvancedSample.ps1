@@ -169,4 +169,4 @@ finally {
 Write-Host "`n生成されたファイル:" -ForegroundColor Cyan
 Write-Host "- screenshot_test.png" -ForegroundColor White
 Write-Host "- element_screenshot_test.png" -ForegroundColor White
-Write-Host "- WebDriver_Error.log" -ForegroundColor White 
+Write-Host "- WebDriver_Error.log" -ForegroundColor White

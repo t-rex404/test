@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShell インベーダーゲーム</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+        }
+        
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background: #000;
+            border: 2px solid #0f0;
+        }
+        
+        #gameInfo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #0f0;
+            font-size: 16px;
+            z-index: 100;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #f00;
+            font-size: 48px;
+            text-align: center;
+            display: none;
+            z-index: 200;
+        }
+        
+        #restartBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #restartBtn:hover {
+            background: #00ff00;
+        }
+        
+        .hidden-text {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #333;
+            font-size: 10px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameInfo">
+        <div>スコア: <span id="score">0</span></div>
+        <div>ライフ: <span id="lives">3</span></div>
+        <div>レベル: <span id="level">1</span></div>
+    </div>
+    
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <div id="gameOver">
+        <div>GAME OVER</div>
+        <div>最終スコア: <span id="finalScore">0</span></div>
+        <button id="restartBtn" onclick="restartGame()">再スタート</button>
+    </div>
+    
+    <div class="hidden-text">PowerShell _lib 隠しコマンド</div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let score = 0;
+        let lives = 3;
+        let level = 1;
+        let gameRunning = true;
+        
+        // プレイヤー
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 30,
+            width: 50,
+            height: 20,
+            speed: 5,
+            dx: 0
+        };
+        
+        // 弾丸配列
+        let bullets = [];
+        let enemyBullets = [];
+        
+        // 敵配列
+        let enemies = [];
+        
+        // キー入力
+        const keys = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        // 敵の初期化
+        function initEnemies() {
+            enemies = [];
+            const rows = 3 + Math.floor(level / 3);
+            const cols = 8;
+            const enemyWidth = 40;
+            const enemyHeight = 30;
+            const padding = 10;
+            
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    enemies.push({
+                        x: col * (enemyWidth + padding) + 50,
+                        y: row * (enemyHeight + padding) + 50,
+                        width: enemyWidth,
+                        height: enemyHeight,
+                        dx: 1,
+                        alive: true
+                    });
+                }
+            }
+        }
+        
+        // 弾丸クラス
+        class Bullet {
+            constructor(x, y, speed, isEnemy = false) {
+                this.x = x;
+                this.y = y;
+                this.width = 3;
+                this.height = 10;
+                this.speed = speed;
+                this.isEnemy = isEnemy;
+            }
+            
+            update() {
+                if (this.isEnemy) {
+                    this.y += this.speed;
+                } else {
+                    this.y -= this.speed;
+                }
+            }
+            
+            draw() {
+                ctx.fillStyle = this.isEnemy ? '#f00' : '#0f0';
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+        }
+        
+        // プレイヤーの描画
+        function drawPlayer() {
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(player.x - player.width/2, player.y, player.width, player.height);
+            
+            // プレイヤーの詳細
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(player.x - player.width/2 + 5, player.y + 5, player.width - 10, player.height - 10);
+        }
+        
+        // 敵の描画
+        function drawEnemies() {
+            enemies.forEach(enemy => {
+                if (enemy.alive) {
+                    ctx.fillStyle = '#f00';
+                    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                    
+                    // 敵の詳細
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(enemy.x + 5, enemy.y + 5, enemy.width - 10, enemy.height - 10);
+                }
+            });
+        }
+        
+        // 弾丸の描画
+        function drawBullets() {
+            bullets.forEach(bullet => bullet.draw());
+            enemyBullets.forEach(bullet => bullet.draw());
+        }
+        
+        // 衝突判定
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        // プレイヤーの更新
+        function updatePlayer() {
+            if (keys['ArrowLeft'] || keys['a']) {
+                player.dx = -player.speed;
+            } else if (keys['ArrowRight'] || keys['d']) {
+                player.dx = player.speed;
+            } else {
+                player.dx = 0;
+            }
+            
+            player.x += player.dx;
+            
+            // 画面端での制限
+            if (player.x - player.width/2 < 0) {
+                player.x = player.width/2;
+            }
+            if (player.x + player.width/2 > canvas.width) {
+                player.x = canvas.width - player.width/2;
+            }
+            
+            // 射撃
+            if (keys[' '] && bullets.length < 3) {
+                bullets.push(new Bullet(player.x, player.y, 7));
+            }
+        }
+        
+        // 敵の更新
+        function updateEnemies() {
+            let shouldMoveDown = false;
+            
+            enemies.forEach(enemy => {
+                if (enemy.alive) {
+                    enemy.x += enemy.dx;
+                    
+                    if (enemy.x <= 0 || enemy.x + enemy.width >= canvas.width) {
+                        shouldMoveDown = true;
+                    }
+                }
+            });
+            
+            if (shouldMoveDown) {
+                enemies.forEach(enemy => {
+                    enemy.y += 20;
+                    enemy.dx *= -1;
+                });
+            }
+            
+            // 敵の射撃
+            if (Math.random() < 0.01) {
+                const aliveEnemies = enemies.filter(e => e.alive);
+                if (aliveEnemies.length > 0) {
+                    const randomEnemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+                    enemyBullets.push(new Bullet(
+                        randomEnemy.x + randomEnemy.width/2,
+                        randomEnemy.y + randomEnemy.height,
+                        3,
+                        true
+                    ));
+                }
+            }
+        }
+        
+        // 弾丸の更新
+        function updateBullets() {
+            bullets = bullets.filter(bullet => {
+                bullet.update();
+                return bullet.y > 0;
+            });
+            
+            enemyBullets = enemyBullets.filter(bullet => {
+                bullet.update();
+                return bullet.y < canvas.height;
+            });
+        }
+        
+        // 衝突チェック
+        function checkCollisions() {
+            // プレイヤーの弾丸と敵
+            bullets.forEach((bullet, bulletIndex) => {
+                enemies.forEach(enemy => {
+                    if (enemy.alive && checkCollision(bullet, enemy)) {
+                        enemy.alive = false;
+                        bullets.splice(bulletIndex, 1);
+                        score += 100;
+                        document.getElementById('score').textContent = score;
+                    }
+                });
+            });
+            
+            // 敵の弾丸とプレイヤー
+            enemyBullets.forEach((bullet, bulletIndex) => {
+                if (checkCollision(bullet, player)) {
+                    enemyBullets.splice(bulletIndex, 1);
+                    lives--;
+                    document.getElementById('lives').textContent = lives;
+                    
+                    if (lives <= 0) {
+                        gameOver();
+                    }
+                }
+            });
+            
+            // 敵とプレイヤーの衝突
+            enemies.forEach(enemy => {
+                if (enemy.alive && checkCollision(enemy, player)) {
+                    gameOver();
+                }
+            });
+        }
+        
+        // レベルチェック
+        function checkLevel() {
+            const aliveEnemies = enemies.filter(e => e.alive);
+            if (aliveEnemies.length === 0) {
+                level++;
+                document.getElementById('level').textContent = level;
+                initEnemies();
+            }
+        }
+        
+        // ゲームオーバー
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // ゲーム再スタート
+        function restartGame() {
+            score = 0;
+            lives = 3;
+            level = 1;
+            gameRunning = true;
+            bullets = [];
+            enemyBullets = [];
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('level').textContent = level;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            initEnemies();
+        }
+        
+        // ゲームループ
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // 画面クリア
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 更新
+            updatePlayer();
+            updateEnemies();
+            updateBullets();
+            checkCollisions();
+            checkLevel();
+            
+            // 描画
+            drawPlayer();
+            drawEnemies();
+            drawBullets();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // ゲーム開始
+        initEnemies();
+        gameLoop();
+        
+        // 隠しコマンド: PowerShellコマンドを入力するとボーナス
+        let commandBuffer = '';
+        document.addEventListener('keydown', (e) => {
+            if (e.key.length === 1) {
+                commandBuffer += e.key.toLowerCase();
+                
+                // PowerShellコマンドのチェック
+                if (commandBuffer.includes('get-process')) {
+                    score += 1000;
+                    document.getElementById('score').textContent = score;
+                    commandBuffer = '';
+                } else if (commandBuffer.includes('invoke-webrequest')) {
+                    lives++;
+                    document.getElementById('lives').textContent = lives;
+                    commandBuffer = '';
+                } else if (commandBuffer.includes('start-sleep')) {
+                    // 一時停止効果
+                    setTimeout(() => {
+                        gameRunning = true;
+                        gameLoop();
+                    }, 2000);
+                    gameRunning = false;
+                    commandBuffer = '';
+                }
+                
+                // バッファをリセット
+                if (commandBuffer.length > 20) {
+                    commandBuffer = '';
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

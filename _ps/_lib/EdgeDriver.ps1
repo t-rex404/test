@@ -7,6 +7,10 @@ class EdgeDriver : WebDriver
     [string]$browser_user_data_dir
     [bool]$is_edge_initialized
 
+    # ========================================
+    # 初期化・接続関連
+    # ========================================
+
     EdgeDriver()
     {
         try
@@ -106,33 +110,22 @@ class EdgeDriver : WebDriver
     {
         try
         {
-            # 環境変数から取得を試行
-            $user_data_dir = $env:EDGE_USER_DATA_DIR
-            if (-not [string]::IsNullOrEmpty($user_data_dir))
-            {
-                if (-not (Test-Path $user_data_dir))
-                {
-                    New-Item -ItemType Directory -Path $user_data_dir -Force | Out-Null
-                }
-                return $user_data_dir
-            }
-
-            # デフォルトパスを使用
-            $default_dir = Join-Path $env:TEMP "EdgeDriver_UserData_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
-            if (-not (Test-Path $default_dir))
-            {
-                New-Item -ItemType Directory -Path $default_dir -Force | Out-Null
-            }
+            # ユーザーデータディレクトリのパスを生成
+            $user_data_dir = Join-Path $env:TEMP "EdgeDriver_UserData_$(Get-Random)"
             
-            Write-Host "ユーザーデータディレクトリを作成しました: $default_dir"
-            return $default_dir
+            Write-Host "Edgeユーザーデータディレクトリを作成しました: $user_data_dir"
+            return $user_data_dir
         }
         catch
         {
-            LogEdgeDriverError $EdgeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ作成エラー: $($_.Exception.Message)"
-            throw "ユーザーデータディレクトリの作成に失敗しました: $($_.Exception.Message)"
+            LogEdgeDriverError $EdgeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)"
+            throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
+
+    # ========================================
+    # 設定・初期化関連
+    # ========================================
 
     # デバッグモードを有効化
     [void] EnableDebugMode()
@@ -144,103 +137,106 @@ class EdgeDriver : WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            # エミュレーションメディアを設定
-            $this.SendWebSocketMessage('Emulation.setEmulatedMedia', @{ media = 'screen' })
-            $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            # ページイベントを有効化
+            $this.EnablePageEvents()
             
-            if ($response.error)
-            {
-                Write-Host "エミュレーションメディア設定に失敗しましたが、処理を続行します: $($response.error.message)"
-            }
-            else
-            {
-                Write-Host "デバッグモードが有効化されました。"
-            }
+            Write-Host "Edgeデバッグモードが有効化されました。"
         }
         catch
         {
             LogEdgeDriverError $EdgeDriverErrorCodes.DEBUG_MODE_ERROR "デバッグモード有効化エラー: $($_.Exception.Message)"
-            Write-Host "デバッグモードの有効化に失敗しましたが、処理を続行します: $($_.Exception.Message)"
+            throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
+
+    # ========================================
+    # エラーハンドリング・クリーンアップ関連
+    # ========================================
 
     # 初期化失敗時のクリーンアップ
     [void] CleanupOnInitializationFailure()
     {
         try
         {
-            if ($this.is_initialized)
+            Write-Host "初期化失敗時のクリーンアップを開始します。" -ForegroundColor Yellow
+            
+            # WebSocket接続を閉じる
+            if ($this.web_socket -and $this.web_socket.State -eq 'Open')
             {
-                $this.Dispose()
-            }
-            else
-            {
-                # 部分的な初期化状態のクリーンアップ
-                if ($this.web_socket -and $this.web_socket.State -eq [System.Net.WebSockets.WebSocketState]::Open)
+                try
                 {
-                    $this.web_socket.Dispose()
-                    $this.web_socket = $null
+                    $this.web_socket.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, "Initialization failed", $null).Wait()
                 }
-                
-                if ($this.browser_exe_process_id -gt 0)
+                catch
                 {
-                    try
-                    {
-                        Stop-Process -Id $this.browser_exe_process_id -Force -ErrorAction SilentlyContinue
-                    }
-                    catch
-                    {
-                        Write-Host "プロセス終了に失敗しました: $($_.Exception.Message)"
-                    }
-                    finally
-                    {
-                        $this.browser_exe_process_id = 0
-                    }
+                    Write-Host "WebSocket接続の閉じる際にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
             }
             
-            $this.is_edge_initialized = $false
-            Write-Host "初期化失敗時のクリーンアップが完了しました。"
+            # ブラウザプロセスを終了
+            if ($this.browser_exe_process_id -gt 0)
+            {
+                try
+                {
+                    $process = Get-Process -Id $this.browser_exe_process_id -ErrorAction SilentlyContinue
+                    if ($process)
+                    {
+                        $process.Kill()
+                        Write-Host "ブラウザプロセスを終了しました。プロセスID: $($this.browser_exe_process_id)" -ForegroundColor Yellow
+                    }
+                }
+                catch
+                {
+                    Write-Host "ブラウザプロセスの終了に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            
+            # ユーザーデータディレクトリを削除
+            if ($this.browser_user_data_dir -and (Test-Path $this.browser_user_data_dir))
+            {
+                try
+                {
+                    Remove-Item -Path $this.browser_user_data_dir -Recurse -Force -ErrorAction SilentlyContinue
+                    Write-Host "ユーザーデータディレクトリを削除しました: $($this.browser_user_data_dir)" -ForegroundColor Yellow
+                }
+                catch
+                {
+                    Write-Host "ユーザーデータディレクトリの削除に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            
+            Write-Host "クリーンアップが完了しました。" -ForegroundColor Yellow
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
+            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
+
+    # ========================================
+    # リソース管理関連
+    # ========================================
 
     # カスタムDisposeメソッド
     [void] Dispose()
     {
         try
         {
-            if ($this.is_edge_initialized)
-            {
-                # 親クラスのDisposeを呼び出し
-                [base]::Dispose()
-                
-                # Edge固有のクリーンアップ
-                if (-not [string]::IsNullOrEmpty($this.browser_user_data_dir) -and (Test-Path $this.browser_user_data_dir))
-                {
-                    try
-                    {
-                        # ユーザーデータディレクトリの削除（オプション）
-                        # Remove-Item -Path $this.browser_user_data_dir -Recurse -Force -ErrorAction SilentlyContinue
-                        Write-Host "ユーザーデータディレクトリを保持しました: $($this.browser_user_data_dir)"
-                    }
-                    catch
-                    {
-                        Write-Host "ユーザーデータディレクトリの削除に失敗しました: $($_.Exception.Message)"
-                    }
-                }
-                
-                $this.is_edge_initialized = $false
-                Write-Host "EdgeDriverのリソースを正常に解放しました。"
-            }
+            Write-Host "EdgeDriverのリソースを解放します。" -ForegroundColor Cyan
+            
+            # 親クラスのDisposeを呼び出し
+            [WebDriver]::Dispose($this)
+            
+            # Edge固有のクリーンアップ
+            $this.CleanupOnInitializationFailure()
+            
+            $this.is_edge_initialized = $false
+            Write-Host "EdgeDriverのリソース解放が完了しました。" -ForegroundColor Green
         }
         catch
         {
             LogEdgeDriverError $EdgeDriverErrorCodes.DISPOSE_ERROR "EdgeDriver Disposeエラー: $($_.Exception.Message)"
-            Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
+            Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 }

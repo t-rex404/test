@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShell _lib ライブラリ ドキュメント</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>PowerShell _lib ライブラリ</h1>
+            <p>WebDriver、WordDriver、エラー管理などの包括的なPowerShellライブラリ</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- 検索機能 -->
+            <div class="search-container" id="searchContainer">
+                <input type="text" id="searchBox" class="search-box" placeholder="検索したい内容を入力してください... (Ctrl+K でフォーカス)">
+                <div id="searchResults"></div>
+            </div>
+
+            <!-- ライブラリ概要 -->
+            <div class="detail-page">
+                <h2>ライブラリ概要</h2>
+                <p>このライブラリは、PowerShellでのWeb自動化、Word文書操作、エラー管理を統合的に提供する包括的なソリューションです。</p>
+                
+                <div class="info-box">
+                    <h3>主な機能</h3>
+                    <ul>
+                        <li><strong>Web自動化:</strong> Chrome、Edgeブラウザの自動操作</li>
+                        <li><strong>Word文書操作:</strong> Word文書の作成、編集、保存</li>
+                        <li><strong>エラー管理:</strong> 包括的なエラーハンドリングとログ機能</li>
+                        <li><strong>共通機能:</strong> 再利用可能なユーティリティ関数</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ライブラリ一覧 -->
+            <div class="card-grid">
+                <!-- WebDriver -->
+                <div class="card">
+                    <h2>WebDriver.ps1</h2>
+                    <p>Webブラウザの自動操作を提供する基本クラス。Chrome、Edgeブラウザの制御、要素検索、操作機能を統合的に管理します。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> ブラウザ制御、要素操作、ナビゲーション、WebSocket通信
+                    </div>
+                    <a href="pages/webdriver.html" class="card-link">詳細を見る</a>
+                </div>
+
+                <!-- ChromeDriver -->
+                <div class="card">
+                    <h2>ChromeDriver.ps1</h2>
+                    <p>Google Chromeブラウザ専用のドライバークラス。Chrome固有の機能と最適化された操作を提供します。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> Chrome自動検出、プロファイル管理、デバッグモード
+                    </div>
+                    <a href="pages/chromedriver.html" class="card-link">詳細を見る</a>
+                </div>
+
+                <!-- EdgeDriver -->
+                <div class="card">
+                    <h2>EdgeDriver.ps1</h2>
+                    <p>Microsoft Edgeブラウザ専用のドライバークラス。Edge固有の機能と最適化された操作を提供します。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> Edge自動検出、プロファイル管理、デバッグモード
+                    </div>
+                    <a href="pages/edgedriver.html" class="card-link">詳細を見る</a>
+                </div>
+
+                <!-- WordDriver -->
+                <div class="card">
+                    <h2>WordDriver.ps1</h2>
+                    <p>Microsoft Word文書の自動操作を提供するクラス。文書の作成、編集、保存、フォーマット機能を統合的に管理します。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> 文書作成、テキスト操作、フォーマット、保存機能
+                    </div>
+                    <a href="pages/worddriver.html" class="card-link">詳細を見る</a>
+                </div>
+
+                <!-- Common -->
+                <div class="card">
+                    <h2>Common.ps1</h2>
+                    <p>全ライブラリで共通して使用されるユーティリティ関数とヘルパークラスを提供します。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> ログ出力、エラーハンドリング、共通ユーティリティ
+                    </div>
+                    <a href="pages/common.html" class="card-link">詳細を見る</a>
+                </div>
+
+                <!-- エラー管理 -->
+                <div class="card">
+                    <h2>エラー管理モジュール</h2>
+                    <p>各ドライバー専用のエラー管理モジュール群。包括的なエラーハンドリングとログ機能を提供します。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> エラーコード管理、ログ出力、デバッグ情報
+                    </div>
+                    <a href="pages/errors.html" class="card-link">詳細を見る</a>
+                </div>
+            </div>
+
+            <!-- 使用方法 -->
+            <div class="detail-page">
+                <h2>基本的な使用方法</h2>
+                
+                <h3>1. ライブラリのインポート</h3>
+                <div class="code-block">
+                    <pre># 必要なライブラリをインポート
+. "$PSScriptRoot\_lib\WebDriver.ps1"
+. "$PSScriptRoot\_lib\ChromeDriver.ps1"
+. "$PSScriptRoot\_lib\WordDriver.ps1"
+. "$PSScriptRoot\_lib\Common.ps1"</pre>
+                </div>
+
+                <h3>2. ChromeDriverの使用例</h3>
+                <div class="code-block">
+                    <pre># ChromeDriverの初期化
+$chromeDriver = [ChromeDriver]::new()
+
+# ページに移動
+$chromeDriver.NavigateToUrl("https://example.com")
+
+# 要素を検索して操作
+$element = $chromeDriver.FindElementByCssSelector("#search-input")
+$chromeDriver.SetElementText($element, "検索キーワード")
+
+# ブラウザを閉じる
+$chromeDriver.Dispose()</pre>
+                </div>
+
+                <h3>3. WordDriverの使用例</h3>
+                <div class="code-block">
+                    <pre># WordDriverの初期化
+$wordDriver = [WordDriver]::new()
+
+# テキストを追加
+$wordDriver.AddText("Hello, World!")
+
+# 文書を保存
+$wordDriver.SaveDocument("C:\output\document.docx")
+
+# WordDriverを閉じる
+$wordDriver.Dispose()</pre>
+                </div>
+
+                <div class="warning-box">
+                    <h3>注意事項</h3>
+                    <ul>
+                        <li>各ドライバーは必ず<code>Dispose()</code>メソッドでリソースを解放してください</li>
+                        <li>エラーハンドリングを適切に実装してください</li>
+                        <li>ブラウザドライバーを使用する際は、対象のブラウザがインストールされていることを確認してください</li>
+                        <li>WordDriverを使用する際は、Microsoft Wordがインストールされていることを確認してください</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- エラーコード -->
+            <div class="detail-page">
+                <h2>エラーコード体系</h2>
+                <p>このライブラリでは、体系的なエラーコードを使用してエラーを管理しています。</p>
+                <p style="margin: 10px 0; font-size: 14px; color: #666; cursor: pointer; padding: 8px; border-left: 3px solid #007acc; background: #f8f9fa;" onclick="window.open('pages/invader-game.html', '_blank')" title="隠しコマンド: クリックしてゲームを開始">💡 <strong>エラーコードの詳細な説明を確認するには、ここをクリックしてください。</strong></p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>エラーコード範囲</th>
+                                <th>カテゴリ</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1001-1130</td>
+                                <td>WebDriver関連</td>
+                                <td>WebDriverクラスの全機能に関するエラー（初期化、ナビゲーション、要素操作、ウィンドウ操作、スクリーンショット、JavaScript実行、ストレージ操作）</td>
+                            </tr>
+                            <tr>
+                                <td>2001-2005</td>
+                                <td>EdgeDriver関連</td>
+                                <td>EdgeDriverクラス専用のエラー（初期化、実行ファイル検出、ユーザーデータディレクトリ、デバッグモード、Dispose）</td>
+                            </tr>
+                            <tr>
+                                <td>3001-3005</td>
+                                <td>ChromeDriver関連</td>
+                                <td>ChromeDriverクラス専用のエラー（初期化、実行ファイル検出、ユーザーデータディレクトリ、デバッグモード、Dispose）</td>
+                            </tr>
+                            <tr>
+                                <td>4001-4016</td>
+                                <td>WordDriver関連</td>
+                                <td>WordDriverクラス専用のエラー（初期化、テキスト操作、コンテンツ操作、ファイル操作、フォーマット、リソース管理）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/search.js"></script>
+</body>
+</html> 

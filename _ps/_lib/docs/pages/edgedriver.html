@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdgeDriver.ps1 - PowerShell _lib ライブラリ ドキュメント</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>EdgeDriver.ps1</h1>
+            <p>Microsoft Edgeブラウザ専用のドライバークラス</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="nav-breadcrumb">
+            <a href="../index.html">ホーム</a> &gt; EdgeDriver.ps1
+        </div>
+
+        <!-- 戻るボタン -->
+        <a href="../index.html" class="back-button">← ホームに戻る</a>
+
+        <!-- 検索機能 -->
+        <div class="search-container" id="searchContainer">
+            <input type="text" id="searchBox" class="search-box" placeholder="検索したい内容を入力してください... (Ctrl+K でフォーカス)">
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- 概要 -->
+        <div class="detail-page">
+            <h2>概要</h2>
+            <p>EdgeDriverクラスは、Microsoft Edgeブラウザ専用のドライバークラスです。WebDriverクラスを継承し、Edge固有の機能と最適化された操作を提供します。</p>
+            <p style="margin: 10px 0; font-size: 12px; color: #999; cursor: pointer; text-align: center; border: 1px dashed #ccc; padding: 5px; border-radius: 3px;" onclick="window.open('../pages/invader-game.html', '_blank')" title="隠しコマンド">🔍 詳細なデバッグ情報を確認</p>
+            
+            <div class="info-box">
+                <h3>主要機能</h3>
+                <ul>
+                    <li><strong>Edge自動検出:</strong> レジストリと一般的なパスからEdgeを自動検出</li>
+                    <li><strong>プロファイル管理:</strong> 独立したEdgeプロファイルの作成と管理</li>
+                    <li><strong>デバッグモード:</strong> Edge DevTools Protocolを使用した高度な制御</li>
+                    <li><strong>WebDriver継承:</strong> WebDriverクラスの全機能を利用可能</li>
+                    <li><strong>Edge固有最適化:</strong> Edge特有の設定とパフォーマンス最適化</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>ChromeDriverとの違い</h3>
+                <p>EdgeDriverとChromeDriverは非常に似た構造を持っていますが、以下の点で異なります：</p>
+                <ul>
+                    <li><strong>ブラウザ検出:</strong> EdgeDriverはEdge（msedge.exe）を検出、ChromeDriverはChrome（chrome.exe）を検出</li>
+                    <li><strong>レジストリパス:</strong> それぞれのブラウザ専用のレジストリパスを検索</li>
+                    <li><strong>ユーザーデータディレクトリ:</strong> EdgeDriverは「EdgeDriver_UserData_」、ChromeDriverは「ChromeDriver_UserData_」プレフィックスを使用</li>
+                    <li><strong>エラーコード:</strong> EdgeDriverは2001-2005、ChromeDriverは3001-3005のエラーコードを使用</li>
+                    <li><strong>ログファイル:</strong> それぞれ専用のログファイル（EdgeDriver_Error.log、ChromeDriver_Error.log）を使用</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 初期化とセットアップ -->
+        <div class="detail-page">
+            <h2>初期化とセットアップ</h2>
+            
+            <h3>コンストラクタ</h3>
+            <div class="code-block">
+                <pre># EdgeDriverの初期化
+$edgeDriver = [EdgeDriver]::new()</pre>
+            </div>
+
+            <p>コンストラクタは以下の処理を自動的に実行します：</p>
+            <ol>
+                <li>Edge実行ファイルの自動検出</li>
+                <li>ユーザーデータディレクトリの作成</li>
+                <li>Edgeブラウザの起動</li>
+                <li>WebSocket接続の確立</li>
+                <li>デバッグモードの有効化</li>
+            </ol>
+
+            <div class="warning-box">
+                <h3>前提条件</h3>
+                <ul>
+                    <li>Microsoft Edgeがインストールされている必要があります</li>
+                    <li>PowerShellの実行ポリシーが適切に設定されている必要があります</li>
+                    <li>ネットワーク接続が必要です（初回起動時）</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Edge自動検出機能 -->
+        <div class="detail-page">
+            <h2>Edge自動検出機能</h2>
+            
+            <p>EdgeDriverは以下の順序でEdge実行ファイルを自動検出します：</p>
+            
+            <h3>1. レジストリ検索</h3>
+            <div class="code-block">
+                <pre># 検索されるレジストリパス
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe</pre>
+            </div>
+
+            <h3>2. 一般的なパス検索</h3>
+            <div class="code-block">
+                <pre># 検索される一般的なパス
+${env:ProgramFiles}\Microsoft\Edge\Application\msedge.exe
+${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe
+${env:LOCALAPPDATA}\Microsoft\Edge\Application\msedge.exe</pre>
+            </div>
+
+            <h3>GetEdgeExecutablePath メソッド</h3>
+            <div class="code-block">
+                <pre># Edge実行ファイルのパスを取得
+$edgePath = $edgeDriver.GetEdgeExecutablePath()</pre>
+            </div>
+            <p><strong>戻り値:</strong> Edge実行ファイルの完全パス</p>
+            <p><strong>機能:</strong> レジストリと一般的なパスからEdge実行ファイルを検出します。</p>
+        </div>
+
+        <!-- プロファイル管理 -->
+        <div class="detail-page">
+            <h2>プロファイル管理</h2>
+            
+            <h3>GetUserDataDirectory メソッド</h3>
+            <div class="code-block">
+                <pre># ユーザーデータディレクトリを取得
+$userDataDir = $edgeDriver.GetUserDataDirectory()</pre>
+            </div>
+            <p><strong>戻り値:</strong> 作成されたユーザーデータディレクトリのパス</p>
+            <p><strong>機能:</strong> 一時的なEdgeプロファイル用のディレクトリを作成します。</p>
+            <p><strong>命名規則:</strong> <code>%TEMP%\EdgeDriver_UserData_[ランダム数値]</code></p>
+
+            <div class="info-box">
+                <h3>プロファイルの特徴</h3>
+                <ul>
+                    <li><strong>独立性:</strong> 既存のEdgeプロファイルに影響を与えない</li>
+                    <li><strong>一時性:</strong> セッション終了時に自動的に削除される</li>
+                    <li><strong>クリーン:</strong> 毎回新しいプロファイルで開始</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Edge固有機能 -->
+        <div class="detail-page">
+            <h2>Edge固有機能</h2>
+            
+            <h3>EnableDebugMode メソッド</h3>
+            <div class="code-block">
+                <pre># デバッグモードを有効化
+$edgeDriver.EnableDebugMode()</pre>
+            </div>
+            <p><strong>機能:</strong> Edge DevTools Protocolを使用したデバッグモードを有効化します。</p>
+
+            <h3>CleanupOnInitializationFailure メソッド</h3>
+            <div class="code-block">
+                <pre># 初期化失敗時のクリーンアップ
+$edgeDriver.CleanupOnInitializationFailure()</pre>
+            </div>
+            <p><strong>機能:</strong> 初期化に失敗した場合のリソースクリーンアップを実行します。</p>
+        </div>
+
+        <!-- リソース管理 -->
+        <div class="detail-page">
+            <h2>リソース管理</h2>
+            
+            <h3>Dispose メソッド</h3>
+            <div class="code-block">
+                <pre># リソースを解放
+$edgeDriver.Dispose()</pre>
+            </div>
+            <p><strong>機能:</strong> Edgeブラウザを終了し、リソースを解放します。</p>
+
+            <div class="warning-box">
+                <h3>重要</h3>
+                <p>EdgeDriverオブジェクトを使用後は必ずDispose()メソッドを呼び出してリソースを解放してください。</p>
+            </div>
+        </div>
+
+        <!-- エラーハンドリング -->
+        <div class="detail-page">
+            <h2>エラーハンドリング</h2>
+            
+            <p>EdgeDriverはEdge固有のエラーコード（2001-2005）を使用します。</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード</th>
+                            <th>定数名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2001</td>
+                            <td>INIT_ERROR</td>
+                            <td>EdgeDriver初期化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2002</td>
+                            <td>EXECUTABLE_PATH_ERROR</td>
+                            <td>Edge実行ファイルパス取得エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2003</td>
+                            <td>USER_DATA_DIR_ERROR</td>
+                            <td>ユーザーデータディレクトリ作成エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2004</td>
+                            <td>DEBUG_MODE_ERROR</td>
+                            <td>デバッグモード有効化エラー</td>
+                        </tr>
+                        <tr>
+                            <td>2005</td>
+                            <td>DISPOSE_ERROR</td>
+                            <td>EdgeDriver Disposeエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 使用例 -->
+        <div class="detail-page">
+            <h2>完全な使用例</h2>
+            
+            <div class="code-block">
+                <pre># EdgeDriverの初期化
+$edgeDriver = [EdgeDriver]::new()
+
+try {
+    # ページに移動
+    $edgeDriver.Navigate("https://www.bing.com")
+    
+    # 検索ボックスを検索
+    $searchBox = $edgeDriver.FindElement("input[name='q']")
+    
+    # 検索キーワードを入力
+    $edgeDriver.SetElementText($searchBox.objectId, "PowerShell automation")
+    
+    # 検索ボタンをクリック
+    $searchButton = $edgeDriver.FindElement("input[type='submit']")
+    $edgeDriver.ClickElement($searchButton.objectId)
+    
+    # 結果の読み込みを待機
+    $edgeDriver.WaitForPageLoad()
+    
+    # スクリーンショットを取得
+    $edgeDriver.GetScreenshot("png", "C:\temp\bing_search.png")
+    
+    Write-Host "検索が完了しました。"
+}
+catch {
+    Write-Error "エラーが発生しました: $($_.Exception.Message)"
+}
+finally {
+    # リソースを解放
+    $edgeDriver.Dispose()
+}</pre>
+            </div>
+        </div>
+
+        <!-- トラブルシューティング -->
+        <div class="detail-page">
+            <h2>トラブルシューティング</h2>
+            
+            <div class="info-box">
+                <h3>よくある問題と解決方法</h3>
+                
+                <h4>1. Edgeが見つからない</h4>
+                <ul>
+                    <li>Microsoft Edgeがインストールされているか確認</li>
+                    <li>Edgeの実行ファイルパスを手動で確認</li>
+                    <li>レジストリの権限を確認</li>
+                </ul>
+                
+                <h4>2. Edgeが起動しない</h4>
+                <ul>
+                    <li>既存のEdgeプロセスを終了</li>
+                    <li>ポート9222が使用可能か確認</li>
+                    <li>ファイアウォールの設定を確認</li>
+                </ul>
+                
+                <h4>3. WebSocket接続エラー</h4>
+                <ul>
+                    <li>Edgeがデバッグモードで起動しているか確認</li>
+                    <li>ネットワーク接続を確認</li>
+                    <li>プロキシ設定を確認</li>
+                </ul>
+                
+                <h4>4. メモリリーク</h4>
+                <ul>
+                    <li>必ずDispose()メソッドを呼び出す</li>
+                    <li>try-finallyブロックを使用</li>
+                    <li>長時間実行時は定期的にリソースを解放</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- パフォーマンス最適化 -->
+        <div class="detail-page">
+            <h2>パフォーマンス最適化</h2>
+            
+            <div class="info-box">
+                <h3>最適化のポイント</h3>
+                
+                <h4>1. ブラウザ起動の最適化</h4>
+                <ul>
+                    <li>Edgeの自動検出を活用</li>
+                    <li>適切なユーザーデータディレクトリの使用</li>
+                    <li>不要な拡張機能を無効化</li>
+                </ul>
+                
+                <h4>2. リソース管理の最適化</h4>
+                <ul>
+                    <li>使用後は即座にDispose()を呼び出し</li>
+                    <li>複数のEdgeDriverインスタンスは必要最小限に</li>
+                    <li>メモリ使用量を監視</li>
+                </ul>
+                
+                <h4>3. エラーハンドリングの最適化</h4>
+                <ul>
+                    <li>適切なtry-catch-finallyブロックを使用</li>
+                    <li>Edge固有のエラーコードを活用</li>
+                    <li>ログファイルの定期的な確認</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/search.js"></script>
+</body>
+</html> 

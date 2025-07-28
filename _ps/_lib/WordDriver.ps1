@@ -14,6 +14,10 @@ class WordDriver
     [bool]$is_saved
     [string]$temp_directory
 
+    # ========================================
+    # 初期化・接続関連
+    # ========================================
+
     WordDriver()
     {
         try
@@ -36,7 +40,7 @@ class WordDriver
         catch
         {
             $this.CleanupOnInitializationFailure()
-                               LogWordDriverError $WordDriverErrorCodes.INIT_ERROR "WordDriver初期化エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.INIT_ERROR "WordDriver初期化エラー: $($_.Exception.Message)"
             throw "WordDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -58,7 +62,7 @@ class WordDriver
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.TEMP_DIR_ERROR "一時ディレクトリ作成エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.TEMP_DIR_ERROR "一時ディレクトリ作成エラー: $($_.Exception.Message)"
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -76,7 +80,7 @@ class WordDriver
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.WORD_APP_ERROR "Wordアプリケーション初期化エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.WORD_APP_ERROR "Wordアプリケーション初期化エラー: $($_.Exception.Message)"
             throw "Wordアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -94,37 +98,36 @@ class WordDriver
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.NEW_DOCUMENT_ERROR "新規ドキュメント作成エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.NEW_DOCUMENT_ERROR "新規ドキュメント作成エラー: $($_.Exception.Message)"
             throw "新規ドキュメントの作成に失敗しました: $($_.Exception.Message)"
         }
     }
 
+    # ========================================
+    # コンテンツ追加関連
+    # ========================================
+
     # テキストを追加
-    [void] AddText([string]$text, [string]$style = "Normal")
+    [void] AddText([string]$text)
     {
         try
         {
+            if ([string]::IsNullOrEmpty($text))
+            {
+                throw "テキストが指定されていません。"
+            }
+
             if (-not $this.is_initialized)
             {
                 throw "WordDriverが初期化されていません。"
             }
 
-            if ([string]::IsNullOrEmpty($text))
-            {
-                Write-Host "空のテキストは追加されません。"
-                return
-            }
-
-            $range = $this.word_document.Range($this.word_document.Content.End - 1, $this.word_document.Content.End - 1)
-            $range.Text = $text + "`r`n"
-            $range.Style = $style
-            
-            $displayText = if ($text.Length -gt 50) { $text.Substring(0, 50) + "..." } else { $text }
-            Write-Host "テキストを追加しました: $displayText"
+            $this.word_document.Content.Text += $text + "`r`n"
+            Write-Host "テキストを追加しました: $text"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_TEXT_ERROR "テキスト追加エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_TEXT_ERROR "テキスト追加エラー: $($_.Exception.Message)"
             throw "テキストの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -134,134 +137,124 @@ class WordDriver
     {
         try
         {
+            if ([string]::IsNullOrEmpty($text))
+            {
+                throw "見出しテキストが指定されていません。"
+            }
+
+            if ($level -lt 1 -or $level -gt 9)
+            {
+                throw "見出しレベルは1から9の間である必要があります。"
+            }
+
             if (-not $this.is_initialized)
             {
                 throw "WordDriverが初期化されていません。"
             }
 
-            if ([string]::IsNullOrEmpty($text))
-            {
-                Write-Host "空の見出しは追加されません。"
-                return
-            }
-
-            if ($level -lt 1 -or $level -gt 9)
-            {
-                $level = 1
-            }
-
-            $style_name = "Heading $level"
-            $this.AddText($text, $style_name)
+            $paragraph = $this.word_document.Content.Paragraphs.Add()
+            $paragraph.Range.Text = $text
+            $paragraph.Range.Style = "Heading $level"
+            $paragraph.Range.InsertParagraphAfter()
             
-            Write-Host "見出しレベル$levelを追加しました: $text"
+            Write-Host "見出しを追加しました: $text (レベル: $level)"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_HEADING_ERROR "見出し追加エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_HEADING_ERROR "見出し追加エラー: $($_.Exception.Message)"
             throw "見出しの追加に失敗しました: $($_.Exception.Message)"
         }
     }
 
     # 段落を追加
-    [void] AddParagraph([string]$text, [string]$alignment = "Left")
+    [void] AddParagraph([string]$text)
     {
         try
         {
+            if ([string]::IsNullOrEmpty($text))
+            {
+                throw "段落テキストが指定されていません。"
+            }
+
             if (-not $this.is_initialized)
             {
                 throw "WordDriverが初期化されていません。"
             }
 
-            if ([string]::IsNullOrEmpty($text))
-            {
-                Write-Host "空の段落は追加されません。"
-                return
-            }
-
-            $paragraph = $this.word_document.Paragraphs.Add()
+            $paragraph = $this.word_document.Content.Paragraphs.Add()
             $paragraph.Range.Text = $text
+            $paragraph.Range.InsertParagraphAfter()
             
-            # 配置を設定
-            switch ($alignment.ToLower())
-            {
-                "left" { $paragraph.Alignment = 0 }    # wdAlignParagraphLeft
-                "center" { $paragraph.Alignment = 1 }  # wdAlignParagraphCenter
-                "right" { $paragraph.Alignment = 2 }   # wdAlignParagraphRight
-                "justify" { $paragraph.Alignment = 3 } # wdAlignParagraphJustify
-                default { $paragraph.Alignment = 0 }
-            }
-            
-            $displayText = if ($text.Length -gt 50) { $text.Substring(0, 50) + "..." } else { $text }
-            Write-Host "段落を追加しました: $displayText"
+            Write-Host "段落を追加しました: $text"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_PARAGRAPH_ERROR "段落追加エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_PARAGRAPH_ERROR "段落追加エラー: $($_.Exception.Message)"
             throw "段落の追加に失敗しました: $($_.Exception.Message)"
         }
     }
 
     # 表を追加
-    [void] AddTable([object[]]$data, [int]$rows, [int]$columns, [string]$title = "")
+    [void] AddTable([object[,]]$data, [string]$title = "")
     {
         try
         {
+            if (-not $data)
+            {
+                throw "テーブルデータが指定されていません。"
+            }
+
             if (-not $this.is_initialized)
             {
                 throw "WordDriverが初期化されていません。"
             }
 
-            if ($rows -le 0 -or $columns -le 0)
+            $rows = $data.GetLength(0)
+            $cols = $data.GetLength(1)
+
+            if ($rows -eq 0 -or $cols -eq 0)
             {
-                throw "行数と列数は1以上である必要があります。"
+                throw "テーブルデータが空です。"
             }
 
-            # 表のタイトルを追加
+            # タイトルを追加（指定されている場合）
             if (-not [string]::IsNullOrEmpty($title))
             {
-                $this.AddParagraph($title, "Center")
+                $this.AddHeading($title, 2)
             }
 
-            # 表を作成
-            $table = $this.word_document.Tables.Add($this.word_document.Range($this.word_document.Content.End - 1), $rows, $columns)
-            
+            # テーブルを作成
+            $table = $this.word_document.Tables.Add($this.word_document.Content, $rows, $cols)
+
             # データを設定
-            if ($data -and $data.Length -gt 0)
+            for ($i = 0; $i -lt $rows; $i++)
             {
-                $data_index = 0
-                for ($i = 1; $i -le $rows; $i++)
+                for ($j = 0; $j -lt $cols; $j++)
                 {
-                    for ($j = 1; $j -le $columns; $j++)
-                    {
-                        if ($data_index -lt $data.Length)
-                        {
-                            $table.Cell($i, $j).Range.Text = $data[$data_index].ToString()
-                            $data_index++
-                        }
-                    }
+                    $table.Cell($i + 1, $j + 1).Range.Text = $data[$i, $j].ToString()
                 }
             }
 
-            # 表の後に改行を追加
-            $this.AddText("")
-            
-            Write-Host "表を追加しました: ${rows}行×${columns}列"
+            # テーブルの後に段落を追加
+            $this.word_document.Content.InsertAfter("`r`n")
+
+            Write-Host "テーブルを追加しました: $rows 行 x $cols 列"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_TABLE_ERROR "表追加エラー: $($_.Exception.Message)"
-            throw "表の追加に失敗しました: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_TABLE_ERROR "テーブル追加エラー: $($_.Exception.Message)"
+            throw "テーブルの追加に失敗しました: $($_.Exception.Message)"
         }
     }
 
     # 画像を追加
-    [void] AddImage([string]$image_path, [int]$width = 400, [int]$height = 300)
+    [void] AddImage([string]$image_path)
     {
         try
         {
-            if (-not $this.is_initialized)
+            if ([string]::IsNullOrEmpty($image_path))
             {
-                throw "WordDriverが初期化されていません。"
+                throw "画像パスが指定されていません。"
             }
 
             if (-not (Test-Path $image_path))
@@ -269,21 +262,19 @@ class WordDriver
                 throw "指定された画像ファイルが見つかりません: $image_path"
             }
 
-            $range = $this.word_document.Range($this.word_document.Content.End - 1, $this.word_document.Content.End - 1)
-            $shape = $this.word_document.InlineShapes.AddPicture($image_path, $false, $true, $range)
-            
-            # サイズを設定
-            $shape.Width = $width
-            $shape.Height = $height
-            
-            # 画像の後に改行を追加
-            $this.AddText("")
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            $this.word_document.InlineShapes.AddPicture($image_path)
+            $this.word_document.Content.InsertAfter("`r`n")
             
             Write-Host "画像を追加しました: $image_path"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_IMAGE_ERROR "画像追加エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_IMAGE_ERROR "画像追加エラー: $($_.Exception.Message)"
             throw "画像の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -298,20 +289,23 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            $range = $this.word_document.Range($this.word_document.Content.End - 1, $this.word_document.Content.End - 1)
-            $range.InsertBreak(7) # wdPageBreak
+            $this.word_document.Content.InsertBreak([Microsoft.Office.Interop.Word.WdBreakType]::wdPageBreak)
             
             Write-Host "ページ区切りを追加しました。"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_PAGE_BREAK_ERROR "ページ区切り追加エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_PAGE_BREAK_ERROR "ページ区切り追加エラー: $($_.Exception.Message)"
             throw "ページ区切りの追加に失敗しました: $($_.Exception.Message)"
         }
     }
 
+    # ========================================
+    # 目次・スタイル関連
+    # ========================================
+
     # 目次を追加
-    [void] AddTableOfContents([int]$levels = 3)
+    [void] AddTableOfContents()
     {
         try
         {
@@ -320,35 +314,60 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            if ($levels -lt 1 -or $levels -gt 9)
-            {
-                $levels = 3
-            }
+            # 目次を挿入する位置を設定
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseStart)
 
-            # 目次の前にページ区切りを追加
-            $this.AddPageBreak()
+            # 目次を追加
+            $this.word_document.TablesOfContents.Add($range, $true, 1, 3, "", "", "", $true, "", $true, $true, 1)
             
-            # 目次タイトルを追加
-            $this.AddHeading("目次", 1)
-            
-            # 目次を挿入
-            $range = $this.word_document.Range($this.word_document.Content.End - 1, $this.word_document.Content.End - 1)
-            $this.word_document.TablesOfContents.Add($range, $true, 1, $levels, 1, "", "", "", $true)
-            
-            # 目次の後にページ区切りを追加
-            $this.AddPageBreak()
-            
-            Write-Host "目次を追加しました（レベル: $levels）"
+            Write-Host "目次を追加しました。"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.ADD_TOC_ERROR "目次追加エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.ADD_TOC_ERROR "目次追加エラー: $($_.Exception.Message)"
             throw "目次の追加に失敗しました: $($_.Exception.Message)"
         }
     }
 
+    # フォントを設定
+    [void] SetFont([string]$font_name, [int]$font_size = 12)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($font_name))
+            {
+                throw "フォント名が指定されていません。"
+            }
+
+            if ($font_size -le 0)
+            {
+                throw "フォントサイズは正の値である必要があります。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            $this.word_document.Content.Font.Name = $font_name
+            $this.word_document.Content.Font.Size = $font_size
+            
+            Write-Host "フォントを設定しました: $font_name, サイズ: $font_size"
+        }
+        catch
+        {
+            LogWordDriverError $WordDriverErrorCodes.SET_FONT_ERROR "フォント設定エラー: $($_.Exception.Message)"
+            throw "フォントの設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # ========================================
+    # ファイル操作関連
+    # ========================================
+
     # ドキュメントを保存
-    [void] Save([string]$file_path = "")
+    [void] SaveDocument([string]$file_path = "")
     {
         try
         {
@@ -357,25 +376,19 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            # ファイルパスが指定されていない場合はデフォルトパスを使用
             if ([string]::IsNullOrEmpty($file_path))
             {
                 $file_path = $this.file_path
             }
 
-            # 目次を更新
-            $this.UpdateTableOfContents()
-            
-            # ドキュメントを保存
             $this.word_document.SaveAs($file_path)
-            $this.file_path = $file_path
             $this.is_saved = $true
             
             Write-Host "ドキュメントを保存しました: $file_path"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.SAVE_ERROR "ドキュメント保存エラー: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.SAVE_DOCUMENT_ERROR "ドキュメント保存エラー: $($_.Exception.Message)"
             throw "ドキュメントの保存に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -390,20 +403,20 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            # 目次が存在する場合は更新
             if ($this.word_document.TablesOfContents.Count -gt 0)
             {
-                foreach ($toc in $this.word_document.TablesOfContents)
-                {
-                    $toc.Update()
-                }
+                $this.word_document.TablesOfContents.Item(1).Update()
                 Write-Host "目次を更新しました。"
+            }
+            else
+            {
+                Write-Host "更新する目次が見つかりません。"
             }
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.UPDATE_TOC_ERROR "目次更新エラー: $($_.Exception.Message)"
-            Write-Host "目次の更新に失敗しましたが、処理を続行します: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.UPDATE_TOC_ERROR "目次更新エラー: $($_.Exception.Message)"
+            throw "目次の更新に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -412,9 +425,9 @@ class WordDriver
     {
         try
         {
-            if (-not $this.is_initialized)
+            if ([string]::IsNullOrEmpty($file_path))
             {
-                throw "WordDriverが初期化されていません。"
+                throw "ファイルパスが指定されていません。"
             }
 
             if (-not (Test-Path $file_path))
@@ -422,107 +435,150 @@ class WordDriver
                 throw "指定されたファイルが見つかりません: $file_path"
             }
 
-            # 既存のドキュメントを閉じる
-            if ($this.word_document)
-            {
-                $this.word_document.Close($false)
-                $this.word_document = $null
-            }
-
-            # 新しいドキュメントを開く
-            $this.word_document = $this.word_app.Documents.Open($file_path)
-            $this.file_path = $file_path
-            $this.is_saved = $true
-            
-            Write-Host "ドキュメントを開きました: $file_path"
-        }
-        catch
-        {
-                           LogWordDriverError $WordDriverErrorCodes.OPEN_DOCUMENT_ERROR "ドキュメントオープンエラー: $($_.Exception.Message)"
-            throw "ドキュメントのオープンに失敗しました: $($_.Exception.Message)"
-        }
-    }
-
-    # フォントを設定
-    [void] SetFont([string]$font_name = "MS Gothic", [int]$font_size = 12, [bool]$is_bold = $false, [bool]$is_italic = $false)
-    {
-        try
-        {
             if (-not $this.is_initialized)
             {
                 throw "WordDriverが初期化されていません。"
             }
 
-            $this.word_document.Content.Font.Name = $font_name
-            $this.word_document.Content.Font.Size = $font_size
-            $this.word_document.Content.Font.Bold = $is_bold
-            $this.word_document.Content.Font.Italic = $is_italic
+            # 既存のドキュメントを閉じる
+            if ($this.word_document)
+            {
+                $this.word_document.Close($false)
+            }
+
+            $this.word_document = $this.word_app.Documents.Open($file_path)
+            $this.file_path = $file_path
             
-            Write-Host "フォントを設定しました: $font_name, $font_size pt"
+            Write-Host "ドキュメントを開きました: $file_path"
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.SET_FONT_ERROR "フォント設定エラー: $($_.Exception.Message)"
-            throw "フォントの設定に失敗しました: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.OPEN_DOCUMENT_ERROR "ドキュメント開くエラー: $($_.Exception.Message)"
+            throw "ドキュメントを開くのに失敗しました: $($_.Exception.Message)"
         }
     }
+
+    # ========================================
+    # エラーハンドリング・クリーンアップ関連
+    # ========================================
 
     # 初期化失敗時のクリーンアップ
     [void] CleanupOnInitializationFailure()
     {
         try
         {
+            Write-Host "初期化失敗時のクリーンアップを開始します。" -ForegroundColor Yellow
+            
+            # ドキュメントを閉じる
             if ($this.word_document)
             {
-                $this.word_document.Close($false)
-                $this.word_document = $null
+                try
+                {
+                    $this.word_document.Close($false)
+                    $this.word_document = $null
+                }
+                catch
+                {
+                    Write-Host "ドキュメントの閉じる際にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
             }
             
+            # Wordアプリケーションを終了
             if ($this.word_app)
             {
-                $this.word_app.Quit()
-                [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.word_app) | Out-Null
-                $this.word_app = $null
+                try
+                {
+                    $this.word_app.Quit()
+                    $this.word_app = $null
+                }
+                catch
+                {
+                    Write-Host "Wordアプリケーションの終了に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
             }
             
-            $this.is_initialized = $false
-            Write-Host "初期化失敗時のクリーンアップが完了しました。"
+            # 一時ディレクトリを削除
+            if ($this.temp_directory -and (Test-Path $this.temp_directory))
+            {
+                try
+                {
+                    Remove-Item -Path $this.temp_directory -Recurse -Force -ErrorAction SilentlyContinue
+                    Write-Host "一時ディレクトリを削除しました: $($this.temp_directory)" -ForegroundColor Yellow
+                }
+                catch
+                {
+                    Write-Host "一時ディレクトリの削除に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            
+            Write-Host "クリーンアップが完了しました。" -ForegroundColor Yellow
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
+            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
+
+    # ========================================
+    # リソース管理関連
+    # ========================================
 
     # リソースを解放
     [void] Dispose()
     {
         try
         {
-            if ($this.is_initialized)
+            Write-Host "WordDriverのリソースを解放します。" -ForegroundColor Cyan
+            
+            # ドキュメントを保存して閉じる
+            if ($this.word_document -and -not $this.is_saved)
             {
-                if ($this.word_document)
+                try
                 {
-                    $this.word_document.Close($false)
-                    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.word_document) | Out-Null
+                    $this.word_document.Save()
+                    Write-Host "ドキュメントを自動保存しました。" -ForegroundColor Yellow
+                }
+                catch
+                {
+                    Write-Host "ドキュメントの自動保存に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            
+            # ドキュメントを閉じる
+            if ($this.word_document)
+            {
+                try
+                {
+                    $this.word_document.Close($true)
                     $this.word_document = $null
                 }
-                
-                if ($this.word_app)
+                catch
+                {
+                    Write-Host "ドキュメントの閉じる際にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            
+            # Wordアプリケーションを終了
+            if ($this.word_app)
+            {
+                try
                 {
                     $this.word_app.Quit()
-                    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.word_app) | Out-Null
                     $this.word_app = $null
                 }
-                
-                $this.is_initialized = $false
-                Write-Host "WordDriverのリソースを正常に解放しました。"
+                catch
+                {
+                    Write-Host "Wordアプリケーションの終了に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
             }
+            
+            $this.is_initialized = $false
+            Write-Host "WordDriverのリソース解放が完了しました。" -ForegroundColor Green
         }
         catch
         {
-                           LogWordDriverError $WordDriverErrorCodes.DISPOSE_ERROR "WordDriver Disposeエラー: $($_.Exception.Message)"
-            Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
+            LogWordDriverError $WordDriverErrorCodes.DISPOSE_ERROR "WordDriver Disposeエラー: $($_.Exception.Message)"
+            Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 } 

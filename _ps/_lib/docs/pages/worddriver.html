@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordDriver.ps1 - PowerShell _lib ライブラリ ドキュメント</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>WordDriver.ps1</h1>
+            <p>Microsoft Word文書の自動操作を提供するクラス</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="nav-breadcrumb">
+            <a href="../index.html">ホーム</a> &gt; WordDriver.ps1
+        </div>
+
+        <!-- 戻るボタン -->
+        <a href="../index.html" class="back-button">← ホームに戻る</a>
+
+        <!-- 検索機能 -->
+        <div class="search-container" id="searchContainer">
+            <input type="text" id="searchBox" class="search-box" placeholder="検索したい内容を入力してください... (Ctrl+K でフォーカス)">
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- 概要 -->
+        <div class="detail-page">
+            <h2>概要</h2>
+            <p>WordDriverクラスは、Microsoft Word文書の自動操作を提供するクラスです。文書の作成、編集、保存、フォーマット機能を統合的に管理します。</p>
+            <p style="margin: 10px 0; font-size: 12px; color: #999; cursor: pointer; text-align: center; border: 1px dashed #ccc; padding: 5px; border-radius: 3px;" onclick="window.open('../pages/invader-game.html', '_blank')" title="隠しコマンド">🔍 詳細なデバッグ情報を確認</p>
+            
+            <div class="info-box">
+                <h3>主要機能</h3>
+                <ul>
+                    <li><strong>文書作成:</strong> 新規Word文書の作成と初期化</li>
+                    <li><strong>テキスト操作:</strong> テキストの追加、編集、削除</li>
+                    <li><strong>フォーマット:</strong> フォント、段落、スタイルの設定</li>
+                    <li><strong>保存機能:</strong> 文書の保存とエクスポート</li>
+                    <li><strong>リソース管理:</strong> 適切なメモリ管理とクリーンアップ</li>
+                    <li><strong>エラーハンドリング:</strong> 包括的なエラー管理</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 初期化とセットアップ -->
+        <div class="detail-page">
+            <h2>初期化とセットアップ</h2>
+            
+            <h3>コンストラクタ</h3>
+            <div class="code-block">
+                <pre># WordDriverの初期化
+$wordDriver = [WordDriver]::new()</pre>
+            </div>
+            <p>コンストラクタは以下の処理を自動的に実行します：</p>
+            <ol>
+                <li>一時ディレクトリの作成</li>
+                <li>Wordアプリケーションの初期化</li>
+                <li>新規ドキュメントの作成</li>
+                <li>基本設定の適用</li>
+            </ol>
+
+            <h3>CreateTempDirectory メソッド</h3>
+            <div class="code-block">
+                <pre># 一時ディレクトリを作成
+$tempDir = $wordDriver.CreateTempDirectory()</pre>
+            </div>
+            <p><strong>戻り値:</strong> 作成された一時ディレクトリのパス</p>
+            <p><strong>機能:</strong> 一時ファイル用のディレクトリを作成します。</p>
+
+            <h3>InitializeWordApplication メソッド</h3>
+            <div class="code-block">
+                <pre># Wordアプリケーションを初期化
+$wordDriver.InitializeWordApplication()</pre>
+            </div>
+            <p><strong>機能:</strong> Microsoft Wordアプリケーションを初期化し、COMオブジェクトを作成します。</p>
+
+            <h3>CreateNewDocument メソッド</h3>
+            <div class="code-block">
+                <pre># 新規ドキュメントを作成
+$wordDriver.CreateNewDocument()</pre>
+            </div>
+            <p><strong>機能:</strong> 新しいWordドキュメントを作成し、アクティブドキュメントとして設定します。</p>
+
+            <div class="warning-box">
+                <h3>前提条件</h3>
+                <ul>
+                    <li>Microsoft Wordがインストールされている必要があります</li>
+                    <li>PowerShellの実行ポリシーが適切に設定されている必要があります</li>
+                    <li>Microsoft.Office.Interop.Wordアセンブリが必要です</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- テキスト操作機能 -->
+        <div class="detail-page">
+            <h2>テキスト操作機能</h2>
+            
+            <h3>AddText メソッド</h3>
+            <div class="code-block">
+                <pre># テキストを追加
+$wordDriver.AddText($text)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$text</code>: 追加するテキスト</li>
+            </ul>
+            <p><strong>機能:</strong> 現在のカーソル位置にテキストを追加します。</p>
+
+            <h3>AddHeading メソッド</h3>
+            <div class="code-block">
+                <pre># 見出しを追加
+$wordDriver.AddHeading($text, $level)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$text</code>: 見出しテキスト</li>
+                <li><code>$level</code>: 見出しレベル（デフォルト: 1）</li>
+            </ul>
+            <p><strong>機能:</strong> 指定したレベルの見出しを追加します。</p>
+
+            <h3>AddParagraph メソッド</h3>
+            <div class="code-block">
+                <pre># 段落を追加
+$wordDriver.AddParagraph($text)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$text</code>: 段落テキスト</li>
+            </ul>
+            <p><strong>機能:</strong> 新しい段落を追加します。</p>
+        </div>
+
+        <!-- コンテンツ操作機能 -->
+        <div class="detail-page">
+            <h2>コンテンツ操作機能</h2>
+            
+            <h3>AddTable メソッド</h3>
+            <div class="code-block">
+                <pre># 表を追加
+$wordDriver.AddTable($data, $title)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$data</code>: 表データの2次元配列</li>
+                <li><code>$title</code>: 表のタイトル（オプション）</li>
+            </ul>
+            <p><strong>機能:</strong> 指定したデータで表を作成し、ドキュメントに追加します。</p>
+
+            <h3>AddImage メソッド</h3>
+            <div class="code-block">
+                <pre># 画像を追加
+$wordDriver.AddImage($image_path)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$image_path</code>: 画像ファイルのパス</li>
+            </ul>
+            <p><strong>機能:</strong> 指定した画像をドキュメントに挿入します。</p>
+
+            <h3>AddPageBreak メソッド</h3>
+            <div class="code-block">
+                <pre># ページ区切りを追加
+$wordDriver.AddPageBreak()</pre>
+            </div>
+            <p><strong>機能:</strong> 現在の位置にページ区切りを挿入します。</p>
+
+            <h3>AddTableOfContents メソッド</h3>
+            <div class="code-block">
+                <pre># 目次を追加
+$wordDriver.AddTableOfContents()</pre>
+            </div>
+            <p><strong>機能:</strong> ドキュメントに目次を追加します。</p>
+        </div>
+
+        <!-- フォーマット機能 -->
+        <div class="detail-page">
+            <h2>フォーマット機能</h2>
+            
+            <h3>SetFont メソッド</h3>
+            <div class="code-block">
+                <pre># フォントを設定
+$wordDriver.SetFont($font_name, $font_size)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$font_name</code>: フォント名</li>
+                <li><code>$font_size</code>: フォントサイズ（デフォルト: 12）</li>
+            </ul>
+            <p><strong>機能:</strong> 現在の選択範囲またはカーソル位置のフォントを設定します。</p>
+        </div>
+
+        <!-- ファイル操作機能 -->
+        <div class="detail-page">
+            <h2>ファイル操作機能</h2>
+            
+            <h3>SaveDocument メソッド</h3>
+            <div class="code-block">
+                <pre># ドキュメントを保存
+$wordDriver.SaveDocument($file_path)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$file_path</code>: 保存先ファイルパス（オプション）</li>
+            </ul>
+            <p><strong>機能:</strong> ドキュメントを指定したパスに保存します。パスが指定されない場合は一時ファイルに保存されます。</p>
+
+            <h3>OpenDocument メソッド</h3>
+            <div class="code-block">
+                <pre># ドキュメントを開く
+$wordDriver.OpenDocument($file_path)</pre>
+            </div>
+            <p><strong>パラメータ:</strong></p>
+            <ul>
+                <li><code>$file_path</code>: 開くファイルのパス</li>
+            </ul>
+            <p><strong>機能:</strong> 指定したファイルをWordで開きます。</p>
+
+            <h3>UpdateTableOfContents メソッド</h3>
+            <div class="code-block">
+                <pre># 目次を更新
+$wordDriver.UpdateTableOfContents()</pre>
+            </div>
+            <p><strong>機能:</strong> ドキュメント内の目次を更新します。</p>
+        </div>
+
+        <!-- リソース管理 -->
+        <div class="detail-page">
+            <h2>リソース管理</h2>
+            
+            <h3>Dispose メソッド</h3>
+            <div class="code-block">
+                <pre># リソースを解放
+$wordDriver.Dispose()</pre>
+            </div>
+            <p><strong>機能:</strong> Wordアプリケーションを終了し、リソースを解放します。</p>
+
+            <h3>CleanupOnInitializationFailure メソッド</h3>
+            <div class="code-block">
+                <pre># 初期化失敗時のクリーンアップ
+$wordDriver.CleanupOnInitializationFailure()</pre>
+            </div>
+            <p><strong>機能:</strong> 初期化に失敗した場合のリソースクリーンアップを実行します。</p>
+
+            <div class="warning-box">
+                <h3>重要</h3>
+                <p>WordDriverオブジェクトを使用後は必ずDispose()メソッドを呼び出してリソースを解放してください。</p>
+            </div>
+        </div>
+
+        <!-- エラーハンドリング -->
+        <div class="detail-page">
+            <h2>エラーハンドリング</h2>
+            
+            <p>WordDriverクラスでは、体系的なエラーコードを使用してエラーを管理しています。</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>エラーコード範囲</th>
+                            <th>カテゴリ</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>4001-4004</td>
+                            <td>初期化関連</td>
+                            <td>WordDriver初期化、一時ディレクトリ作成、Wordアプリケーション初期化、新規ドキュメント作成に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4005-4007</td>
+                            <td>テキスト操作関連</td>
+                            <td>テキスト追加、見出し追加、段落追加に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4008-4010</td>
+                            <td>コンテンツ操作関連</td>
+                            <td>表追加、画像追加、ページ区切り追加に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4011-4013</td>
+                            <td>目次関連</td>
+                            <td>目次追加、目次更新に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4012, 4014</td>
+                            <td>ファイル操作関連</td>
+                            <td>ドキュメント保存、ドキュメントオープンに関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4015</td>
+                            <td>フォーマット関連</td>
+                            <td>フォント設定に関するエラー</td>
+                        </tr>
+                        <tr>
+                            <td>4016</td>
+                            <td>リソース管理関連</td>
+                            <td>WordDriver Disposeに関するエラー</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 使用例 -->
+        <div class="detail-page">
+            <h2>完全な使用例</h2>
+            
+            <div class="code-block">
+                <pre># WordDriverの初期化
+$wordDriver = [WordDriver]::new()
+
+try {
+    # テキストを追加
+    $wordDriver.AddText("Hello, World!")
+    
+    # 見出しを追加
+    $wordDriver.AddHeading("第1章", 1)
+    $wordDriver.AddHeading("1.1 概要", 2)
+    
+    # 段落を追加
+    $wordDriver.AddParagraph("これは最初の段落です。")
+    $wordDriver.AddParagraph("これは2番目の段落です。")
+    
+    # 表を追加
+    $tableData = @(
+        @("項目", "説明", "備考"),
+        @("項目1", "説明1", "備考1"),
+        @("項目2", "説明2", "備考2")
+    )
+    $wordDriver.AddTable($tableData, "サンプル表")
+    
+    # ページ区切りを追加
+    $wordDriver.AddPageBreak()
+    
+    # 目次を追加
+    $wordDriver.AddTableOfContents()
+    
+    # フォントを設定
+    $wordDriver.SetFont("MS Gothic", 12)
+    
+    # ドキュメントを保存
+    $wordDriver.SaveDocument("C:\output\sample_document.docx")
+    
+    # 目次を更新
+    $wordDriver.UpdateTableOfContents()
+    
+    Write-Host "ドキュメントの作成が完了しました。"
+}
+catch {
+    Write-Error "エラーが発生しました: $($_.Exception.Message)"
+}
+finally {
+    # リソースを解放
+    $wordDriver.Dispose()
+}</pre>
+            </div>
+        </div>
+
+        <!-- トラブルシューティング -->
+        <div class="detail-page">
+            <h2>トラブルシューティング</h2>
+            
+            <div class="info-box">
+                <h3>よくある問題と解決方法</h3>
+                
+                <h4>1. Wordアプリケーションが起動しない</h4>
+                <ul>
+                    <li>Microsoft Wordがインストールされているか確認</li>
+                    <li>Wordプロセスが残っていないか確認</li>
+                    <li>COMオブジェクトの権限を確認</li>
+                </ul>
+                
+                <h4>2. ファイル保存エラー</h4>
+                <ul>
+                    <li>保存先ディレクトリの権限を確認</li>
+                    <li>ファイルが他のアプリケーションで開かれていないか確認</li>
+                    <li>ディスク容量を確認</li>
+                </ul>
+                
+                <h4>3. フォント設定エラー</h4>
+                <ul>
+                    <li>指定したフォントがインストールされているか確認</li>
+                    <li>フォント名のスペルを確認</li>
+                    <li>システムフォントを使用</li>
+                </ul>
+                
+                <h4>4. メモリリーク</h4>
+                <ul>
+                    <li>必ずDispose()メソッドを呼び出す</li>
+                    <li>try-finallyブロックを使用</li>
+                    <li>長時間実行時は定期的にリソースを解放</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- パフォーマンス最適化 -->
+        <div class="detail-page">
+            <h2>パフォーマンス最適化</h2>
+            
+            <div class="info-box">
+                <h3>最適化のポイント</h3>
+                
+                <h4>1. リソース管理の最適化</h4>
+                <ul>
+                    <li>使用後は即座にDispose()を呼び出し</li>
+                    <li>複数のWordDriverインスタンスは必要最小限に</li>
+                    <li>メモリ使用量を監視</li>
+                </ul>
+                
+                <h4>2. 操作の最適化</h4>
+                <ul>
+                    <li>大量のテキスト追加は一括で実行</li>
+                    <li>不要なフォーマット操作を削除</li>
+                    <li>適切な保存タイミングを設定</li>
+                </ul>
+                
+                <h4>3. エラーハンドリングの最適化</h4>
+                <ul>
+                    <li>適切なtry-catch-finallyブロックを使用</li>
+                    <li>エラーログの定期的な確認</li>
+                    <li>重要なエラーの監視</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/search.js"></script>
+</body>
+</html> 
