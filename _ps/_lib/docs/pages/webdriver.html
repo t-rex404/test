@@ -278,10 +278,9 @@ $elements = $webDriver.FindElementsGeneric($expression, $query_type, $element)</
 
             <h3>特定セレクタによる検索</h3>
             <div class="code-block">
-                <pre># XPathで要素を検索
+                <pre><!-- # XPathで要素を検索
 $elements = $webDriver.FindElementsByXPath($xpath)
-
-# クラス名で要素を検索
+--># クラス名で要素を検索
 $elements = $webDriver.FindElementsByClassName($class_name)
 
 # 名前で要素を検索
@@ -295,10 +294,10 @@ $elements = $webDriver.FindElementsByTagName($tag_name)</pre>
             <div class="code-block">
                 <pre># JavaScriptで要素存在確認
 $exists = $webDriver.IsExistsElementGeneric($expression, $query_type, $element)
-
+<!--
 # XPathで要素存在確認
 $exists = $webDriver.IsExistsElementByXPath($xpath)
-
+-->
 # クラス名で要素存在確認
 $exists = $webDriver.IsExistsElementByClassName($class_name, $index)
 
