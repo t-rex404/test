@@ -417,33 +417,34 @@ class WebDriver
     {
         try
         {
+            Write-Host "Step1: ページ遷移"
             if ([string]::IsNullOrEmpty($url))
             {
                 throw "URLが指定されていません。"
             }
-
+            Write-Host "Step2: WebDriverが初期化されているか確認"
             if (-not $this.is_initialized)
             {
                 throw "WebDriverが初期化されていません。"
             }
-
+            Write-Host "Step3: URLの形式を検証"
             # URLの形式を検証
-            if (-not [System.Uri]::IsWellFormedUriString($url, [System.UriKind]::AbsoluteOrRelative))
+            if (-not [System.Uri]::IsWellFormedUriString($url, [System.UriKind]::RelativeOrAbsolute))
             {
                 throw "無効なURL形式です: $url"
             }
-
+            Write-Host "Step4: ページ遷移リクエスト送信"
             # ページ遷移リクエスト送信
             $this.SendWebSocketMessage('Page.navigate', @{ url = $url })
             $response = $this.ReceiveWebSocketMessage()
-            
+            Write-Host "Step5: レスポンスのエラーチェック"
             # レスポンスのエラーチェック
             $response_obj = $response | ConvertFrom-Json
             if ($response_obj.error)
             {
                 throw "ページ遷移エラー: $($response_obj.error.message)"
             }
-
+            Write-Host "Step6: ページロード完了待機"
             # ページロード完了待機
             $timeout = [datetime]::Now.AddSeconds(60)
             $retry_count = 0
@@ -495,7 +496,7 @@ class WebDriver
             {
                 Write-Host "ページイベントの有効化に失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-
+            Write-Host "Step7: 利用可能なタブ情報を取得"
             # 利用可能なタブ情報を取得
             try
             {
@@ -505,7 +506,7 @@ class WebDriver
             {
                 Write-Host "ターゲット発見に失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-
+            Write-Host "Step8: JavaScript実行環境を有効化し、`document` オブジェクトにアクセスできるようにする"
             # JavaScript実行環境を有効化し、`document` オブジェクトにアクセスできるようにする
             try
             {
@@ -516,7 +517,7 @@ class WebDriver
             {
                 Write-Host "Runtime.enableに失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-
+            Write-Host "Step9: 現在のページのDOMツリーを取得し、documentノード直下の要素まで取得"
             # 現在のページのDOMツリーを取得し、documentノード直下の要素まで取得
             try
             {
@@ -527,7 +528,7 @@ class WebDriver
             {
                 Write-Host "DOM.getDocumentに失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-
+            Write-Host "Step10: ページ遷移が完了しました"
             Write-Host "ページ遷移が完了しました: $url"
         }
         catch

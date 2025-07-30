@@ -25,3 +25,75 @@
 - 実行ユーザー: ai
 - 実行パス: C:\000_common\PowerShell\prototype\test
 - モジュール: WebDriver
+[2025/07/31 06:59:31], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 06:59:31
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:06:44], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:06:44
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:07:14], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:07:14
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:08:20], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:08:20
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:11:32], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:11:32
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:13:00], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:13:00
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:13:57], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:13:57
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver
+[2025/07/31 07:17:00], ERROR_CODE:WebDriverErrorCodes.NAVIGATION_ERROR, ERROR_TITLE:不明なエラー, ERROR_MESSAGE:ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+詳細情報:
+- エラーコード: WebDriverErrorCodes.NAVIGATION_ERROR
+- エラータイトル: 不明なエラー
+- エラーメッセージ: ページ遷移エラー: Cannot convert argument "uriKind", with value: "", for "IsWellFormedUriString" to type "System.UriKind": "Cannot convert null to type "System.UriKind" due to enumeration values that are not valid. Specify one of the following enumeration values and try again. The possible enumeration values are "RelativeOrAbsolute,Absolute,Relative"."
+- タイムスタンプ: 2025/07/31 07:17:00
+- 実行ユーザー: ai
+- 実行パス: C:\000_common\PowerShell\prototype\test
+- モジュール: WebDriver

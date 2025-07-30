@@ -30,8 +30,10 @@ Function Main()
         try
         {
             $driver = New-Object -TypeName 'EdgeDriver'
+            
             $driver.Navigate("https://www.google.com")
-            $driver.Close()
+            start-sleep -Seconds 10
+            $driver.CloseWindow()
             $result = $SUCCESS_CODE
         }
         catch

@@ -40,7 +40,7 @@ class WordDriver
         catch
         {
             $this.CleanupOnInitializationFailure()
-            LogWordDriverError WordDriverErrorCodes.INIT_ERROR "WordDriver初期化エラー: $($_.Exception.Message)"
+            LogWordDriverError $($WordDriverErrorCodes.INIT_ERROR) "WordDriver初期化エラー: $($_.Exception.Message)"
             throw "WordDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
