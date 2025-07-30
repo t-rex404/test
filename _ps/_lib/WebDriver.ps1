@@ -3370,5 +3370,3 @@ class WebDriver
         }
     }
 }
-
-

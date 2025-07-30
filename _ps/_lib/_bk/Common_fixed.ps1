@@ -2,14 +2,10 @@
 # 各ドライバークラスで使用する共通機能を提供
 
 # エラー管理モジュールをインポート
-#. "$PSScriptRoot\WebDriverErrors.ps1"
-#. "$PSScriptRoot\EdgeDriverErrors.ps1"
-#. "$PSScriptRoot\ChromeDriverErrors.ps1"
-#. "$PSScriptRoot\WordDriverErrors.ps1"
-import-module "$PSScriptRoot\WebDriverErrors.psm1"
-import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
-import-module "$PSScriptRoot\ChromeDriverErrors.psm1"
-import-module "$PSScriptRoot\WordDriverErrors.psm1"
+. "$PSScriptRoot\WebDriverErrors.ps1"
+. "$PSScriptRoot\EdgeDriverErrors.ps1"
+. "$PSScriptRoot\ChromeDriverErrors.ps1"
+. "$PSScriptRoot\WordDriverErrors.ps1"
 
 class Common
 {
@@ -53,17 +49,21 @@ class Common
         Write-Error $errorMessage
         
         # 詳細なエラー情報をログに追加（デバッグ用）
-        $debugInfo = @"
-詳細情報:
-- エラーコード: $errorCode
-- エラーメッセージ: $message
-- モジュール: $module
-- タイムスタンプ: $timestamp
-- PowerShellバージョン: $($PSVersionTable.PSVersion)
-- OS: $($PSVersionTable.OS)
-- 実行ユーザー: $env:USERNAME
-- 実行パス: $PWD
-"@
+        # ヒアドキュメントの代わりに文字列連結を使用
+        $psVersion = $PSVersionTable.PSVersion.ToString()
+        $osInfo = $PSVersionTable.OS
+        $userName = $env:USERNAME
+        $currentPath = $PWD.Path
+        
+        $debugInfo = "詳細情報:`n" +
+                    "- エラーコード: $errorCode`n" +
+                    "- エラーメッセージ: $message`n" +
+                    "- モジュール: $module`n" +
+                    "- タイムスタンプ: $timestamp`n" +
+                    "- PowerShellバージョン: $psVersion`n" +
+                    "- OS: $osInfo`n" +
+                    "- 実行ユーザー: $userName`n" +
+                    "- 実行パス: $currentPath"
         
         $debugInfo | Out-File -Append -FilePath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
     }
@@ -72,4 +72,4 @@ class Common
 # 共通インスタンスを作成
 $Common = [Common]::new()
 
-Write-Host "Commonライブラリが正常にインポートされました。" -ForegroundColor Green
+Write-Host "Commonライブラリが正常にインポートされました。" -ForegroundColor Green 
