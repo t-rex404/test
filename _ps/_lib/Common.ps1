@@ -59,8 +59,6 @@ class Common
 - エラーメッセージ: $message
 - モジュール: $module
 - タイムスタンプ: $timestamp
-- PowerShellバージョン: $($PSVersionTable.PSVersion)
-- OS: $($PSVersionTable.OS)
 - 実行ユーザー: $env:USERNAME
 - 実行パス: $PWD
 "@

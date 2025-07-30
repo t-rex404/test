@@ -1,5 +1,5 @@
 # ChromeDriverエラー管理モジュールをインポート
-. "$PSScriptRoot\ChromeDriverErrors.ps1"
+import-module "$PSScriptRoot\ChromeDriverErrors.psm1"
 
 class ChromeDriver : WebDriver
 {
@@ -45,7 +45,7 @@ class ChromeDriver : WebDriver
         {
             # 初期化に失敗した場合のクリーンアップ
             $this.CleanupOnInitializationFailure()
-            LogChromeDriverError $ChromeDriverErrorCodes.INIT_ERROR "ChromeDriver初期化エラー: $($_.Exception.Message)"
+            LogChromeDriverError ChromeDriverErrorCodes.INIT_ERROR "ChromeDriver初期化エラー: $($_.Exception.Message)"
             throw "ChromeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -66,11 +66,11 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $browser_exe_path = Get-ItemPropertyValue -Path $registry_path -Name '(default)' -ErrorAction Stop
-                    if ($browser_exe_path -and (Test-Path $browser_exe_path))
+                    $this.browser_exe_path = Get-ItemPropertyValue -Path $registry_path -Name '(default)' -ErrorAction Stop
+                    if ($this.browser_exe_path -and (Test-Path $this.browser_exe_path))
                     {
-                        Write-Host "Chrome実行ファイルが見つかりました: $browser_exe_path"
-                        return $browser_exe_path
+                        Write-Host "Chrome実行ファイルが見つかりました: $this.browser_exe_path"
+                        return $this.browser_exe_path
                     }
                 }
                 catch
@@ -104,7 +104,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            LogChromeDriverError $ChromeDriverErrorCodes.EXECUTABLE_PATH_ERROR "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)"
+            LogChromeDriverError ChromeDriverErrorCodes.EXECUTABLE_PATH_ERROR "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)"
             throw "Chrome実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -122,7 +122,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            LogChromeDriverError $ChromeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)"
+            LogChromeDriverError ChromeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)"
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -148,7 +148,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            LogChromeDriverError $ChromeDriverErrorCodes.DEBUG_MODE_ERROR "デバッグモード有効化エラー: $($_.Exception.Message)"
+            LogChromeDriverError ChromeDriverErrorCodes.DEBUG_MODE_ERROR "デバッグモード有効化エラー: $($_.Exception.Message)"
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -239,7 +239,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            LogChromeDriverError $ChromeDriverErrorCodes.DISPOSE_ERROR "ChromeDriver Disposeエラー: $($_.Exception.Message)"
+            LogChromeDriverError ChromeDriverErrorCodes.DISPOSE_ERROR "ChromeDriver Disposeエラー: $($_.Exception.Message)"
             Write-Host "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }

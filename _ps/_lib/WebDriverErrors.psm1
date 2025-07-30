@@ -327,8 +327,6 @@ function LogWebDriverError([string]$error_code, [string]$message)
 - エラータイトル: $error_title
 - エラーメッセージ: $message
 - タイムスタンプ: $timestamp
-- PowerShellバージョン: $($PSVersionTable.PSVersion)
-- OS: $($PSVersionTable.OS)
 - 実行ユーザー: $env:USERNAME
 - 実行パス: $PWD
 - モジュール: WebDriver

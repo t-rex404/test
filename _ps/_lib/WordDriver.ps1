@@ -3,7 +3,7 @@
 Add-Type -AssemblyName Microsoft.Office.Interop.Word
 
 # WordDriverエラー管理モジュールをインポート
-. "$PSScriptRoot\WordDriverErrors.ps1"
+import-module "$PSScriptRoot\WordDriverErrors.psm1"
 
 class WordDriver
 {
@@ -40,7 +40,7 @@ class WordDriver
         catch
         {
             $this.CleanupOnInitializationFailure()
-            LogWordDriverError $WordDriverErrorCodes.INIT_ERROR "WordDriver初期化エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.INIT_ERROR "WordDriver初期化エラー: $($_.Exception.Message)"
             throw "WordDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -62,7 +62,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.TEMP_DIR_ERROR "一時ディレクトリ作成エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.TEMP_DIR_ERROR "一時ディレクトリ作成エラー: $($_.Exception.Message)"
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -80,7 +80,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.WORD_APP_ERROR "Wordアプリケーション初期化エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.WORD_APP_ERROR "Wordアプリケーション初期化エラー: $($_.Exception.Message)"
             throw "Wordアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -98,7 +98,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.NEW_DOCUMENT_ERROR "新規ドキュメント作成エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.NEW_DOCUMENT_ERROR "新規ドキュメント作成エラー: $($_.Exception.Message)"
             throw "新規ドキュメントの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -127,7 +127,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_TEXT_ERROR "テキスト追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_TEXT_ERROR "テキスト追加エラー: $($_.Exception.Message)"
             throw "テキストの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -166,7 +166,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_HEADING_ERROR "見出し追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_HEADING_ERROR "見出し追加エラー: $($_.Exception.Message)"
             throw "見出しの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -194,7 +194,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_PARAGRAPH_ERROR "段落追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_PARAGRAPH_ERROR "段落追加エラー: $($_.Exception.Message)"
             throw "段落の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -252,7 +252,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_TABLE_ERROR "テーブル追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_TABLE_ERROR "テーブル追加エラー: $($_.Exception.Message)"
             throw "テーブルの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -284,7 +284,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_IMAGE_ERROR "画像追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_IMAGE_ERROR "画像追加エラー: $($_.Exception.Message)"
             throw "画像の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -305,7 +305,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_PAGE_BREAK_ERROR "ページ区切り追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_PAGE_BREAK_ERROR "ページ区切り追加エラー: $($_.Exception.Message)"
             throw "ページ区切りの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -335,7 +335,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.ADD_TOC_ERROR "目次追加エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.ADD_TOC_ERROR "目次追加エラー: $($_.Exception.Message)"
             throw "目次の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -372,7 +372,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.SET_FONT_ERROR "フォント設定エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.SET_FONT_ERROR "フォント設定エラー: $($_.Exception.Message)"
             throw "フォントの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -393,7 +393,7 @@ class WordDriver
 
             if ([string]::IsNullOrEmpty($file_path))
             {
-                $file_path = $this.file_path
+                $this.file_path = $this.file_path
             }
 
             $this.word_document.SaveAs($file_path)
@@ -403,7 +403,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.SAVE_DOCUMENT_ERROR "ドキュメント保存エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.SAVE_DOCUMENT_ERROR "ドキュメント保存エラー: $($_.Exception.Message)"
             throw "ドキュメントの保存に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -430,7 +430,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.UPDATE_TOC_ERROR "目次更新エラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.UPDATE_TOC_ERROR "目次更新エラー: $($_.Exception.Message)"
             throw "目次の更新に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -468,7 +468,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.OPEN_DOCUMENT_ERROR "ドキュメント開くエラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.OPEN_DOCUMENT_ERROR "ドキュメント開くエラー: $($_.Exception.Message)"
             throw "ドキュメントを開くのに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -592,7 +592,7 @@ class WordDriver
         }
         catch
         {
-            LogWordDriverError $WordDriverErrorCodes.DISPOSE_ERROR "WordDriver Disposeエラー: $($_.Exception.Message)"
+            LogWordDriverError WordDriverErrorCodes.DISPOSE_ERROR "WordDriver Disposeエラー: $($_.Exception.Message)"
             Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }

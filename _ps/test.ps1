@@ -7,9 +7,6 @@ write-host "TEST'$PSScriptRoot"
 . "$PSScriptRoot\_lib\WebDriver.ps1"
 . "$PSScriptRoot\_lib\ChromeDriver.ps1"
 . "$PSScriptRoot\_lib\EdgeDriver.ps1"
-. "$PSScriptRoot\_lib\WordDriver.ps1"
-
-
 
 Function Main()
 {
@@ -32,9 +29,9 @@ Function Main()
     {
         try
         {
-            $webdriver = [WebDriver]::new()
-            $webdriver.Open("https://www.google.com")
-            $webdriver.Close()
+            $driver = New-Object -TypeName 'EdgeDriver'
+            $driver.Navigate("https://www.google.com")
+            $driver.Close()
             $result = $SUCCESS_CODE
         }
         catch

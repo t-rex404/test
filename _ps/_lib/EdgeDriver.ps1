@@ -1,5 +1,5 @@
 # EdgeDriverエラー管理モジュールをインポート
-. "$PSScriptRoot\EdgeDriverErrors.ps1"
+import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
 
 class EdgeDriver : WebDriver
 {
@@ -45,7 +45,7 @@ class EdgeDriver : WebDriver
         {
             # 初期化に失敗した場合のクリーンアップ
             $this.CleanupOnInitializationFailure()
-            LogEdgeDriverError $EdgeDriverErrorCodes.INIT_ERROR "EdgeDriver初期化エラー: $($_.Exception.Message)"
+            LogEdgeDriverError EdgeDriverErrorCodes.INIT_ERROR "EdgeDriver初期化エラー: $($_.Exception.Message)"
             throw "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -66,11 +66,11 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $browser_exe_path = Get-ItemPropertyValue -Path $registry_path -Name '(default)' -ErrorAction Stop
-                    if ($browser_exe_path -and (Test-Path $browser_exe_path))
+                    $this.browser_exe_path = Get-ItemPropertyValue -Path $registry_path -Name '(default)' -ErrorAction Stop
+                    if ($this.browser_exe_path -and (Test-Path $this.browser_exe_path))
                     {
-                        Write-Host "Edge実行ファイルが見つかりました: $browser_exe_path"
-                        return $browser_exe_path
+                        Write-Host "Edge実行ファイルが見つかりました: $this.browser_exe_path"
+                        return $this.browser_exe_path
                     }
                 }
                 catch
@@ -100,7 +100,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError $EdgeDriverErrorCodes.EXECUTABLE_PATH_ERROR "Edge実行ファイルパス取得エラー: $($_.Exception.Message)"
+            LogEdgeDriverError EdgeDriverErrorCodes.EXECUTABLE_PATH_ERROR "Edge実行ファイルパス取得エラー: $($_.Exception.Message)"
             throw "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -118,7 +118,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError $EdgeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)"
+            LogEdgeDriverError EdgeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)"
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -144,7 +144,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError $EdgeDriverErrorCodes.DEBUG_MODE_ERROR "デバッグモード有効化エラー: $($_.Exception.Message)"
+            LogEdgeDriverError EdgeDriverErrorCodes.DEBUG_MODE_ERROR "デバッグモード有効化エラー: $($_.Exception.Message)"
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -235,7 +235,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError $EdgeDriverErrorCodes.DISPOSE_ERROR "EdgeDriver Disposeエラー: $($_.Exception.Message)"
+            LogEdgeDriverError EdgeDriverErrorCodes.DISPOSE_ERROR "EdgeDriver Disposeエラー: $($_.Exception.Message)"
             Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
