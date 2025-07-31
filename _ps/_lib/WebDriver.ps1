@@ -1,5 +1,9 @@
 ﻿# WebDriverエラー管理モジュールをインポート
-import-module "$PSScriptRoot\WebDriverErrors.psm1"
+#import-module "$PSScriptRoot\WebDriverErrors.psm1"
+
+# 共通ライブラリをインポート
+#. "$PSScriptRoot\Common.ps1"
+#$Common = New-Object -TypeName 'Common'
 
 # WebDriverクラス
 class WebDriver
@@ -21,7 +25,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1001)
-            LogWebDriverError $WebDriverErrorCodes.INIT_ERROR "WebDriver初期化エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1001", "WebDriver初期化エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log") | Out-Null
             throw "WebDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -98,7 +102,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1002)
-            LogWebDriverError $WebDriverErrorCodes.BROWSER_START_ERROR "ブラウザ起動エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1002", "ブラウザ起動エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ブラウザの起動に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -161,7 +165,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1003)
-            LogWebDriverError $WebDriverErrorCodes.TAB_INFO_ERROR "タブ情報取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1003", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "タブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -235,7 +239,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1004)
-            LogWebDriverError $WebDriverErrorCodes.WEBSOCKET_CONNECTION_ERROR "WebSocket接続エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1004", "WebSocket接続エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "WebSocket接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -281,7 +285,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1005)
-            LogWebDriverError $WebDriverErrorCodes.WEBSOCKET_SEND_ERROR "WebSocket メッセージ送信エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1005", "WebSocket メッセージ送信エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "WebSocketメッセージ送信に失敗しました: $($_.Exception.Message)"
         }
         finally
@@ -403,7 +407,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1006)
-            LogWebDriverError $WebDriverErrorCodes.WEBSOCKET_RECEIVE_ERROR "WebSocket メッセージ受信エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1006", "WebSocket メッセージ受信エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "WebSocketメッセージの受信に失敗しました: $($_.Exception.Message)"
         }
         return $response_json
@@ -535,7 +539,7 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1011)
-            LogWebDriverError $WebDriverErrorCodes.NAVIGATION_ERROR "ページ遷移エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1011", "ページ遷移エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ページ遷移に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -590,7 +594,7 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1016)
-            LogWebDriverError $WebDriverErrorCodes.AD_LOAD_WAIT_ERROR "広告読み込み待機エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1016", "広告読み込み待機エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "広告の読み込み待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -623,7 +627,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1077)
-            LogWebDriverError $WebDriverErrorCodes.CLOSE_WINDOW_ERROR "ウィンドウを閉じるエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1077", "ウィンドウを閉じるエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             Write-Host "ウィンドウを閉じる際にエラーが発生しました: $($_.Exception.Message)"
         }
     }
@@ -693,7 +697,7 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1007)
-            LogWebDriverError $WebDriverErrorCodes.DISPOSE_ERROR "Disposeエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1007", "Disposeエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             Write-Host "リソースの解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
@@ -726,7 +730,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1081)
-            LogWebDriverError $WebDriverErrorCodes.DISCOVER_TARGETS_ERROR "ターゲット発見エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1081", "ターゲット発見エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ターゲットの発見に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -755,7 +759,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1082)
-            LogWebDriverError $WebDriverErrorCodes.GET_AVAILABLE_TABS_ERROR "タブ情報取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1082", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "利用可能なタブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -786,7 +790,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1083)
-            LogWebDriverError $WebDriverErrorCodes.SET_ACTIVE_TAB_ERROR "タブアクティブ化エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1083", "タブアクティブ化エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "タブのアクティブ化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -817,7 +821,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1084)
-            LogWebDriverError $WebDriverErrorCodes.CLOSE_TAB_ERROR "タブ切断エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1084", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "タブの切断に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -843,7 +847,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1085)
-            LogWebDriverError $WebDriverErrorCodes.ENABLE_PAGE_EVENTS_ERROR "ページイベント有効化エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1085", "ページイベント有効化エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ページイベントの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -887,7 +891,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1021)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENT_ERROR "要素検索エラー (CSS): $($_.Exception.Message)"
+            $global:Common.HandleError("1021", "要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "CSSセレクタでの要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -927,7 +931,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1028)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENTS_ERROR "複数要素検索エラー (CSS): $($_.Exception.Message)"
+            $global:Common.HandleError("1028", "複数要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "CSSセレクタでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -967,7 +971,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1022)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENT_GENERIC_ERROR "要素検索エラー ($query_type): $($_.Exception.Message)"
+            $global:Common.HandleError("1022", "要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "$query_type による要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1007,7 +1011,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1029)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENTS_GENERIC_ERROR "複数要素検索エラー ($query_type): $($_.Exception.Message)"
+            $global:Common.HandleError("1029", "複数要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "$query_type による複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1056,7 +1060,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1030)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENTS_BY_CLASSNAME_ERROR "複数要素検索エラー (ClassName): $($_.Exception.Message)"
+            $global:Common.HandleError("1030", "複数要素検索エラー (ClassName): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ClassNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1096,7 +1100,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1031)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENTS_BY_NAME_ERROR "複数要素検索エラー (Name): $($_.Exception.Message)"
+            $global:Common.HandleError("1031", "複数要素検索エラー (Name): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "Nameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1136,7 +1140,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1032)
-            LogWebDriverError $WebDriverErrorCodes.FIND_ELEMENTS_BY_TAGNAME_ERROR "複数要素検索エラー (TagName): $($_.Exception.Message)"
+            $global:Common.HandleError("1032", "複数要素検索エラー (TagName): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "TagNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1176,7 +1180,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1033)
-            LogWebDriverError $WebDriverErrorCodes.IS_EXISTS_ELEMENT_GENERIC_ERROR "要素存在確認エラー ($query_type): $($_.Exception.Message)"
+            $global:Common.HandleError("1033", "要素存在確認エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "$query_type による要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1197,7 +1201,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1034)
-            LogWebDriverError $WebDriverErrorCodes.IS_EXISTS_ELEMENT_XPATH_ERROR "XPath要素存在確認エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1034", "XPath要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "XPathでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1223,7 +1227,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1035)
-            LogWebDriverError $WebDriverErrorCodes.IS_EXISTS_ELEMENT_CLASSNAME_ERROR "ClassName要素存在確認エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1035", "ClassName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ClassNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1244,7 +1248,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1036)
-            LogWebDriverError $WebDriverErrorCodes.IS_EXISTS_ELEMENT_ID_ERROR "Id要素存在確認エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1036", "Id要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "Idでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1270,7 +1274,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1037)
-            LogWebDriverError $WebDriverErrorCodes.IS_EXISTS_ELEMENT_NAME_ERROR "Name要素存在確認エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1037", "Name要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "Nameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1296,7 +1300,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1038)
-            LogWebDriverError $WebDriverErrorCodes.IS_EXISTS_ELEMENT_TAGNAME_ERROR "TagName要素存在確認エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1038", "TagName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "TagNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1333,7 +1337,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1051)
-            LogWebDriverError $WebDriverErrorCodes.GET_ELEMENT_TEXT_ERROR "要素テキスト取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1051", "要素テキスト取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のテキスト取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1364,7 +1368,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1052)
-            LogWebDriverError $WebDriverErrorCodes.SET_ELEMENT_TEXT_ERROR "要素テキスト設定エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1052", "要素テキスト設定エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素へのテキスト入力に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1395,7 +1399,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1054)
-            LogWebDriverError $WebDriverErrorCodes.CLICK_ELEMENT_ERROR "要素クリックエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1054", "要素クリックエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のクリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1433,7 +1437,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1060)
-            LogWebDriverError $WebDriverErrorCodes.GET_ELEMENT_ATTRIBUTE_ERROR "要素属性取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1060", "要素属性取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素の属性取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1469,7 +1473,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1061)
-            LogWebDriverError $WebDriverErrorCodes.SET_ELEMENT_ATTRIBUTE_ERROR "要素属性設定エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1061", "要素属性設定エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素の属性設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1503,7 +1507,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1064)
-            LogWebDriverError $WebDriverErrorCodes.GET_HREF_ERROR "href取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1064", "href取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "hrefの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1541,7 +1545,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1062)
-            LogWebDriverError $WebDriverErrorCodes.GET_ELEMENT_CSS_PROPERTY_ERROR "CSSプロパティ取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1062", "CSSプロパティ取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のCSSプロパティ取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1577,7 +1581,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1063)
-            LogWebDriverError $WebDriverErrorCodes.SET_ELEMENT_CSS_PROPERTY_ERROR "CSSプロパティ設定エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1063", "CSSプロパティ設定エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のCSSプロパティ設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1617,7 +1621,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1065)
-            LogWebDriverError $WebDriverErrorCodes.SELECT_OPTION_BY_INDEX_ERROR "オプション選択エラー (インデックス): $($_.Exception.Message)"
+            $global:Common.HandleError("1065", "オプション選択エラー (インデックス): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "インデックスによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1653,7 +1657,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1066)
-            LogWebDriverError $WebDriverErrorCodes.SELECT_OPTION_BY_TEXT_ERROR "オプション選択エラー (テキスト): $($_.Exception.Message)"
+            $global:Common.HandleError("1066", "オプション選択エラー (テキスト): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "テキストによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1684,7 +1688,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1067)
-            LogWebDriverError $WebDriverErrorCodes.DESELECT_ALL_OPTIONS_ERROR "オプション未選択エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1067", "オプション未選択エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "オプションの未選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1715,7 +1719,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1053)
-            LogWebDriverError $WebDriverErrorCodes.CLEAR_ELEMENT_ERROR "要素クリアエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1053", "要素クリアエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のクリアに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1755,7 +1759,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1071)
-            LogWebDriverError $WebDriverErrorCodes.RESIZE_WINDOW_ERROR "ウィンドウリサイズエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1071", "ウィンドウリサイズエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウのリサイズに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1786,7 +1790,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1072)
-            LogWebDriverError $WebDriverErrorCodes.NORMAL_WINDOW_ERROR "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)"
+            $global:Common.HandleError("1072", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウの通常状態への変更に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1817,7 +1821,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1073)
-            LogWebDriverError $WebDriverErrorCodes.MAXIMIZE_WINDOW_ERROR "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)"
+            $global:Common.HandleError("1073", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウの最大化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1848,7 +1852,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1074)
-            LogWebDriverError $WebDriverErrorCodes.MINIMIZE_WINDOW_ERROR "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)"
+            $global:Common.HandleError("1074", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウの最小化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1879,7 +1883,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1075)
-            LogWebDriverError $WebDriverErrorCodes.FULLSCREEN_WINDOW_ERROR "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)"
+            $global:Common.HandleError("1075", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウのフルスクリーン化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1910,7 +1914,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1076)
-            LogWebDriverError $WebDriverErrorCodes.MOVE_WINDOW_ERROR "ウィンドウ移動エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1076", "ウィンドウ移動エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウの移動に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1940,7 +1944,7 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1012)
-            LogWebDriverError $WebDriverErrorCodes.GO_BACK_ERROR "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)"
+            $global:Common.HandleError("1012", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ブラウザの履歴を戻る操作に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1966,7 +1970,7 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1013)
-            LogWebDriverError $WebDriverErrorCodes.GO_FORWARD_ERROR "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)"
+            $global:Common.HandleError("1013", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ブラウザの履歴を進む操作に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1992,7 +1996,7 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1014)
-            LogWebDriverError $WebDriverErrorCodes.REFRESH_ERROR "ブラウザ更新エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1014", "ブラウザ更新エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ブラウザの更新に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2029,7 +2033,7 @@ class WebDriver
         catch
         {
             # 情報取得関連エラー (1091)
-            LogWebDriverError $WebDriverErrorCodes.GET_URL_ERROR "URL取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1091", "URL取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "URLの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2062,7 +2066,7 @@ class WebDriver
         catch
         {
             # 情報取得関連エラー (1092)
-            LogWebDriverError $WebDriverErrorCodes.GET_TITLE_ERROR "タイトル取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1092", "タイトル取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "タイトルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2090,7 +2094,7 @@ class WebDriver
         catch
         {
             # 情報取得関連エラー (1093)
-            LogWebDriverError $WebDriverErrorCodes.GET_SOURCE_CODE_ERROR "ソースコード取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1093", "ソースコード取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ソースコードの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2123,7 +2127,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1078)
-            LogWebDriverError $WebDriverErrorCodes.GET_WINDOW_HANDLE_ERROR "ウィンドウハンドル取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1078", "ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2160,7 +2164,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1079)
-            LogWebDriverError $WebDriverErrorCodes.GET_WINDOW_HANDLES_ERROR "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1079", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "複数のウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2191,7 +2195,7 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1080)
-            LogWebDriverError $WebDriverErrorCodes.GET_WINDOW_SIZE_ERROR "ウィンドウサイズ取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1080", "ウィンドウサイズ取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ウィンドウサイズの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2302,7 +2306,7 @@ class WebDriver
         catch
         {
             # スクリーンショット関連エラー (1101)
-            LogWebDriverError $WebDriverErrorCodes.SCREENSHOT_ERROR "スクリーンショット取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1101", "スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "スクリーンショットの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2399,7 +2403,7 @@ class WebDriver
         catch
         {
             # スクリーンショット関連エラー (1102)
-            LogWebDriverError $WebDriverErrorCodes.SCREENSHOT_OBJECT_ERROR "要素スクリーンショット取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1102", "要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
 
@@ -2493,7 +2497,7 @@ class WebDriver
         catch
         {
             # スクリーンショット関連エラー (1103)
-            LogWebDriverError $WebDriverErrorCodes.SCREENSHOT_OBJECTS_ERROR "複数要素スクリーンショット取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1103", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "複数要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2550,7 +2554,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1039)
-            LogWebDriverError $WebDriverErrorCodes.WAIT_FOR_ELEMENT_VISIBLE_ERROR "要素表示待機エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1039", "要素表示待機エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素の表示待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2613,7 +2617,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1040)
-            LogWebDriverError $WebDriverErrorCodes.WAIT_FOR_ELEMENT_CLICKABLE_ERROR "要素クリック可能性待機エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1040", "要素クリック可能性待機エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "要素のクリック可能性待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2661,7 +2665,7 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1015)
-            LogWebDriverError $WebDriverErrorCodes.WAIT_FOR_PAGE_LOAD_ERROR "ページロード待機エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1015", "ページロード待機エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ページロードの待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2714,7 +2718,7 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1041)
-            LogWebDriverError $WebDriverErrorCodes.WAIT_FOR_CONDITION_ERROR "カスタム条件待機エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1041", "カスタム条件待機エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "カスタム条件の待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2754,7 +2758,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1058)
-            LogWebDriverError $WebDriverErrorCodes.SEND_KEYS_ERROR "キーボード入力エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1058", "キーボード入力エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "キーボード入力に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2825,7 +2829,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1059)
-            LogWebDriverError $WebDriverErrorCodes.SEND_SPECIAL_KEY_ERROR "特殊キー送信エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1059", "特殊キー送信エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "特殊キーの送信に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2860,7 +2864,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1057)
-            LogWebDriverError $WebDriverErrorCodes.MOUSE_HOVER_ERROR "マウスホバーエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1057", "マウスホバーエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "マウスホバーに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2891,7 +2895,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1055)
-            LogWebDriverError $WebDriverErrorCodes.DOUBLE_CLICK_ERROR "ダブルクリックエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1055", "ダブルクリックエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ダブルクリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2922,7 +2926,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1056)
-            LogWebDriverError $WebDriverErrorCodes.RIGHT_CLICK_ERROR "右クリックエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1056", "右クリックエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "右クリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2957,7 +2961,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1068)
-            LogWebDriverError $WebDriverErrorCodes.SET_CHECKBOX_ERROR "チェックボックス設定エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1068", "チェックボックス設定エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "チェックボックスの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2988,7 +2992,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1069)
-            LogWebDriverError $WebDriverErrorCodes.SELECT_RADIO_BUTTON_ERROR "ラジオボタン選択エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1069", "ラジオボタン選択エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ラジオボタンの選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3048,7 +3052,7 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1070)
-            LogWebDriverError $WebDriverErrorCodes.UPLOAD_FILE_ERROR "ファイルアップロードエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1070", "ファイルアップロードエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ファイルアップロードに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3085,7 +3089,7 @@ class WebDriver
         catch
         {
             # JavaScript実行関連エラー (1111)
-            LogWebDriverError $WebDriverErrorCodes.EXECUTE_SCRIPT_ERROR "JavaScript実行エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1111", "JavaScript実行エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "JavaScriptの実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3116,7 +3120,7 @@ class WebDriver
         catch
         {
             # JavaScript実行関連エラー (1112)
-            LogWebDriverError $WebDriverErrorCodes.EXECUTE_SCRIPT_ASYNC_ERROR "JavaScript非同期実行エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1112", "JavaScript非同期実行エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "JavaScriptの非同期実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3153,7 +3157,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1121)
-            LogWebDriverError $WebDriverErrorCodes.GET_COOKIE_ERROR "クッキー取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1121", "クッキー取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "クッキーの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3192,7 +3196,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1122)
-            LogWebDriverError $WebDriverErrorCodes.SET_COOKIE_ERROR "クッキー設定エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1122", "クッキー設定エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "クッキーの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3223,7 +3227,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1123)
-            LogWebDriverError $WebDriverErrorCodes.DELETE_COOKIE_ERROR "クッキー削除エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1123", "クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3249,7 +3253,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1124)
-            LogWebDriverError $WebDriverErrorCodes.CLEAR_ALL_COOKIES_ERROR "全クッキー削除エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1124", "全クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "全クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3286,7 +3290,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1125)
-            LogWebDriverError $WebDriverErrorCodes.GET_LOCAL_STORAGE_ERROR "ローカルストレージ取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1125", "ローカルストレージ取得エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ローカルストレージの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3317,7 +3321,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1126)
-            LogWebDriverError $WebDriverErrorCodes.SET_LOCAL_STORAGE_ERROR "ローカルストレージ設定エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1126", "ローカルストレージ設定エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ローカルストレージの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3348,7 +3352,7 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1127)
-            LogWebDriverError $WebDriverErrorCodes.REMOVE_LOCAL_STORAGE_ERROR "ローカルストレージ削除エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1127", "ローカルストレージ削除エラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ローカルストレージの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3374,8 +3378,13 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1128)
-            LogWebDriverError $WebDriverErrorCodes.CLEAR_LOCAL_STORAGE_ERROR "ローカルストレージクリアエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("1128", "ローカルストレージクリアエラー: $($_.Exception.Message)", "WebDriver", ".\WebDriver_Error.log")
             throw "ローカルストレージのクリアに失敗しました: $($_.Exception.Message)"
         }
     }
 }
+
+
+
+
+

@@ -1,5 +1,8 @@
-# EdgeDriverエラー管理モジュールをインポート
-import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
+﻿# EdgeDriverエラー管理モジュールをインポート
+#import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
+
+# 共通ライブラリをインポート
+. "$PSScriptRoot\Common.ps1"
 
 class EdgeDriver : WebDriver
 {
@@ -45,7 +48,7 @@ class EdgeDriver : WebDriver
         {
             # 初期化に失敗した場合のクリーンアップ
             $this.CleanupOnInitializationFailure()
-            LogEdgeDriverError EdgeDriverErrorCodes.INIT_ERROR "EdgeDriver初期化エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("2001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
             throw "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -100,7 +103,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError EdgeDriverErrorCodes.EXECUTABLE_PATH_ERROR "Edge実行ファイルパス取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("2002", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
             throw "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -124,7 +127,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError EdgeDriverErrorCodes.USER_DATA_DIR_ERROR "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("2003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -150,7 +153,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError EdgeDriverErrorCodes.DEBUG_MODE_ERROR "デバッグモード有効化エラー: $($_.Exception.Message)"
+            $global:Common.HandleError("2004", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -241,8 +244,11 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            LogEdgeDriverError EdgeDriverErrorCodes.DISPOSE_ERROR "EdgeDriver Disposeエラー: $($_.Exception.Message)"
+            $global:Common.HandleError("2005", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
             Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 }
+
+
+
