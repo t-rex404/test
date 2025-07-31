@@ -65,12 +65,13 @@ class WebDriver
             }
 
             $url = 'about:blank'
-            $argument_list = '--new-window ' + $url + ' --remote-debugging-port=9222 --disable-popup-blocking --no-first-run --user-data-dir=' + $browser_user_data_dir
+            $argument_list = '--new-window ' + $url + ' --remote-debugging-port=9222 --disable-popup-blocking --no-first-run --disable-fre --user-data-dir=' + $browser_user_data_dir
                 # 引数の意味
                 # --new-window                 : 新しいウィンドウを開く。
                 # --remote-debugging-port=9222 : デバッグ用 WebSocket をポート 9222 で有効化。
                 # --disable-popup-blocking     : パップアップを無効化。
                 # --no-first-run               : 最初の起動を無効化。
+                # --disable-fre                : フリを無効化。
                 # --user-data-dir              : ユーザーデータを指定(別のプロファイルを指定)（既存のブラウザに影響を与えないようにするため）。
                 
             # ブラウザをデバッグモードで開く
