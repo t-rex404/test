@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExcelDriver.ps1 - 使用方法</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>ExcelDriver.ps1</h1>
+            <p>Microsoft Excelワークブックの自動操作を提供するクラス</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <a href="../index.html" class="back-link">← メインページに戻る</a>
+
+            <!-- 隠しコマンド用の透明な要素 -->
+            <div id="hiddenCommand" style="position: fixed; top: 0; left: 0; width: 50px; height: 50px; z-index: 9999; opacity: 0; cursor: default;"></div>
+
+            <!-- 概要 -->
+            <div class="detail-page">
+                <h2>概要</h2>
+                <p>ExcelDriver.ps1は、Microsoft Excelワークブックの自動操作を提供するクラスです。セル操作、ワークシート管理、データ処理機能を統合的に管理し、PowerShellからExcelファイルを効率的に操作できます。</p>
+                
+                <div class="info-box">
+                    <h3>主な特徴</h3>
+                    <ul>
+                        <li><strong>ワークブック管理:</strong> 新規ワークブックの作成、既存ワークブックの開き、保存</li>
+                        <li><strong>セル操作:</strong> セルの値設定・取得、範囲操作、フォーマット</li>
+                        <li><strong>ワークシート管理:</strong> ワークシートの追加、選択、削除</li>
+                        <li><strong>データ処理:</strong> データの読み込み、書き込み、変換</li>
+                        <li><strong>フォーマット機能:</strong> フォント、スタイル、色、罫線の設定</li>
+                        <li><strong>エラーハンドリング:</strong> 包括的なエラー管理とログ機能</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 初期化 -->
+            <div class="detail-page">
+                <h2>初期化</h2>
+                <p>ExcelDriverクラスは、Microsoft Excelアプリケーションの初期化と新規ワークブックの作成を行います。</p>
+                
+                <div class="code-block">
+                    <pre># ライブラリのインポート
+. "$PSScriptRoot\_lib\ExcelDriver.ps1"
+
+# ExcelDriverの初期化
+$excelDriver = [ExcelDriver]::new()</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>初期化プロセス</h3>
+                    <ol>
+                        <li><strong>Excelアプリケーション起動:</strong> Microsoft Excelアプリケーションを起動</li>
+                        <li><strong>一時ディレクトリ作成:</strong> 作業用の一時ディレクトリを作成</li>
+                        <li><strong>新規ワークブック作成:</strong> 新しいExcelワークブックを作成</li>
+                        <li><strong>COMオブジェクト管理:</strong> Excel COMオブジェクトの初期化</li>
+                    </ol>
+                </div>
+
+                <div class="warning-box">
+                    <h3>注意事項</h3>
+                    <ul>
+                        <li>Microsoft Excelがインストールされていることを確認してください</li>
+                        <li>初期化後は必ず<code>Dispose()</code>メソッドでリソースを解放してください</li>
+                        <li>Excelのバージョンによっては動作が異なる場合があります</li>
+                        <li>COMオブジェクトの権限が必要な場合があります</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- セル操作 -->
+            <div class="detail-page">
+                <h2>セル操作</h2>
+                <p>ExcelDriverでは、個別のセルや範囲の操作が可能です。</p>
+                
+                <div class="method-category">
+                    <h4>基本的なセル操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SetCellValue(cellAddress, value)</strong> - セルに値を設定</li>
+                        <li><strong>GetCellValue(cellAddress)</strong> - セルの値を取得</li>
+                        <li><strong>SetRangeValue(startCell, endCell, values)</strong> - 範囲に値を設定</li>
+                        <li><strong>GetRangeValue(startCell, endCell)</strong> - 範囲の値を取得</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># 基本的なセル操作
+$excelDriver = [ExcelDriver]::new()
+
+# セルに値を設定
+$excelDriver.SetCellValue("A1", "商品名")
+$excelDriver.SetCellValue("B1", "価格")
+$excelDriver.SetCellValue("C1", "数量")
+
+# セルの値を取得
+$value = $excelDriver.GetCellValue("A1")
+Write-Host "A1の値: $value"
+
+# 範囲に値を設定
+$data = @(
+    @("商品A", 1000, 10),
+    @("商品B", 2000, 5),
+    @("商品C", 1500, 8)
+)
+$excelDriver.SetRangeValue("A2", "C4", $data)</pre>
+                </div>
+            </div>
+
+            <!-- ワークシート操作 -->
+            <div class="detail-page">
+                <h2>ワークシート操作</h2>
+                <p>ExcelDriverでは、ワークシートの管理が可能です。</p>
+                
+                <div class="method-category">
+                    <h4>ワークシート操作</h4>
+                    <ul class="method-list">
+                        <li><strong>AddWorksheet(sheetName)</strong> - ワークシートを追加</li>
+                        <li><strong>SelectWorksheet(sheetName)</strong> - ワークシートを選択</li>
+                        <li><strong>DeleteWorksheet(sheetName)</strong> - ワークシートを削除</li>
+                        <li><strong>GetWorksheetNames()</strong> - ワークシート名の一覧を取得</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># ワークシート操作の例
+$excelDriver = [ExcelDriver]::new()
+
+# 新しいワークシートを追加
+$excelDriver.AddWorksheet("売上データ")
+$excelDriver.AddWorksheet("月次レポート")
+
+# ワークシートを選択
+$excelDriver.SelectWorksheet("売上データ")
+
+# 選択したワークシートにデータを追加
+$excelDriver.SetCellValue("A1", "売上データ")
+
+# 別のワークシートに切り替え
+$excelDriver.SelectWorksheet("月次レポート")
+$excelDriver.SetCellValue("A1", "月次レポート")
+
+# ワークシート名の一覧を取得
+$sheetNames = $excelDriver.GetWorksheetNames()
+foreach ($name in $sheetNames) {
+    Write-Host "ワークシート: $name"
+}</pre>
+                </div>
+            </div>
+
+            <!-- フォーマット操作 -->
+            <div class="detail-page">
+                <h2>フォーマット操作</h2>
+                <p>ExcelDriverでは、セルのフォーマットを設定できます。</p>
+                
+                <div class="method-category">
+                    <h4>フォーマット操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SetCellFont(cellAddress, fontName, fontSize)</strong> - セルのフォントを設定</li>
+                        <li><strong>SetCellBold(cellAddress, bold)</strong> - セルを太字に設定</li>
+                        <li><strong>SetCellBackgroundColor(cellAddress, color)</strong> - セルの背景色を設定</li>
+                        <li><strong>SetCellBorder(cellAddress, borderStyle)</strong> - セルの罫線を設定</li>
+                        <li><strong>SetCellAlignment(cellAddress, alignment)</strong> - セルの配置を設定</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># フォーマット操作の例
+$excelDriver = [ExcelDriver]::new()
+
+# ヘッダー行を設定
+$excelDriver.SetCellValue("A1", "商品名")
+$excelDriver.SetCellValue("B1", "価格")
+$excelDriver.SetCellValue("C1", "数量")
+
+# ヘッダーのフォーマット
+$excelDriver.SetCellFont("A1:C1", "Arial", 12)
+$excelDriver.SetCellBold("A1:C1", $true)
+$excelDriver.SetCellBackgroundColor("A1:C1", "LightBlue")
+$excelDriver.SetCellAlignment("A1:C1", "Center")
+
+# データ行を設定
+$excelDriver.SetCellValue("A2", "商品A")
+$excelDriver.SetCellValue("B2", 1000)
+$excelDriver.SetCellValue("C2", 10)
+
+# データ行のフォーマット
+$excelDriver.SetCellFont("A2:C2", "Calibri", 11)
+$excelDriver.SetCellAlignment("B2:C2", "Right")</pre>
+                </div>
+            </div>
+
+            <!-- データ処理 -->
+            <div class="detail-page">
+                <h2>データ処理</h2>
+                <p>ExcelDriverでは、大量のデータを効率的に処理できます。</p>
+                
+                <div class="method-category">
+                    <h4>データ処理機能</h4>
+                    <ul class="method-list">
+                        <li><strong>ImportFromArray(data, startCell)</strong> - 配列からデータをインポート</li>
+                        <li><strong>ExportToArray(startCell, endCell)</strong> - データを配列にエクスポート</li>
+                        <li><strong>ImportFromCsv(csvPath, startCell)</strong> - CSVファイルからデータをインポート</li>
+                        <li><strong>ExportToCsv(startCell, endCell, csvPath)</strong> - データをCSVファイルにエクスポート</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># データ処理の例
+$excelDriver = [ExcelDriver]::new()
+
+# 配列からデータをインポート
+$data = @(
+    @("商品A", 1000, 10, "2024-01-01"),
+    @("商品B", 2000, 5, "2024-01-02"),
+    @("商品C", 1500, 8, "2024-01-03"),
+    @("商品D", 3000, 3, "2024-01-04")
+)
+$excelDriver.ImportFromArray($data, "A2")
+
+# ヘッダーを設定
+$headers = @("商品名", "価格", "数量", "日付")
+$excelDriver.ImportFromArray($headers, "A1")
+
+# データを配列にエクスポート
+$exportedData = $excelDriver.ExportToArray("A1", "D5")
+
+# CSVファイルにエクスポート
+$excelDriver.ExportToCsv("A1", "D5", "C:\output\data.csv")</pre>
+                </div>
+            </div>
+
+            <!-- 数式操作 -->
+            <div class="detail-page">
+                <h2>数式操作</h2>
+                <p>ExcelDriverでは、Excel数式を設定できます。</p>
+                
+                <div class="method-category">
+                    <h4>数式操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SetCellFormula(cellAddress, formula)</strong> - セルに数式を設定</li>
+                        <li><strong>GetCellFormula(cellAddress)</strong> - セルの数式を取得</li>
+                        <li><strong>CalculateWorksheet()</strong> - ワークシートの計算を実行</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># 数式操作の例
+$excelDriver = [ExcelDriver]::new()
+
+# データを設定
+$excelDriver.SetCellValue("A1", "商品名")
+$excelDriver.SetCellValue("B1", "価格")
+$excelDriver.SetCellValue("C1", "数量")
+$excelDriver.SetCellValue("D1", "小計")
+
+$excelDriver.SetCellValue("A2", "商品A")
+$excelDriver.SetCellValue("B2", 1000)
+$excelDriver.SetCellValue("C2", 10)
+
+$excelDriver.SetCellValue("A3", "商品B")
+$excelDriver.SetCellValue("B3", 2000)
+$excelDriver.SetCellValue("C3", 5)
+
+# 数式を設定
+$excelDriver.SetCellFormula("D2", "=B2*C2")
+$excelDriver.SetCellFormula("D3", "=B3*C3")
+
+# 合計行を追加
+$excelDriver.SetCellValue("A4", "合計")
+$excelDriver.SetCellFormula("D4", "=SUM(D2:D3)")
+
+# 計算を実行
+$excelDriver.CalculateWorksheet()</pre>
+                </div>
+            </div>
+
+            <!-- ファイル操作 -->
+            <div class="detail-page">
+                <h2>ファイル操作</h2>
+                <p>ExcelDriverでは、ワークブックの保存と開きが可能です。</p>
+                
+                <div class="method-category">
+                    <h4>ファイル操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SaveWorkbook(filePath)</strong> - ワークブックを保存</li>
+                        <li><strong>OpenWorkbook(filePath)</strong> - 既存のワークブックを開く</li>
+                        <li><strong>CloseWorkbook()</strong> - ワークブックを閉じる</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># ファイル操作の例
+$excelDriver = [ExcelDriver]::new()
+
+# ワークブックにデータを追加
+$excelDriver.SetCellValue("A1", "サンプルデータ")
+$excelDriver.SetCellValue("A2", "Hello, Excel!")
+
+# ワークブックを保存
+$excelDriver.SaveWorkbook("C:\output\sample.xlsx")
+
+# 既存のワークブックを開く
+$excelDriver.OpenWorkbook("C:\input\existing.xlsx")
+
+# ワークブックを編集
+$excelDriver.SetCellValue("B1", "新しいデータ")
+
+# 変更を保存
+$excelDriver.SaveWorkbook("C:\output\updated.xlsx")</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>サポートされるファイル形式</h3>
+                    <ul>
+                        <li><strong>.xlsx:</strong> Excel 2007以降の標準形式</li>
+                        <li><strong>.xls:</strong> Excel 97-2003形式（互換性）</li>
+                        <li><strong>.csv:</strong> CSV形式（読み書き）</li>
+                        <li><strong>.txt:</strong> テキスト形式（タブ区切り）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- エラーハンドリング -->
+            <div class="detail-page">
+                <h2>エラーハンドリング</h2>
+                <p>ExcelDriverでは、Excel固有のエラーと一般的なエラーを包括的に管理します。</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>エラーコード</th>
+                                <th>エラー名</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>5001</td>
+                                <td>ExcelDriver初期化エラー</td>
+                                <td>ExcelDriverの初期化に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5002</td>
+                                <td>一時ディレクトリ作成エラー</td>
+                                <td>一時ディレクトリの作成に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5003</td>
+                                <td>Excelアプリケーション初期化エラー</td>
+                                <td>Excelアプリケーションの起動に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5004</td>
+                                <td>新規ワークブック作成エラー</td>
+                                <td>新規ワークブックの作成に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5005</td>
+                                <td>セル値設定エラー</td>
+                                <td>セルへの値設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5006</td>
+                                <td>セル値取得エラー</td>
+                                <td>セルからの値取得に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5007</td>
+                                <td>範囲値設定エラー</td>
+                                <td>範囲への値設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5008</td>
+                                <td>範囲値取得エラー</td>
+                                <td>範囲からの値取得に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5009</td>
+                                <td>ワークシート追加エラー</td>
+                                <td>ワークシートの追加に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5010</td>
+                                <td>ワークシート選択エラー</td>
+                                <td>ワークシートの選択に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5011</td>
+                                <td>フォント設定エラー</td>
+                                <td>フォントの設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5012</td>
+                                <td>ワークブック保存エラー</td>
+                                <td>ワークブックの保存に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5013</td>
+                                <td>ワークブック開くエラー</td>
+                                <td>ワークブックの開きに失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5014</td>
+                                <td>数式設定エラー</td>
+                                <td>数式の設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5015</td>
+                                <td>計算実行エラー</td>
+                                <td>計算の実行に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>5016</td>
+                                <td>ExcelDriver Disposeエラー</td>
+                                <td>リソース解放時にエラーが発生した場合</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <pre># エラーハンドリングの例
+try {
+    $excelDriver = [ExcelDriver]::new()
+    
+    # ワークブックにデータを追加
+    $excelDriver.SetCellValue("A1", "エラーハンドリング例")
+    $excelDriver.SetCellValue("A2", "このワークブックは正常に作成されました。")
+    
+    # ワークブックを保存
+    $excelDriver.SaveWorkbook("C:\output\example.xlsx")
+}
+catch {
+    Write-Host "ExcelDriverエラー: $($_.Exception.Message)" -ForegroundColor Red
+    # エラーログは自動的に .\AllDrivers_Error.log に出力されます
+}
+finally {
+    if ($excelDriver) {
+        $excelDriver.Dispose()
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- リソース管理 -->
+            <div class="detail-page">
+                <h2>リソース管理</h2>
+                <p>ExcelDriverは、適切なリソース管理を提供します。</p>
+                
+                <div class="method-category">
+                    <h4>リソース管理</h4>
+                    <ul class="method-list">
+                        <li><strong>Dispose()</strong> - リソースを解放</li>
+                        <li><strong>CloseWorkbook()</strong> - ワークブックを閉じる</li>
+                        <li><strong>QuitExcel()</strong> - Excelアプリケーションを終了</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># リソース管理の例
+try {
+    $excelDriver = [ExcelDriver]::new()
+    
+    # ワークブック操作...
+    $excelDriver.SetCellValue("A1", "Hello, Excel!")
+    $excelDriver.SaveWorkbook("C:\output\test.xlsx")
+}
+finally {
+    if ($excelDriver) {
+        # リソースを解放
+        $excelDriver.Dispose()
+    }
+}</pre>
+                </div>
+
+                <div class="warning-box">
+                    <h3>重要</h3>
+                    <p>ExcelDriverインスタンスは必ず<code>Dispose()</code>メソッドでリソースを解放してください。そうしないと、Excelプロセスが残り続ける可能性があります。</p>
+                </div>
+            </div>
+
+            <!-- 使用例 -->
+            <div class="detail-page">
+                <h2>使用例</h2>
+                
+                <h3>基本的なデータ入力</h3>
+                <div class="code-block">
+                    <pre># 基本的なデータ入力例
+$excelDriver = [ExcelDriver]::new()
+
+# ヘッダーを設定
+$excelDriver.SetCellValue("A1", "商品名")
+$excelDriver.SetCellValue("B1", "価格")
+$excelDriver.SetCellValue("C1", "数量")
+$excelDriver.SetCellValue("D1", "小計")
+
+# ヘッダーのフォーマット
+$excelDriver.SetCellFont("A1:D1", "Arial", 12)
+$excelDriver.SetCellBold("A1:D1", $true)
+$excelDriver.SetCellBackgroundColor("A1:D1", "LightGray")
+
+# データを設定
+$excelDriver.SetCellValue("A2", "商品A")
+$excelDriver.SetCellValue("B2", 1000)
+$excelDriver.SetCellValue("C2", 10)
+
+$excelDriver.SetCellValue("A3", "商品B")
+$excelDriver.SetCellValue("B3", 2000)
+$excelDriver.SetCellValue("C3", 5)
+
+# 数式を設定
+$excelDriver.SetCellFormula("D2", "=B2*C2")
+$excelDriver.SetCellFormula("D3", "=B3*C3")
+
+# 合計行を追加
+$excelDriver.SetCellValue("A4", "合計")
+$excelDriver.SetCellFormula("D4", "=SUM(D2:D3)")
+
+# 計算を実行
+$excelDriver.CalculateWorksheet()
+
+# ワークブックを保存
+$excelDriver.SaveWorkbook("C:\output\sales_data.xlsx")
+
+# リソースを解放
+$excelDriver.Dispose()</pre>
+                </div>
+
+                <h3>複数ワークシートの管理</h3>
+                <div class="code-block">
+                    <pre># 複数ワークシートの管理例
+$excelDriver = [ExcelDriver]::new()
+
+# 売上データシートを作成
+$excelDriver.AddWorksheet("売上データ")
+$excelDriver.SelectWorksheet("売上データ")
+
+$salesData = @(
+    @("商品A", 1000, 10, "2024-01-01"),
+    @("商品B", 2000, 5, "2024-01-02"),
+    @("商品C", 1500, 8, "2024-01-03")
+)
+
+$headers = @("商品名", "価格", "数量", "日付")
+$excelDriver.ImportFromArray($headers, "A1")
+$excelDriver.ImportFromArray($salesData, "A2")
+
+# 月次レポートシートを作成
+$excelDriver.AddWorksheet("月次レポート")
+$excelDriver.SelectWorksheet("月次レポート")
+
+$excelDriver.SetCellValue("A1", "月次レポート")
+$excelDriver.SetCellValue("A3", "総売上")
+$excelDriver.SetCellFormula("B3", "=SUM('売上データ'!B:B)")
+
+# ワークブックを保存
+$excelDriver.SaveWorkbook("C:\output\monthly_report.xlsx")
+
+$excelDriver.Dispose()</pre>
+                </div>
+            </div>
+
+            <!-- トラブルシューティング -->
+            <div class="detail-page">
+                <h2>トラブルシューティング</h2>
+                
+                <div class="method-category">
+                    <h4>よくある問題と解決方法</h4>
+                    <ul class="method-list">
+                        <li><strong>Excelが見つからない:</strong> Microsoft Excelがインストールされているか確認</li>
+                        <li><strong>COMオブジェクトエラー:</strong> 管理者権限で実行またはCOMオブジェクトの権限を確認</li>
+                        <li><strong>ファイル保存エラー:</strong> 保存先のディレクトリが存在し、書き込み権限があるか確認</li>
+                        <li><strong>数式エラー:</strong> 数式の構文が正しいか確認</li>
+                        <li><strong>メモリ不足:</strong> システムのメモリ使用量を確認</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3>デバッグのヒント</h3>
+                    <ul>
+                        <li>エラーログファイル<code>.\AllDrivers_Error.log</code>を確認してください</li>
+                        <li>Microsoft Excelが最新版であることを確認してください</li>
+                        <li>一時的にアンチウイルスソフトを無効にしてテストしてください</li>
+                        <li>管理者権限でPowerShellを実行してください</li>
+                        <li>Excelの起動に時間がかかる場合があります</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="../js/script.js"></script>
+    
+    <!-- 隠しコマンド用のJavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let clickCount = 0;
+            let clickTimer = null;
+            
+            // 隠しコマンド用の要素をクリックした時の処理
+            document.getElementById('hiddenCommand').addEventListener('click', function(e) {
+                e.preventDefault();
+                clickCount++;
+                
+                // タイマーをリセット
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                }
+                
+                // 3秒後にクリックカウントをリセット
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 3000);
+                
+                // 5回クリックでゲームを開く
+                if (clickCount >= 5) {
+                    // インベーダーゲームを新規タブで開く
+                    window.open('./invader.html', '_blank');
+                    
+                    // 少し遅れてブロック崩しゲームも開く
+                    setTimeout(() => {
+                        window.open('./blockbreaker.html', '_blank');
+                    }, 500);
+                    
+                    // カウントをリセット
+                    clickCount = 0;
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
+
+

@@ -2,7 +2,8 @@
 #import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
 
 # 共通ライブラリをインポート
-. "$PSScriptRoot\Common.ps1"
+#. "$PSScriptRoot\Common.ps1"
+#$Common = New-Object -TypeName 'Common'
 
 class EdgeDriver : WebDriver
 {
@@ -48,7 +49,7 @@ class EdgeDriver : WebDriver
         {
             # 初期化に失敗した場合のクリーンアップ
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("2001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
+            $global:Common.HandleError("2001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
             throw "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -103,7 +104,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2002", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
+            $global:Common.HandleError("2002", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
             throw "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -127,7 +128,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
+            $global:Common.HandleError("2003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -153,7 +154,7 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2004", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
+            $global:Common.HandleError("2004", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -244,11 +245,12 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2005", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\EdgeDriver_Error.log")
+            $global:Common.HandleError("2005", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
             Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 }
+
 
 
 

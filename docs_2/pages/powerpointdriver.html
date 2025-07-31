@@ -1,0 +1,723 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPointDriver.ps1 - 使用方法</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>PowerPointDriver.ps1</h1>
+            <p>Microsoft PowerPointプレゼンテーションの自動操作を提供するクラス</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <a href="../index.html" class="back-link">← メインページに戻る</a>
+
+            <!-- 隠しコマンド用の透明な要素 -->
+            <div id="hiddenCommand" style="position: fixed; top: 0; left: 0; width: 50px; height: 50px; z-index: 9999; opacity: 0; cursor: default;"></div>
+
+            <!-- 概要 -->
+            <div class="detail-page">
+                <h2>概要</h2>
+                <p>PowerPointDriver.ps1は、Microsoft PowerPointプレゼンテーションの自動操作を提供するクラスです。スライド作成、コンテンツ追加、デザイン機能を統合的に管理し、PowerShellからPowerPointプレゼンテーションを効率的に作成できます。</p>
+                
+                <div class="info-box">
+                    <h3>主な特徴</h3>
+                    <ul>
+                        <li><strong>プレゼンテーション管理:</strong> 新規プレゼンテーションの作成、既存プレゼンテーションの開き、保存</li>
+                        <li><strong>スライド操作:</strong> スライドの追加、選択、削除、レイアウト設定</li>
+                        <li><strong>コンテンツ追加:</strong> テキスト、画像、図形、テーブルの追加</li>
+                        <li><strong>デザイン機能:</strong> テーマ、フォント、色、アニメーションの設定</li>
+                        <li><strong>テンプレート機能:</strong> 既存テンプレートの適用、カスタムテンプレート作成</li>
+                        <li><strong>エラーハンドリング:</strong> 包括的なエラー管理とログ機能</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 初期化 -->
+            <div class="detail-page">
+                <h2>初期化</h2>
+                <p>PowerPointDriverクラスは、Microsoft PowerPointアプリケーションの初期化と新規プレゼンテーションの作成を行います。</p>
+                
+                <div class="code-block">
+                    <pre># ライブラリのインポート
+. "$PSScriptRoot\_lib\PowerPointDriver.ps1"
+
+# PowerPointDriverの初期化
+$powerPointDriver = [PowerPointDriver]::new()</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>初期化プロセス</h3>
+                    <ol>
+                        <li><strong>PowerPointアプリケーション起動:</strong> Microsoft PowerPointアプリケーションを起動</li>
+                        <li><strong>一時ディレクトリ作成:</strong> 作業用の一時ディレクトリを作成</li>
+                        <li><strong>新規プレゼンテーション作成:</strong> 新しいPowerPointプレゼンテーションを作成</li>
+                        <li><strong>COMオブジェクト管理:</strong> PowerPoint COMオブジェクトの初期化</li>
+                    </ol>
+                </div>
+
+                <div class="warning-box">
+                    <h3>注意事項</h3>
+                    <ul>
+                        <li>Microsoft PowerPointがインストールされていることを確認してください</li>
+                        <li>初期化後は必ず<code>Dispose()</code>メソッドでリソースを解放してください</li>
+                        <li>PowerPointのバージョンによっては動作が異なる場合があります</li>
+                        <li>COMオブジェクトの権限が必要な場合があります</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- スライド操作 -->
+            <div class="detail-page">
+                <h2>スライド操作</h2>
+                <p>PowerPointDriverでは、スライドの作成と管理が可能です。</p>
+                
+                <div class="method-category">
+                    <h4>スライド操作</h4>
+                    <ul class="method-list">
+                        <li><strong>AddSlide()</strong> - 新しいスライドを追加</li>
+                        <li><strong>AddSlide(layoutType)</strong> - レイアウトを指定してスライドを追加</li>
+                        <li><strong>SelectSlide(slideIndex)</strong> - スライドを選択</li>
+                        <li><strong>DeleteSlide(slideIndex)</strong> - スライドを削除</li>
+                        <li><strong>GetSlideCount()</strong> - スライド数を取得</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># スライド操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# タイトルスライドを追加
+$powerPointDriver.AddSlide("Title Slide")
+
+# コンテンツスライドを追加
+$powerPointDriver.AddSlide("Content Slide")
+
+# 2枚目のスライドを選択
+$powerPointDriver.SelectSlide(2)
+
+# スライド数を取得
+$slideCount = $powerPointDriver.GetSlideCount()
+Write-Host "スライド数: $slideCount"</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>利用可能なレイアウトタイプ</h3>
+                    <ul>
+                        <li><strong>Title Slide:</strong> タイトルスライド</li>
+                        <li><strong>Title and Content:</strong> タイトルとコンテンツ</li>
+                        <li><strong>Section Header:</strong> セクションヘッダー</li>
+                        <li><strong>Two Content:</strong> 2つのコンテンツ</li>
+                        <li><strong>Comparison:</strong> 比較レイアウト</li>
+                        <li><strong>Title Only:</strong> タイトルのみ</li>
+                        <li><strong>Blank:</strong> 空白スライド</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- テキスト操作 -->
+            <div class="detail-page">
+                <h2>テキスト操作</h2>
+                <p>PowerPointDriverでは、スライドにテキストを追加できます。</p>
+                
+                <div class="method-category">
+                    <h4>テキスト操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SetTitle(text)</strong> - スライドのタイトルを設定</li>
+                        <li><strong>AddText(text)</strong> - テキストを追加</li>
+                        <li><strong>AddTextBox(text, left, top, width, height)</strong> - テキストボックスを追加</li>
+                        <li><strong>SetTextFont(fontName, fontSize)</strong> - テキストのフォントを設定</li>
+                        <li><strong>SetTextColor(color)</strong> - テキストの色を設定</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># テキスト操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# タイトルスライドを追加
+$powerPointDriver.AddSlide("Title Slide")
+
+# タイトルを設定
+$powerPointDriver.SetTitle("PowerShell自動化プレゼンテーション")
+
+# サブタイトルを追加
+$powerPointDriver.AddText("PowerShellを使用した業務自動化の紹介")
+
+# コンテンツスライドを追加
+$powerPointDriver.AddSlide("Title and Content")
+
+# スライドタイトルを設定
+$powerPointDriver.SetTitle("自動化のメリット")
+
+# コンテンツを追加
+$powerPointDriver.AddText("• 作業効率の向上")
+$powerPointDriver.AddText("• エラーの削減")
+$powerPointDriver.AddText("• コストの削減")
+$powerPointDriver.AddText("• 一貫性の確保")</pre>
+                </div>
+            </div>
+
+            <!-- 図形操作 -->
+            <div class="detail-page">
+                <h2>図形操作</h2>
+                <p>PowerPointDriverでは、スライドに図形を追加できます。</p>
+                
+                <div class="method-category">
+                    <h4>図形操作</h4>
+                    <ul class="method-list">
+                        <li><strong>AddShape(shapeType, left, top, width, height)</strong> - 図形を追加</li>
+                        <li><strong>AddShape(shapeType, left, top, width, height, text)</strong> - テキスト付き図形を追加</li>
+                        <li><strong>SetShapeFillColor(color)</strong> - 図形の塗りつぶし色を設定</li>
+                        <li><strong>SetShapeBorderColor(color)</strong> - 図形の境界線色を設定</li>
+                        <li><strong>SetShapeBorderWidth(width)</strong> - 図形の境界線幅を設定</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># 図形操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# スライドを追加
+$powerPointDriver.AddSlide("Blank")
+
+# 四角形を追加
+$powerPointDriver.AddShape("Rectangle", 100, 100, 200, 100, "四角形")
+
+# 円を追加
+$powerPointDriver.AddShape("Oval", 350, 100, 150, 150, "円")
+
+# 矢印を追加
+$powerPointDriver.AddShape("RightArrow", 100, 250, 200, 100)
+
+# 図形の色を設定
+$powerPointDriver.SetShapeFillColor("LightBlue")
+$powerPointDriver.SetShapeBorderColor("DarkBlue")
+$powerPointDriver.SetShapeBorderWidth(3)</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>利用可能な図形タイプ</h3>
+                    <ul>
+                        <li><strong>Rectangle:</strong> 四角形</li>
+                        <li><strong>Oval:</strong> 円・楕円</li>
+                        <li><strong>Triangle:</strong> 三角形</li>
+                        <li><strong>Diamond:</strong> ひし形</li>
+                        <li><strong>RightArrow:</strong> 右矢印</li>
+                        <li><strong>LeftArrow:</strong> 左矢印</li>
+                        <li><strong>UpArrow:</strong> 上矢印</li>
+                        <li><strong>DownArrow:</strong> 下矢印</li>
+                        <li><strong>Star:</strong> 星</li>
+                        <li><strong>Heart:</strong> ハート</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 画像操作 -->
+            <div class="detail-page">
+                <h2>画像操作</h2>
+                <p>PowerPointDriverでは、スライドに画像を追加できます。</p>
+                
+                <div class="method-category">
+                    <h4>画像操作</h4>
+                    <ul class="method-list">
+                        <li><strong>AddPicture(imagePath)</strong> - 画像を追加（元のサイズ）</li>
+                        <li><strong>AddPicture(imagePath, left, top, width, height)</strong> - サイズ指定で画像を追加</li>
+                        <li><strong>SetPictureBorder(color, width)</strong> - 画像の境界線を設定</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># 画像操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# スライドを追加
+$powerPointDriver.AddSlide("Blank")
+
+# 画像を追加（元のサイズ）
+$powerPointDriver.AddPicture("C:\images\logo.png")
+
+# サイズ指定で画像を追加
+$powerPointDriver.AddPicture("C:\images\chart.png", 100, 200, 400, 300)
+
+# 画像の境界線を設定
+$powerPointDriver.SetPictureBorder("Black", 2)</pre>
+                </div>
+
+                <div class="warning-box">
+                    <h3>画像の注意事項</h3>
+                    <ul>
+                        <li>画像ファイルが存在することを確認してください</li>
+                        <li>サポートされる形式: PNG, JPG, JPEG, GIF, BMP</li>
+                        <li>画像サイズはピクセル単位で指定します</li>
+                        <li>大きな画像ファイルは処理に時間がかかる場合があります</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- テーブル操作 -->
+            <div class="detail-page">
+                <h2>テーブル操作</h2>
+                <p>PowerPointDriverでは、スライドにテーブルを追加できます。</p>
+                
+                <div class="method-category">
+                    <h4>テーブル操作</h4>
+                    <ul class="method-list">
+                        <li><strong>AddTable(rows, columns, left, top, width, height)</strong> - テーブルを追加</li>
+                        <li><strong>SetTableCell(table, row, column, text)</strong> - セルにテキストを設定</li>
+                        <li><strong>GetTableCell(table, row, column)</strong> - セルのテキストを取得</li>
+                        <li><strong>SetTableStyle(table, style)</strong> - テーブルのスタイルを設定</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># テーブル操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# スライドを追加
+$powerPointDriver.AddSlide("Blank")
+
+# 4行3列のテーブルを追加
+$table = $powerPointDriver.AddTable(4, 3, 100, 100, 400, 200)
+
+# ヘッダー行を設定
+$powerPointDriver.SetTableCell($table, 1, 1, "項目")
+$powerPointDriver.SetTableCell($table, 1, 2, "実績")
+$powerPointDriver.SetTableCell($table, 1, 3, "目標")
+
+# データ行を設定
+$powerPointDriver.SetTableCell($table, 2, 1, "売上")
+$powerPointDriver.SetTableCell($table, 2, 2, "1,000,000円")
+$powerPointDriver.SetTableCell($table, 2, 3, "1,200,000円")
+
+$powerPointDriver.SetTableCell($table, 3, 1, "顧客数")
+$powerPointDriver.SetTableCell($table, 3, 2, "150名")
+$powerPointDriver.SetTableCell($table, 3, 3, "200名")
+
+$powerPointDriver.SetTableCell($table, 4, 1, "満足度")
+$powerPointDriver.SetTableCell($table, 4, 2, "85%")
+$powerPointDriver.SetTableCell($table, 4, 3, "90%")
+
+# テーブルのスタイルを設定
+$powerPointDriver.SetTableStyle($table, "Medium Style 2")</pre>
+                </div>
+            </div>
+
+            <!-- デザイン操作 -->
+            <div class="detail-page">
+                <h2>デザイン操作</h2>
+                <p>PowerPointDriverでは、プレゼンテーションのデザインを設定できます。</p>
+                
+                <div class="method-category">
+                    <h4>デザイン操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SetTheme(themeName)</strong> - テーマを設定</li>
+                        <li><strong>SetBackgroundColor(color)</strong> - 背景色を設定</li>
+                        <li><strong>SetBackgroundImage(imagePath)</strong> - 背景画像を設定</li>
+                        <li><strong>SetFont(fontName, fontSize)</strong> - フォントを設定</li>
+                        <li><strong>SetColorScheme(colorScheme)</strong> - カラースキームを設定</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># デザイン操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# テーマを設定
+$powerPointDriver.SetTheme("Office Theme")
+
+# カラースキームを設定
+$powerPointDriver.SetColorScheme("Blue")
+
+# スライドを追加
+$powerPointDriver.AddSlide("Title Slide")
+
+# タイトルを設定
+$powerPointDriver.SetTitle("デザイン例")
+$powerPointDriver.SetFont("Arial", 24)
+
+# 背景色を設定
+$powerPointDriver.SetBackgroundColor("LightBlue")
+
+# コンテンツを追加
+$powerPointDriver.AddText("このスライドはカスタムデザインが適用されています。")</pre>
+                </div>
+            </div>
+
+            <!-- ファイル操作 -->
+            <div class="detail-page">
+                <h2>ファイル操作</h2>
+                <p>PowerPointDriverでは、プレゼンテーションの保存と開きが可能です。</p>
+                
+                <div class="method-category">
+                    <h4>ファイル操作</h4>
+                    <ul class="method-list">
+                        <li><strong>SavePresentation(filePath)</strong> - プレゼンテーションを保存</li>
+                        <li><strong>OpenPresentation(filePath)</strong> - 既存のプレゼンテーションを開く</li>
+                        <li><strong>ClosePresentation()</strong> - プレゼンテーションを閉じる</li>
+                        <li><strong>ExportToPdf(filePath)</strong> - PDFとしてエクスポート</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># ファイル操作の例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# プレゼンテーションにコンテンツを追加
+$powerPointDriver.AddSlide("Title Slide")
+$powerPointDriver.SetTitle("サンプルプレゼンテーション")
+$powerPointDriver.AddText("PowerShellで作成されたプレゼンテーション")
+
+# プレゼンテーションを保存
+$powerPointDriver.SavePresentation("C:\output\sample.pptx")
+
+# 既存のプレゼンテーションを開く
+$powerPointDriver.OpenPresentation("C:\input\existing.pptx")
+
+# プレゼンテーションを編集
+$powerPointDriver.AddSlide("Title and Content")
+$powerPointDriver.SetTitle("新しいスライド")
+
+# 変更を保存
+$powerPointDriver.SavePresentation("C:\output\updated.pptx")
+
+# PDFとしてエクスポート
+$powerPointDriver.ExportToPdf("C:\output\presentation.pdf")</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>サポートされるファイル形式</h3>
+                    <ul>
+                        <li><strong>.pptx:</strong> PowerPoint 2007以降の標準形式</li>
+                        <li><strong>.ppt:</strong> PowerPoint 97-2003形式（互換性）</li>
+                        <li><strong>.pdf:</strong> PDF形式（エクスポート）</li>
+                        <li><strong>.potx:</strong> PowerPointテンプレート形式</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- エラーハンドリング -->
+            <div class="detail-page">
+                <h2>エラーハンドリング</h2>
+                <p>PowerPointDriverでは、PowerPoint固有のエラーと一般的なエラーを包括的に管理します。</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>エラーコード</th>
+                                <th>エラー名</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>6001</td>
+                                <td>PowerPointDriver初期化エラー</td>
+                                <td>PowerPointDriverの初期化に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6002</td>
+                                <td>一時ディレクトリ作成エラー</td>
+                                <td>一時ディレクトリの作成に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6003</td>
+                                <td>PowerPointアプリケーション初期化エラー</td>
+                                <td>PowerPointアプリケーションの起動に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6004</td>
+                                <td>新規プレゼンテーション作成エラー</td>
+                                <td>新規プレゼンテーションの作成に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6005</td>
+                                <td>スライド追加エラー</td>
+                                <td>スライドの追加に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6006</td>
+                                <td>スライド選択エラー</td>
+                                <td>スライドの選択に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6007</td>
+                                <td>タイトル設定エラー</td>
+                                <td>タイトルの設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6008</td>
+                                <td>テキスト追加エラー</td>
+                                <td>テキストの追加に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6009</td>
+                                <td>図形追加エラー</td>
+                                <td>図形の追加に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6010</td>
+                                <td>画像追加エラー</td>
+                                <td>画像の追加に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6011</td>
+                                <td>テーブル追加エラー</td>
+                                <td>テーブルの追加に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6012</td>
+                                <td>プレゼンテーション保存エラー</td>
+                                <td>プレゼンテーションの保存に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6013</td>
+                                <td>プレゼンテーション開くエラー</td>
+                                <td>プレゼンテーションの開きに失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6014</td>
+                                <td>テーマ設定エラー</td>
+                                <td>テーマの設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6015</td>
+                                <td>フォント設定エラー</td>
+                                <td>フォントの設定に失敗した場合</td>
+                            </tr>
+                            <tr>
+                                <td>6016</td>
+                                <td>PowerPointDriver Disposeエラー</td>
+                                <td>リソース解放時にエラーが発生した場合</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <pre># エラーハンドリングの例
+try {
+    $powerPointDriver = [PowerPointDriver]::new()
+    
+    # プレゼンテーションにコンテンツを追加
+    $powerPointDriver.AddSlide("Title Slide")
+    $powerPointDriver.SetTitle("エラーハンドリング例")
+    $powerPointDriver.AddText("このプレゼンテーションは正常に作成されました。")
+    
+    # プレゼンテーションを保存
+    $powerPointDriver.SavePresentation("C:\output\example.pptx")
+}
+catch {
+    Write-Host "PowerPointDriverエラー: $($_.Exception.Message)" -ForegroundColor Red
+    # エラーログは自動的に .\AllDrivers_Error.log に出力されます
+}
+finally {
+    if ($powerPointDriver) {
+        $powerPointDriver.Dispose()
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- リソース管理 -->
+            <div class="detail-page">
+                <h2>リソース管理</h2>
+                <p>PowerPointDriverは、適切なリソース管理を提供します。</p>
+                
+                <div class="method-category">
+                    <h4>リソース管理</h4>
+                    <ul class="method-list">
+                        <li><strong>Dispose()</strong> - リソースを解放</li>
+                        <li><strong>ClosePresentation()</strong> - プレゼンテーションを閉じる</li>
+                        <li><strong>QuitPowerPoint()</strong> - PowerPointアプリケーションを終了</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <pre># リソース管理の例
+try {
+    $powerPointDriver = [PowerPointDriver]::new()
+    
+    # プレゼンテーション操作...
+    $powerPointDriver.AddSlide("Title Slide")
+    $powerPointDriver.SetTitle("Hello, PowerPoint!")
+    $powerPointDriver.SavePresentation("C:\output\test.pptx")
+}
+finally {
+    if ($powerPointDriver) {
+        # リソースを解放
+        $powerPointDriver.Dispose()
+    }
+}</pre>
+                </div>
+
+                <div class="warning-box">
+                    <h3>重要</h3>
+                    <p>PowerPointDriverインスタンスは必ず<code>Dispose()</code>メソッドでリソースを解放してください。そうしないと、PowerPointプロセスが残り続ける可能性があります。</p>
+                </div>
+            </div>
+
+            <!-- 使用例 -->
+            <div class="detail-page">
+                <h2>使用例</h2>
+                
+                <h3>基本的なプレゼンテーション作成</h3>
+                <div class="code-block">
+                    <pre># 基本的なプレゼンテーション作成例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# テーマを設定
+$powerPointDriver.SetTheme("Office Theme")
+
+# タイトルスライドを追加
+$powerPointDriver.AddSlide("Title Slide")
+$powerPointDriver.SetTitle("PowerShell自動化プレゼンテーション")
+$powerPointDriver.AddText("業務効率化のためのPowerShell活用")
+
+# 目次スライドを追加
+$powerPointDriver.AddSlide("Title and Content")
+$powerPointDriver.SetTitle("目次")
+$powerPointDriver.AddText("• PowerShellとは")
+$powerPointDriver.AddText("• 自動化のメリット")
+$powerPointDriver.AddText("• 実用例")
+$powerPointDriver.AddText("• まとめ")
+
+# コンテンツスライドを追加
+$powerPointDriver.AddSlide("Title and Content")
+$powerPointDriver.SetTitle("PowerShellとは")
+$powerPointDriver.AddText("• Microsoftが開発したスクリプト言語")
+$powerPointDriver.AddText("• Windows環境での自動化に最適")
+$powerPointDriver.AddText("• 豊富なコマンドレットとモジュール")
+$powerPointDriver.AddText("• オブジェクト指向の設計")
+
+# プレゼンテーションを保存
+$powerPointDriver.SavePresentation("C:\output\powershell_presentation.pptx")
+
+# リソースを解放
+$powerPointDriver.Dispose()</pre>
+                </div>
+
+                <h3>図形とテーブルを使用したプレゼンテーション</h3>
+                <div class="code-block">
+                    <pre># 図形とテーブルを使用したプレゼンテーション例
+$powerPointDriver = [PowerPointDriver]::new()
+
+# スライドを追加
+$powerPointDriver.AddSlide("Blank")
+
+# タイトルを追加
+$powerPointDriver.AddTextBox("売上レポート", 100, 50, 400, 50)
+$powerPointDriver.SetTextFont("Arial", 24)
+$powerPointDriver.SetTextColor("DarkBlue")
+
+# テーブルを追加
+$table = $powerPointDriver.AddTable(4, 3, 100, 150, 400, 200)
+
+# テーブルにデータを設定
+$powerPointDriver.SetTableCell($table, 1, 1, "四半期")
+$powerPointDriver.SetTableCell($table, 1, 2, "売上")
+$powerPointDriver.SetTableCell($table, 1, 3, "成長率")
+
+$powerPointDriver.SetTableCell($table, 2, 1, "Q1")
+$powerPointDriver.SetTableCell($table, 2, 2, "1,000万円")
+$powerPointDriver.SetTableCell($table, 2, 3, "10%")
+
+$powerPointDriver.SetTableCell($table, 3, 1, "Q2")
+$powerPointDriver.SetTableCell($table, 3, 2, "1,200万円")
+$powerPointDriver.SetTableCell($table, 3, 3, "20%")
+
+$powerPointDriver.SetTableCell($table, 4, 1, "Q3")
+$powerPointDriver.SetTableCell($table, 4, 2, "1,500万円")
+$powerPointDriver.SetTableCell($table, 4, 3, "25%")
+
+# 図形を追加
+$powerPointDriver.AddShape("RightArrow", 550, 200, 100, 50, "成長")
+
+# プレゼンテーションを保存
+$powerPointDriver.SavePresentation("C:\output\sales_report.pptx")
+
+$powerPointDriver.Dispose()</pre>
+                </div>
+            </div>
+
+            <!-- トラブルシューティング -->
+            <div class="detail-page">
+                <h2>トラブルシューティング</h2>
+                
+                <div class="method-category">
+                    <h4>よくある問題と解決方法</h4>
+                    <ul class="method-list">
+                        <li><strong>PowerPointが見つからない:</strong> Microsoft PowerPointがインストールされているか確認</li>
+                        <li><strong>COMオブジェクトエラー:</strong> 管理者権限で実行またはCOMオブジェクトの権限を確認</li>
+                        <li><strong>ファイル保存エラー:</strong> 保存先のディレクトリが存在し、書き込み権限があるか確認</li>
+                        <li><strong>画像追加エラー:</strong> 画像ファイルが存在し、サポートされる形式か確認</li>
+                        <li><strong>メモリ不足:</strong> システムのメモリ使用量を確認</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3>デバッグのヒント</h3>
+                    <ul>
+                        <li>エラーログファイル<code>.\AllDrivers_Error.log</code>を確認してください</li>
+                        <li>Microsoft PowerPointが最新版であることを確認してください</li>
+                        <li>一時的にアンチウイルスソフトを無効にしてテストしてください</li>
+                        <li>管理者権限でPowerShellを実行してください</li>
+                        <li>PowerPointの起動に時間がかかる場合があります</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="../js/script.js"></script>
+    
+    <!-- 隠しコマンド用のJavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let clickCount = 0;
+            let clickTimer = null;
+            
+            // 隠しコマンド用の要素をクリックした時の処理
+            document.getElementById('hiddenCommand').addEventListener('click', function(e) {
+                e.preventDefault();
+                clickCount++;
+                
+                // タイマーをリセット
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                }
+                
+                // 3秒後にクリックカウントをリセット
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 3000);
+                
+                // 5回クリックでゲームを開く
+                if (clickCount >= 5) {
+                    // インベーダーゲームを新規タブで開く
+                    window.open('./invader.html', '_blank');
+                    
+                    // 少し遅れてブロック崩しゲームも開く
+                    setTimeout(() => {
+                        window.open('./blockbreaker.html', '_blank');
+                    }, 500);
+                    
+                    // カウントをリセット
+                    clickCount = 0;
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
+
+

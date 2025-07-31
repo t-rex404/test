@@ -2,7 +2,8 @@
 #import-module "$PSScriptRoot\ChromeDriverErrors.psm1"
 
 # 共通ライブラリをインポート
-. "$PSScriptRoot\Common.ps1"
+#. "$PSScriptRoot\Common.ps1"
+#$Common = New-Object -TypeName 'Common'
 
 class ChromeDriver : WebDriver
 {
@@ -48,7 +49,7 @@ class ChromeDriver : WebDriver
         {
             # 初期化に失敗した場合のクリーンアップ
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("3001", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", ".\ChromeDriver_Error.log")
+            $global:Common.HandleError("3001", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
             throw "ChromeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -107,7 +108,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3002", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\ChromeDriver_Error.log")
+            $global:Common.HandleError("3002", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
             throw "Chrome実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -131,7 +132,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\ChromeDriver_Error.log")
+            $global:Common.HandleError("3003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -157,7 +158,7 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3004", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", ".\ChromeDriver_Error.log")
+            $global:Common.HandleError("3004", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -248,11 +249,12 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3005", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", ".\ChromeDriver_Error.log")
+            $global:Common.HandleError("3005", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
             Write-Host "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 }
+
 
 
 
