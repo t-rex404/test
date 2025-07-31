@@ -111,8 +111,14 @@ class EdgeDriver : WebDriver
         try
         {
             # ユーザーデータディレクトリのパスを生成
-            $user_data_dir = Join-Path $env:TEMP "EdgeDriver_UserData_$(Get-Random)"
-            
+            #$user_data_dir = Join-Path $env:TEMP "EdgeDriver_UserData_$(Get-Random)"
+            $user_data_dir = 'C:\temp\EdgeDriver_UserData'
+
+            if (Test-Path $user_data_dir)
+            {
+                Remove-Item -Path $user_data_dir -Recurse -Force
+            }
+
             Write-Host "Edgeユーザーデータディレクトリを作成しました: $user_data_dir"
             return $user_data_dir
         }

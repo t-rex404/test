@@ -115,8 +115,14 @@ class ChromeDriver : WebDriver
         try
         {
             # ユーザーデータディレクトリのパスを生成
-            $user_data_dir = Join-Path $env:TEMP "ChromeDriver_UserData_$(Get-Random)"
+            #$user_data_dir = Join-Path $env:TEMP "ChromeDriver_UserData_$(Get-Random)"
+            $user_data_dir = 'C:\temp\ChromeDriver_UserData'
             
+            if (Test-Path $user_data_dir)
+            {
+                Remove-Item -Path $user_data_dir -Recurse -Force
+            }
+
             Write-Host "Chromeユーザーデータディレクトリを作成しました: $user_data_dir"
             return $user_data_dir
         }
