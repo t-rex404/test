@@ -1016,14 +1016,160 @@ class WebDriver
         }
     }
     
-    <#
-    # XPathで複数の要素を検索
-    [array] FindElementsByXPath([string]$xpath)
+
+
+    # ========================================
+    # 単体要素検索メソッド
+    # ========================================
+
+    # XPathで単体要素を検索
+    [hashtable] FindElementByXPath([string]$xpath)
     {
-        $expression = "...document.evaluate('$xpath', document, null, XPathResult.ANY_TYPE, null).iterateNext().outerHTML"
-        return $this.FindElementsGeneric($expression, 'XPath', $xpath)
+        try
+        {
+            if ([string]::IsNullOrEmpty($xpath))
+            {
+                throw "XPathが指定されていません。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $expression = "document.evaluate('$xpath', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue"
+            return $this.FindElementGeneric($expression, 'XPath', $xpath)
+        }
+        catch
+        {
+            # 要素検索関連エラー (1023)
+            $global:Common.HandleError("1023", "XPath単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "XPathでの単体要素検索に失敗しました: $($_.Exception.Message)"
+        }
     }
-    #>
+
+    # class属性で単体要素を検索
+    [hashtable] FindElementByClassName([string]$class_name, [int]$index = 0)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($class_name))
+            {
+                throw "クラス名が指定されていません。"
+            }
+
+            if ($index -lt 0)
+            {
+                throw "インデックスは0以上である必要があります。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $expression = "document.getElementsByClassName('$class_name')[$index]"
+            return $this.FindElementGeneric($expression, 'ClassName', $class_name)
+        }
+        catch
+        {
+            # 要素検索関連エラー (1024)
+            $global:Common.HandleError("1024", "ClassName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "ClassNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # name属性で単体要素を検索
+    [hashtable] FindElementByName([string]$name, [int]$index = 0)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($name))
+            {
+                throw "name属性が指定されていません。"
+            }
+
+            if ($index -lt 0)
+            {
+                throw "インデックスは0以上である必要があります。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $expression = "document.getElementsByName('$name')[$index]"
+            return $this.FindElementGeneric($expression, 'Name', $name)
+        }
+        catch
+        {
+            # 要素検索関連エラー (1025)
+            $global:Common.HandleError("1025", "Name単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "Nameでの単体要素検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # id属性で単体要素を検索
+    [hashtable] FindElementById([string]$id)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($id))
+            {
+                throw "IDが指定されていません。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $expression = "document.getElementById('$id')"
+            return $this.FindElementGeneric($expression, 'Id', $id)
+        }
+        catch
+        {
+            # 要素検索関連エラー (1026)
+            $global:Common.HandleError("1026", "Id単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "Idでの単体要素検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # tag名で単体要素を検索
+    [hashtable] FindElementByTagName([string]$tag_name, [int]$index = 0)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($tag_name))
+            {
+                throw "タグ名が指定されていません。"
+            }
+
+            if ($index -lt 0)
+            {
+                throw "インデックスは0以上である必要があります。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $expression = "document.getElementsByTagName('$tag_name')[$index]"
+            return $this.FindElementGeneric($expression, 'TagName', $tag_name)
+        }
+        catch
+        {
+            # 要素検索関連エラー (1027)
+            $global:Common.HandleError("1027", "TagName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "TagNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # ========================================
+    # 複数要素検索メソッド
+    # ========================================
 
     # class属性で複数の要素を検索
     [array] FindElementsByClassName([string]$class_name)

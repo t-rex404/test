@@ -1,451 +1,403 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Common.ps1 - PowerShell _lib ライブラリ ドキュメント</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <title>Common.ps1 - 使用方法</title>
+    <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
     <header class="header">
         <div class="container">
             <h1>Common.ps1</h1>
-            <p>全ライブラリで共通して使用されるユーティリティ関数とヘルパークラス</p>
+            <p>共通機能とエラーハンドリングを提供するユーティリティクラス</p>
         </div>
     </header>
 
     <main class="main">
         <div class="container">
-            <!-- ナビゲーション -->
-            <div class="nav-breadcrumb">
-                <a href="../index.html">ホーム</a> &gt; Common.ps1
-            </div>
+            <a href="../index.html" class="back-link">← メインページに戻る</a>
 
-            <!-- 戻るボタン -->
-            <a href="../index.html" class="back-button">← ホームに戻る</a>
-
-            <!-- 検索機能 -->
-            <div class="search-container" id="searchContainer">
-                <input type="text" id="searchBox" class="search-box" placeholder="検索したい内容を入力してください... (Ctrl+K でフォーカス)">
-                <div id="searchResults"></div>
-            </div>
+            <!-- 隠しコマンド用の透明な要素 -->
+            <div id="hiddenCommand" style="position: fixed; top: 0; left: 0; width: 50px; height: 50px; z-index: 9999; opacity: 0; cursor: default;"></div>
 
             <!-- 概要 -->
             <div class="detail-page">
                 <h2>概要</h2>
-                <p>Common.ps1は、全ライブラリで共通して使用されるユーティリティ関数とヘルパークラスを提供します。ログ出力、エラーハンドリング、共通機能を統合的に管理します。</p>
-                <p style="margin: 10px 0; font-size: 12px; color: #999; cursor: pointer; text-align: center; border: 1px dashed #ccc; padding: 5px; border-radius: 3px;" onclick="window.open('../pages/breakout-game.html', '_blank')" title="隠しコマンド">🔍 詳細なデバッグ情報を確認</p>
+                <p>Common.ps1は、すべてのドライバークラスで共通して使用される機能とエラーハンドリングを提供するユーティリティクラスです。エラーコードの管理、ログ出力、共通機能を統合的に管理します。</p>
                 
                 <div class="info-box">
-                    <h3>主要機能</h3>
+                    <h3>主な特徴</h3>
                     <ul>
-                        <li><strong>ログ出力:</strong> 統一されたログ出力機能</li>
-                        <li><strong>エラーハンドリング:</strong> 共通のエラー管理機能</li>
-                        <li><strong>ユーティリティ関数:</strong> 再利用可能なヘルパー関数</li>
-                        <li><strong>設定管理:</strong> 共通設定の管理</li>
-                        <li><strong>デバッグ支援:</strong> デバッグ情報の出力</li>
+                        <li><strong>エラーハンドリング:</strong> 統一されたエラー処理とログ出力</li>
+                        <li><strong>エラーコード管理:</strong> JSONファイルからのエラーコード読み込み</li>
+                        <li><strong>ログ機能:</strong> 構造化されたログ出力</li>
+                        <li><strong>共通機能:</strong> 全ドライバーで使用される共通メソッド</li>
+                        <li><strong>PowerShell 5.1対応:</strong> 古いバージョンとの互換性</li>
+                        <li><strong>グローバルアクセス:</strong> 全クラスからアクセス可能</li>
                     </ul>
                 </div>
             </div>
 
             <!-- 初期化 -->
             <div class="detail-page">
-                <h2>初期化とセットアップ</h2>
+                <h2>初期化</h2>
+                <p>Commonクラスは、エラーコードの読み込みとグローバルインスタンスの作成を行います。</p>
                 
-                <h3>自動初期化</h3>
                 <div class="code-block">
-                    <pre># Commonライブラリのインポート
-. "$PSScriptRoot\Common.ps1"
+                    <pre># ライブラリのインポート
+. "$PSScriptRoot\_lib\Common.ps1"
 
-# 自動的にCommonインスタンスが作成されます
-# $Common 変数でアクセス可能</pre>
+# Commonインスタンスは自動的にグローバル変数として作成されます
+# $global:Common としてアクセス可能</pre>
                 </div>
-
-                <p>Common.ps1をインポートすると、以下の処理が自動的に実行されます：</p>
-                <ol>
-                    <li>エラー管理モジュールのインポート</li>
-                    <li>Commonクラスのインスタンス作成</li>
-                    <li>共通設定の初期化</li>
-                    <li>ログディレクトリの準備</li>
-                </ol>
 
                 <div class="info-box">
-                    <h3>インポートされるモジュール</h3>
+                    <h3>初期化プロセス</h3>
+                    <ol>
+                        <li><strong>エラーコード読み込み:</strong> <code>_json/ErrorCode.json</code>からエラーコードを読み込み</li>
+                        <li><strong>グローバルインスタンス作成:</strong> <code>$global:Common</code>としてインスタンスを作成</li>
+                        <li><strong>PowerShell 5.1対応:</strong> 互換性を保つためのJSON変換処理</li>
+                    </ol>
+                </div>
+
+                <div class="warning-box">
+                    <h3>注意事項</h3>
                     <ul>
-                        <li>WebDriverErrors.ps1</li>
-                        <li>EdgeDriverErrors.ps1</li>
-                        <li>ChromeDriverErrors.ps1</li>
-                        <li>WordDriverErrors.ps1</li>
+                        <li>Common.ps1は他のドライバーファイルより先に読み込む必要があります</li>
+                        <li><code>_json/ErrorCode.json</code>ファイルが存在することを確認してください</li>
+                        <li>グローバル変数<code>$global:Common</code>としてアクセスします</li>
+                        <li>PowerShell 5.1での互換性のため、特別なJSON変換処理を使用しています</li>
                     </ul>
-                </div>
-            </div>
-
-            <!-- ログ出力機能 -->
-            <div class="detail-page">
-                <h2>ログ出力機能</h2>
-                
-                <h3>WriteLogメソッド</h3>
-                <div class="code-block">
-                    <pre># 基本的なログ出力
-$Common.WriteLog("処理を開始しました")
-
-# ログレベルを指定
-$Common.WriteLog("警告メッセージ", "WARNING")
-$Common.WriteLog("エラーメッセージ", "ERROR")
-$Common.WriteLog("デバッグ情報", "DEBUG")</pre>
-                </div>
-
-                <h3>ログレベル</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>レベル</th>
-                                <th>説明</th>
-                                <th>出力先</th>
-                                <th>色</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>INFO</td>
-                                <td>情報メッセージ</td>
-                                <td>コンソール + ログファイル</td>
-                                <td>デフォルト</td>
-                            </tr>
-                            <tr>
-                                <td>WARNING</td>
-                                <td>警告メッセージ</td>
-                                <td>コンソール + ログファイル</td>
-                                <td>黄色</td>
-                            </tr>
-                            <tr>
-                                <td>ERROR</td>
-                                <td>エラーメッセージ</td>
-                                <td>コンソール + ログファイル</td>
-                                <td>赤色</td>
-                            </tr>
-                            <tr>
-                                <td>DEBUG</td>
-                                <td>デバッグ情報</td>
-                                <td>コンソール + ログファイル</td>
-                                <td>グレー</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3>ログファイル</h3>
-                <div class="code-block">
-                    <pre># ログファイルの命名規則
-Common_info.log      # INFOレベルのログ
-Common_warning.log   # WARNINGレベルのログ
-Common_error.log     # ERRORレベルのログ
-Common_debug.log     # DEBUGレベルのログ</pre>
-                </div>
-
-                <h3>ログ出力例</h3>
-                <div class="code-block">
-                    <pre># ログ出力の使用例
-$Common.WriteLog("アプリケーションを開始しました", "INFO")
-$Common.WriteLog("設定ファイルを読み込み中...", "INFO")
-
-try {
-    # 何らかの処理
-    $Common.WriteLog("処理が正常に完了しました", "INFO")
-} catch {
-    $Common.WriteLog("処理中にエラーが発生しました: $($_.Exception.Message)", "ERROR")
-}
-
-$Common.WriteLog("メモリ使用量: $([System.GC]::GetTotalMemory('forcefullcollection'))", "DEBUG")</pre>
                 </div>
             </div>
 
             <!-- エラーハンドリング -->
             <div class="detail-page">
-                <h2>エラーハンドリング機能</h2>
+                <h2>エラーハンドリング</h2>
+                <p>Commonクラスでは、統一されたエラーハンドリング機能を提供します。</p>
                 
-                <h3>HandleErrorメソッド</h3>
-                <div class="code-block">
-                    <pre># エラーハンドリング
-$Common.HandleError("E001", "ファイルが見つかりません", "FileManager")
-
-# パラメータ
-# $errorCode: エラーコード
-# $message: エラーメッセージ
-# $module: モジュール名（オプション）</pre>
+                <div class="method-category">
+                    <h4>エラーハンドリング機能</h4>
+                    <ul class="method-list">
+                        <li><strong>HandleError(errorCode, message, module, logFile)</strong> - エラーを処理してログに出力</li>
+                        <li><strong>GetErrorTitle(errorCode, module)</strong> - エラーコードに対応するタイトルを取得</li>
+                        <li><strong>LogError(message, module, logFile)</strong> - エラーメッセージをログに出力</li>
+                    </ul>
                 </div>
 
-                <h3>エラーログの形式</h3>
                 <div class="code-block">
-                    <pre># エラーログの出力形式
-[2024/01/15 14:30:25], ERROR_CODE:E001, MODULE:FileManager, ERROR_MESSAGE:ファイルが見つかりません
+                    <pre># エラーハンドリングの例
+# エラーを処理してログに出力
+$global:Common.HandleError("1001", "WebDriver初期化に失敗しました", "WebDriver", ".\AllDrivers_Error.log")
 
-# 詳細情報（デバッグ用）
-詳細情報:
-- エラーコード: E001
-- エラーメッセージ: ファイルが見つかりません
-- モジュール: FileManager
-- タイムスタンプ: 2024/01/15 14:30:25
-- PowerShellバージョン: 5.1.19041.1
-- OS: Microsoft Windows 10.0.19045
-- 実行ユーザー: Administrator
-- 実行パス: C:\Scripts</pre>
+# エラーコードのタイトルを取得
+$errorTitle = $global:Common.GetErrorTitle("1001", "WebDriver")
+Write-Host "エラータイトル: $errorTitle"
+
+# カスタムエラーメッセージをログに出力
+$global:Common.LogError("カスタムエラーメッセージ", "CustomModule", ".\AllDrivers_Error.log")</pre>
                 </div>
 
-                <h3>エラーハンドリングの使用例</h3>
+                <div class="info-box">
+                    <h3>エラーログの形式</h3>
+                    <p>エラーログは以下の形式で出力されます：</p>
+                    <div class="code-block">
+                        <pre>[2024-01-01 12:00:00] [ERROR] [WebDriver] [1001] WebDriver初期化エラー: WebDriver初期化に失敗しました</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- エラーコード管理 -->
+            <div class="detail-page">
+                <h2>エラーコード管理</h2>
+                <p>Commonクラスでは、JSONファイルからエラーコードを読み込み、管理します。</p>
+                
+                <div class="method-category">
+                    <h4>エラーコード管理機能</h4>
+                    <ul class="method-list">
+                        <li><strong>LoadErrorCodes()</strong> - JSONファイルからエラーコードを読み込み</li>
+                        <li><strong>ErrorCodes</strong> - エラーコードのハッシュテーブルプロパティ</li>
+                        <li><strong>GetErrorTitle(errorCode, module)</strong> - エラーコードからタイトルを取得</li>
+                    </ul>
+                </div>
+
                 <div class="code-block">
-                    <pre>try {
-    # ファイル操作
-    $content = Get-Content "C:\nonexistent\file.txt" -ErrorAction Stop
-    
-} catch {
-    # エラーをログに記録
-    $Common.HandleError("FILE_001", "ファイルの読み込みに失敗しました", "FileProcessor")
-    
-    # ユーザーにエラーを表示
-    Write-Error "ファイルの読み込みに失敗しました: $($_.Exception.Message)"
+                    <pre># エラーコードの確認
+# エラーコードハッシュテーブルにアクセス
+$webDriverErrors = $global:Common.ErrorCodes["WebDriver"]
+$edgeDriverErrors = $global:Common.ErrorCodes["EdgeDriver"]
+
+# 特定のエラーコードのタイトルを取得
+$errorTitle = $global:Common.GetErrorTitle("1001", "WebDriver")
+Write-Host "エラー1001のタイトル: $errorTitle"
+
+# すべてのエラーコードを表示
+foreach ($module in $global:Common.ErrorCodes.Keys) {
+    Write-Host "=== $module ==="
+    foreach ($code in $global:Common.ErrorCodes[$module].Keys) {
+        $title = $global:Common.ErrorCodes[$module][$code]
+        Write-Host "  $code`: $title"
+    }
+}</pre>
+                </div>
+
+                <div class="info-box">
+                    <h3>エラーコードの構造</h3>
+                    <p>エラーコードは以下の構造で管理されています：</p>
+                    <div class="code-block">
+                        <pre>{
+  "WebDriver": {
+    "1001": "WebDriver初期化エラー",
+    "1002": "ブラウザ起動エラー",
+    ...
+  },
+  "EdgeDriver": {
+    "2001": "EdgeDriver初期化エラー",
+    "2002": "Edge実行ファイルパス取得エラー",
+    ...
+  },
+  ...
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSONファイル構造 -->
+            <div class="detail-page">
+                <h2>JSONファイル構造</h2>
+                <p>エラーコードは<code>_json/ErrorCode.json</code>ファイルで管理されています。</p>
+                
+                <div class="code-block">
+                    <pre>{
+  "WebDriver": {
+    "1001": "WebDriver初期化エラー",
+    "1002": "ブラウザ起動エラー",
+    "1003": "WebSocket接続エラー",
+    "1004": "ページ移動エラー",
+    "1005": "要素検索エラー",
+    "1006": "要素操作エラー",
+    "1007": "WebDriver Disposeエラー"
+  },
+  "EdgeDriver": {
+    "2001": "EdgeDriver初期化エラー",
+    "2002": "Edge実行ファイルパス取得エラー",
+    "2003": "ユーザーデータディレクトリ取得エラー",
+    "2004": "デバッグモード有効化エラー",
+    "2005": "EdgeDriver Disposeエラー"
+  },
+  "ChromeDriver": {
+    "3001": "ChromeDriver初期化エラー",
+    "3002": "Chrome実行ファイルパス取得エラー",
+    "3003": "ユーザーデータディレクトリ取得エラー",
+    "3004": "デバッグモード有効化エラー",
+    "3005": "ChromeDriver Disposeエラー"
+  },
+  "WordDriver": {
+    "4001": "WordDriver初期化エラー",
+    "4002": "一時ディレクトリ作成エラー",
+    "4003": "Wordアプリケーション初期化エラー",
+    "4004": "新規ドキュメント作成エラー",
+    "4005": "テキスト追加エラー",
+    "4006": "見出し追加エラー",
+    "4007": "段落追加エラー",
+    "4008": "テーブル追加エラー",
+    "4009": "画像追加エラー",
+    "4010": "ページ区切り追加エラー",
+    "4011": "目次追加エラー",
+    "4012": "ドキュメント保存エラー",
+    "4013": "目次更新エラー",
+    "4014": "ドキュメント開くエラー",
+    "4015": "フォント設定エラー",
+    "4016": "WordDriver Disposeエラー"
+  },
+  "ExcelDriver": {
+    "5001": "ExcelDriver初期化エラー",
+    "5002": "一時ディレクトリ作成エラー",
+    "5003": "Excelアプリケーション初期化エラー",
+    "5004": "新規ワークブック作成エラー",
+    "5005": "セル値設定エラー",
+    "5006": "セル値取得エラー",
+    "5007": "範囲値設定エラー",
+    "5008": "範囲値取得エラー",
+    "5009": "ワークシート追加エラー",
+    "5010": "ワークシート選択エラー",
+    "5011": "フォント設定エラー",
+    "5012": "ワークブック保存エラー",
+    "5013": "ワークブック開くエラー",
+    "5014": "数式設定エラー",
+    "5015": "計算実行エラー",
+    "5016": "ExcelDriver Disposeエラー"
+  },
+  "PowerPointDriver": {
+    "6001": "PowerPointDriver初期化エラー",
+    "6002": "一時ディレクトリ作成エラー",
+    "6003": "PowerPointアプリケーション初期化エラー",
+    "6004": "新規プレゼンテーション作成エラー",
+    "6005": "スライド追加エラー",
+    "6006": "スライド選択エラー",
+    "6007": "タイトル設定エラー",
+    "6008": "テキスト追加エラー",
+    "6009": "図形追加エラー",
+    "6010": "画像追加エラー",
+    "6011": "テーブル追加エラー",
+    "6012": "プレゼンテーション保存エラー",
+    "6013": "プレゼンテーション開くエラー",
+    "6014": "テーマ設定エラー",
+    "6015": "フォント設定エラー",
+    "6016": "PowerPointDriver Disposeエラー"
+  }
 }</pre>
                 </div>
             </div>
 
-            <!-- 共通ユーティリティ -->
+            <!-- PowerShell 5.1対応 -->
             <div class="detail-page">
-                <h2>共通ユーティリティ機能</h2>
+                <h2>PowerShell 5.1対応</h2>
+                <p>Commonクラスは、PowerShell 5.1との互換性を保つために特別な処理を行います。</p>
                 
-                <h3>設定管理</h3>
-                <div class="code-block">
-                    <pre># 設定の取得
-$config = $Common.GetConfiguration()
-
-# 設定の更新
-$Common.UpdateConfiguration(@{
-    "LogLevel" = "DEBUG"
-    "MaxRetries" = 3
-    "Timeout" = 30
-})
-
-# 設定の保存
-$Common.SaveConfiguration()</pre>
+                <div class="method-category">
+                    <h4>PowerShell 5.1対応機能</h4>
+                    <ul class="method-list">
+                        <li><strong>手動JSON変換:</strong> <code>ConvertFrom-Json -AsHashtable</code>の代替処理</li>
+                        <li><strong>グローバル変数管理:</strong> <code>$global:Common</code>として明示的にグローバルスコープで管理</li>
+                        <li><strong>互換性チェック:</strong> PowerShell 5.1の制限に対応</li>
+                    </ul>
                 </div>
 
-                <h3>パス操作</h3>
                 <div class="code-block">
-                    <pre># パスの正規化
-$normalizedPath = $Common.NormalizePath("C:\temp\..\data\file.txt")
-# 結果: C:\data\file.txt
+                    <pre># PowerShell 5.1対応のJSON変換処理
+# ConvertFrom-Json -AsHashtable がサポートされていないため、
+# 手動でハッシュテーブルに変換します
 
-# パスの存在確認
-$exists = $Common.PathExists("C:\temp\file.txt")
+$jsonContent = Get-Content $jsonPath -Raw
+$jsonObject = ConvertFrom-Json $jsonContent
 
-# ディレクトリの作成
-$Common.CreateDirectory("C:\temp\newfolder")</pre>
+# 手動でハッシュテーブルに変換
+$errorCodes = @{}
+foreach ($module in $jsonObject.PSObject.Properties) {
+    $errorCodes[$module.Name] = @{}
+    foreach ($code in $module.Value.PSObject.Properties) {
+        $errorCodes[$module.Name][$code.Name] = $code.Value
+    }
+}</pre>
                 </div>
 
-                <h3>文字列操作</h3>
-                <div class="code-block">
-                    <pre># 文字列の検証
-$isValid = $Common.IsValidString("test", "alphanumeric")
-
-# 文字列の正規化
-$normalized = $Common.NormalizeString("  Test  String  ")
-# 結果: "Test String"
-
-# 文字列の暗号化
-$encrypted = $Common.EncryptString("sensitive data", "password")
-
-# 文字列の復号化
-$decrypted = $Common.DecryptString($encrypted, "password")</pre>
-                </div>
-
-                <h3>日時操作</h3>
-                <div class="code-block">
-                    <pre># 現在のタイムスタンプ
-$timestamp = $Common.GetCurrentTimestamp()
-
-# 日時のフォーマット
-$formatted = $Common.FormatDateTime((Get-Date), "yyyy-MM-dd HH:mm:ss")
-
-# 日時の検証
-$isValid = $Common.IsValidDateTime("2024-01-15 14:30:25")</pre>
+                <div class="warning-box">
+                    <h3>PowerShell 5.1の制限</h3>
+                    <ul>
+                        <li><code>ConvertFrom-Json -AsHashtable</code>パラメータがサポートされていません</li>
+                        <li>クラス内でのグローバル変数アクセスに制限があります</li>
+                        <li>一部の新しい構文がサポートされていません</li>
+                    </ul>
                 </div>
             </div>
 
             <!-- 使用例 -->
             <div class="detail-page">
-                <h2>基本的な使用例</h2>
+                <h2>使用例</h2>
                 
-                <h3>1. シンプルなログ出力</h3>
+                <h3>基本的なエラーハンドリング</h3>
                 <div class="code-block">
-                    <pre># Commonライブラリのインポート
-. "$PSScriptRoot\Common.ps1"
-
-# アプリケーション開始
-$Common.WriteLog("アプリケーションを開始しました", "INFO")
-
-# 処理の実行
-$Common.WriteLog("データ処理を開始します", "INFO")
-
+                    <pre># 基本的なエラーハンドリング例
 try {
     # 何らかの処理
-    $result = 1 + 1
-    $Common.WriteLog("計算結果: $result", "DEBUG")
-    
-    $Common.WriteLog("処理が正常に完了しました", "INFO")
-    
-} catch {
-    $Common.WriteLog("処理中にエラーが発生しました", "ERROR")
-    $Common.HandleError("CALC_001", $_.Exception.Message, "Calculator")
+    $result = SomeOperation()
+    if (-not $result) {
+        # エラーをログに出力
+        $global:Common.HandleError("1001", "処理に失敗しました", "CustomModule", ".\AllDrivers_Error.log")
+    }
 }
-
-# アプリケーション終了
-$Common.WriteLog("アプリケーションを終了しました", "INFO")</pre>
+catch {
+    # 例外をキャッチしてエラーログに出力
+    $global:Common.HandleError("9999", $_.Exception.Message, "CustomModule", ".\AllDrivers_Error.log")
+}</pre>
                 </div>
 
-                <h3>2. エラーハンドリング付きファイル操作</h3>
+                <h3>エラーコードの動的取得</h3>
                 <div class="code-block">
-                    <pre>function Process-File {
-    param([string]$FilePath)
-    
-    $Common.WriteLog("ファイル処理を開始: $FilePath", "INFO")
-    
-    try {
-        # ファイルの存在確認
-        if (-not $Common.PathExists($FilePath)) {
-            throw "ファイルが見つかりません: $FilePath"
-        }
-        
-        # ファイルの読み込み
-        $content = Get-Content $FilePath -ErrorAction Stop
-        $Common.WriteLog("ファイルの読み込みが完了しました", "INFO")
-        
-        # 内容の処理
-        $processedContent = $content | ForEach-Object { $_.ToUpper() }
-        
-        # 結果の保存
-        $outputPath = $Common.NormalizePath("$FilePath.processed")
-        $processedContent | Out-File $outputPath -Encoding UTF8
-        
-        $Common.WriteLog("ファイル処理が完了しました: $outputPath", "INFO")
-        
-    } catch {
-        $Common.HandleError("FILE_PROC_001", $_.Exception.Message, "FileProcessor")
-        throw
+                    <pre># エラーコードの動的取得例
+# 特定のモジュールのエラーコードを取得
+$webDriverErrors = $global:Common.ErrorCodes["WebDriver"]
+
+# エラーコードの存在確認
+if ($webDriverErrors.ContainsKey("1001")) {
+    $errorTitle = $webDriverErrors["1001"]
+    Write-Host "エラー1001: $errorTitle"
+}
+
+# すべてのモジュールのエラーコードを列挙
+foreach ($moduleName in $global:Common.ErrorCodes.Keys) {
+    Write-Host "=== $moduleName ==="
+    $moduleErrors = $global:Common.ErrorCodes[$moduleName]
+    foreach ($errorCode in $moduleErrors.Keys) {
+        $errorTitle = $moduleErrors[$errorCode]
+        Write-Host "  $errorCode`: $errorTitle"
     }
+}</pre>
+                </div>
+
+                <h3>カスタムエラーハンドリング</h3>
+                <div class="code-block">
+                    <pre># カスタムエラーハンドリング例
+function HandleCustomError {
+    param(
+        [string]$ErrorCode,
+        [string]$Message,
+        [string]$Module
+    )
+    
+    # エラーコードのタイトルを取得
+    $errorTitle = $global:Common.GetErrorTitle($ErrorCode, $Module)
+    
+    # カスタムログメッセージを作成
+    $customMessage = "[$Module] $errorTitle: $Message"
+    
+    # ログに出力
+    $global:Common.LogError($customMessage, $Module, ".\Custom_Error.log")
+    
+    # コンソールにも出力
+    Write-Host $customMessage -ForegroundColor Red
 }
 
 # 使用例
-Process-File "C:\temp\input.txt"</pre>
-                </div>
-
-                <h3>3. 設定管理付きアプリケーション</h3>
-                <div class="code-block">
-                    <pre># 設定の初期化
-$config = @{
-    "LogLevel" = "INFO"
-    "MaxRetries" = 3
-    "Timeout" = 30
-    "OutputDirectory" = "C:\output"
-}
-
-$Common.UpdateConfiguration($config)
-$Common.SaveConfiguration()
-
-# 設定を使用した処理
-$settings = $Common.GetConfiguration()
-$Common.WriteLog("設定を読み込みました: $($settings.LogLevel)", "INFO")
-
-# 設定に基づく処理
-for ($i = 1; $i -le $settings.MaxRetries; $i++) {
-    $Common.WriteLog("試行 $i / $($settings.MaxRetries)", "INFO")
-    
-    try {
-        # 何らかの処理
-        Start-Sleep -Seconds $settings.Timeout
-        $Common.WriteLog("処理が成功しました", "INFO")
-        break
-        
-    } catch {
-        $Common.WriteLog("試行 $i が失敗しました: $($_.Exception.Message)", "WARNING")
-        
-        if ($i -eq $settings.MaxRetries) {
-            $Common.HandleError("RETRY_001", "最大試行回数に達しました", "RetryProcessor")
-        }
-    }
-}</pre>
+HandleCustomError "1001" "カスタムエラーメッセージ", "CustomModule"</pre>
                 </div>
             </div>
 
             <!-- ログファイル管理 -->
             <div class="detail-page">
                 <h2>ログファイル管理</h2>
+                <p>Commonクラスでは、統一されたログファイル管理を提供します。</p>
                 
-                <h3>ログファイルの場所</h3>
-                <div class="code-block">
-                    <pre># ログファイルの保存場所
-.\Common_info.log      # 現在のディレクトリ
-.\Common_warning.log
-.\Common_error.log
-.\Common_debug.log</pre>
+                <div class="method-category">
+                    <h4>ログファイル管理機能</h4>
+                    <ul class="method-list">
+                        <li><strong>統一ログファイル:</strong> すべてのドライバーで<code>.\AllDrivers_Error.log</code>を使用</li>
+                        <li><strong>構造化ログ:</strong> タイムスタンプ、レベル、モジュール、エラーコードを含む</li>
+                        <li><strong>自動ローテーション:</strong> ログファイルの自動管理</li>
+                    </ul>
                 </div>
 
-                <h3>ログローテーション</h3>
                 <div class="code-block">
-                    <pre># ログファイルのローテーション
-$Common.RotateLogFiles()
-
-# 古いログファイルの削除
-$Common.CleanupOldLogs(30)  # 30日以上古いログを削除
-
-# ログファイルの圧縮
-$Common.CompressLogFiles()</pre>
+                    <pre># ログファイルの例
+[2024-01-01 12:00:00] [ERROR] [WebDriver] [1001] WebDriver初期化エラー: WebDriver初期化に失敗しました
+[2024-01-01 12:00:05] [ERROR] [EdgeDriver] [2001] EdgeDriver初期化エラー: Edge実行ファイルが見つかりません
+[2024-01-01 12:00:10] [ERROR] [WordDriver] [4001] WordDriver初期化エラー: Wordアプリケーションの起動に失敗しました
+[2024-01-01 12:00:15] [ERROR] [ExcelDriver] [5001] ExcelDriver初期化エラー: Excelアプリケーションの起動に失敗しました
+[2024-01-01 12:00:20] [ERROR] [PowerPointDriver] [6001] PowerPointDriver初期化エラー: PowerPointアプリケーションの起動に失敗しました</pre>
                 </div>
 
-                <h3>ログレベルの動的変更</h3>
-                <div class="code-block">
-                    <pre># ログレベルを動的に変更
-$Common.SetLogLevel("DEBUG")  # デバッグモードに変更
-
-# 詳細なログ出力
-$Common.WriteLog("詳細なデバッグ情報", "DEBUG")
-
-# ログレベルを元に戻す
-$Common.SetLogLevel("INFO")</pre>
-                </div>
-            </div>
-
-            <!-- パフォーマンス監視 -->
-            <div class="detail-page">
-                <h2>パフォーマンス監視</h2>
-                
-                <h3>メモリ使用量の監視</h3>
-                <div class="code-block">
-                    <pre># メモリ使用量の取得
-$memoryUsage = $Common.GetMemoryUsage()
-$Common.WriteLog("メモリ使用量: $memoryUsage MB", "DEBUG")
-
-# メモリ使用量の監視
-$Common.StartMemoryMonitoring()
-
-# 処理実行
-# ... 何らかの処理 ...
-
-# メモリ使用量の停止
-$memoryReport = $Common.StopMemoryMonitoring()
-$Common.WriteLog("メモリ監視レポート: $memoryReport", "INFO")</pre>
-                </div>
-
-                <h3>実行時間の測定</h3>
-                <div class="code-block">
-                    <pre># 実行時間の測定開始
-$Common.StartTimer("fileProcessing")
-
-# 処理実行
-# ... 何らかの処理 ...
-
-# 実行時間の測定停止
-$elapsedTime = $Common.StopTimer("fileProcessing")
-$Common.WriteLog("ファイル処理時間: $elapsedTime 秒", "INFO")</pre>
+                <div class="info-box">
+                    <h3>ログ形式の詳細</h3>
+                    <ul>
+                        <li><strong>タイムスタンプ:</strong> <code>[YYYY-MM-DD HH:MM:SS]</code></li>
+                        <li><strong>レベル:</strong> <code>[ERROR]</code>、<code>[WARNING]</code>、<code>[INFO]</code></li>
+                        <li><strong>モジュール:</strong> <code>[ModuleName]</code></li>
+                        <li><strong>エラーコード:</strong> <code>[ErrorCode]</code></li>
+                        <li><strong>エラータイトル:</strong> エラーコードに対応するタイトル</li>
+                        <li><strong>メッセージ:</strong> 詳細なエラーメッセージ</li>
+                    </ul>
                 </div>
             </div>
 
@@ -453,84 +405,105 @@ $Common.WriteLog("ファイル処理時間: $elapsedTime 秒", "INFO")</pre>
             <div class="detail-page">
                 <h2>トラブルシューティング</h2>
                 
-                <h3>よくある問題と解決法</h3>
-                
-                <h4>1. ログファイルが作成されない</h4>
-                <div class="code-block">
-                    <pre># 権限を確認
-$currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-$Common.WriteLog("現在のユーザー: $currentUser", "INFO")
-
-# ディレクトリの権限を確認
-$testPath = ".\test.log"
-try {
-    "test" | Out-File $testPath -ErrorAction Stop
-    Remove-Item $testPath
-    $Common.WriteLog("ログディレクトリの権限は正常です", "INFO")
-} catch {
-    $Common.WriteLog("ログディレクトリの権限に問題があります", "ERROR")
-}</pre>
+                <div class="method-category">
+                    <h4>よくある問題と解決方法</h4>
+                    <ul class="method-list">
+                        <li><strong>JSONファイルが見つからない:</strong> <code>_json/ErrorCode.json</code>ファイルの存在を確認</li>
+                        <li><strong>グローバル変数にアクセスできない:</strong> <code>$global:Common</code>として明示的にアクセス</li>
+                        <li><strong>PowerShell 5.1エラー:</strong> 互換性のための特別な処理が適用されていることを確認</li>
+                        <li><strong>ログファイルが作成されない:</strong> 書き込み権限を確認</li>
+                        <li><strong>エラーコードが取得できない:</strong> JSONファイルの形式を確認</li>
+                    </ul>
                 </div>
 
-                <h4>2. ログレベルが反映されない</h4>
-                <div class="code-block">
-                    <pre># ログレベルを強制的に設定
-$Common.SetLogLevel("DEBUG", $true)  # 強制設定
-
-# 設定を確認
-$currentLevel = $Common.GetLogLevel()
-$Common.WriteLog("現在のログレベル: $currentLevel", "INFO")</pre>
-                </div>
-
-                <h4>3. エラーログが出力されない</h4>
-                <div class="code-block">
-                    <pre># エラーハンドリングのテスト
-try {
-    throw "テストエラー"
-} catch {
-    $Common.HandleError("TEST_001", $_.Exception.Message, "TestModule")
-}
-
-# エラーログファイルの確認
-if (Test-Path ".\Common_Error.log") {
-    $Common.WriteLog("エラーログファイルが正常に作成されています", "INFO")
-} else {
-    $Common.WriteLog("エラーログファイルの作成に失敗しています", "ERROR")
-}</pre>
+                <div class="warning-box">
+                    <h3>デバッグのヒント</h3>
+                    <ul>
+                        <li>Common.ps1が他のドライバーファイルより先に読み込まれていることを確認してください</li>
+                        <li><code>$global:Common</code>が正しく作成されているか確認してください</li>
+                        <li>JSONファイルの構文が正しいか確認してください</li>
+                        <li>ログファイルの書き込み権限を確認してください</li>
+                        <li>PowerShell 5.1を使用している場合は、互換性の問題がないか確認してください</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- ベストプラクティス -->
+            <!-- パフォーマンス最適化 -->
             <div class="detail-page">
-                <h2>ベストプラクティス</h2>
+                <h2>パフォーマンス最適化</h2>
+                <p>Commonクラスでは、パフォーマンスを最適化するための機能を提供します。</p>
                 
-                <h3>ログ出力のベストプラクティス</h3>
-                <ul>
-                    <li><strong>適切なログレベルを使用:</strong> INFO、WARNING、ERROR、DEBUGを適切に使い分ける</li>
-                    <li><strong>意味のあるメッセージ:</strong> 何が起こったかを明確に記述する</li>
-                    <li><strong>一貫性を保つ:</strong> メッセージの形式を統一する</li>
-                    <li><strong>機密情報を避ける:</strong> パスワードや個人情報はログに出力しない</li>
-                </ul>
+                <div class="method-category">
+                    <h4>パフォーマンス最適化機能</h4>
+                    <ul class="method-list">
+                        <li><strong>遅延読み込み:</strong> エラーコードは必要時にのみ読み込み</li>
+                        <li><strong>キャッシュ機能:</strong> 一度読み込んだエラーコードをキャッシュ</li>
+                        <li><strong>効率的なJSON処理:</strong> PowerShell 5.1対応の最適化された処理</li>
+                        <li><strong>メモリ効率:</strong> 必要最小限のメモリ使用量</li>
+                    </ul>
+                </div>
 
-                <h3>エラーハンドリングのベストプラクティス</h3>
-                <ul>
-                    <li><strong>適切なエラーコード:</strong> 意味のあるエラーコードを使用する</li>
-                    <li><strong>詳細なエラー情報:</strong> デバッグに必要な情報を含める</li>
-                    <li><strong>エラーの伝播:</strong> 上位レイヤーに適切にエラーを伝播する</li>
-                    <li><strong>リソースのクリーンアップ:</strong> エラー時もリソースを適切に解放する</li>
-                </ul>
+                <div class="code-block">
+                    <pre># パフォーマンス最適化の例
+# エラーコードは一度だけ読み込まれ、キャッシュされます
+$startTime = Get-Date
 
-                <h3>パフォーマンスのベストプラクティス</h3>
-                <ul>
-                    <li><strong>ログレベルの調整:</strong> 本番環境ではDEBUGログを無効化する</li>
-                    <li><strong>ログローテーション:</strong> 定期的にログファイルをローテーションする</li>
-                    <li><strong>メモリ監視:</strong> 長時間実行される処理ではメモリ使用量を監視する</li>
-                    <li><strong>非同期ログ出力:</strong> パフォーマンスが重要な場合は非同期ログ出力を検討する</li>
-                </ul>
+# 初回アクセス（JSONファイルから読み込み）
+$errorTitle1 = $global:Common.GetErrorTitle("1001", "WebDriver")
+
+# 2回目以降のアクセス（キャッシュから取得）
+$errorTitle2 = $global:Common.GetErrorTitle("1001", "WebDriver")
+
+$endTime = Get-Date
+$duration = ($endTime - $startTime).TotalMilliseconds
+Write-Host "処理時間: $duration ms"</pre>
+                </div>
             </div>
         </div>
     </main>
-
-    <script src="../js/search.js"></script>
+    <script src="../js/script.js"></script>
+    
+    <!-- 隠しコマンド用のJavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let clickCount = 0;
+            let clickTimer = null;
+            
+            // 隠しコマンド用の要素をクリックした時の処理
+            document.getElementById('hiddenCommand').addEventListener('click', function(e) {
+                e.preventDefault();
+                clickCount++;
+                
+                // タイマーをリセット
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                }
+                
+                // 3秒後にクリックカウントをリセット
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 3000);
+                
+                // 5回クリックでゲームを開く
+                if (clickCount >= 5) {
+                    // インベーダーゲームを新規タブで開く
+                    window.open('./invader.html', '_blank');
+                    
+                    // 少し遅れてブロック崩しゲームも開く
+                    setTimeout(() => {
+                        window.open('./blockbreaker.html', '_blank');
+                    }, 500);
+                    
+                    // カウントをリセット
+                    clickCount = 0;
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html> 
+
+
