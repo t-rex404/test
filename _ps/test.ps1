@@ -4,9 +4,6 @@ write-host "TEST'$PSScriptRoot"
 
 # 共通ライブラリをインポート
 . "$PSScriptRoot\_lib\Common.ps1"
-. "$PSScriptRoot\_lib\WebDriver.ps1"
-. "$PSScriptRoot\_lib\ChromeDriver.ps1"
-. "$PSScriptRoot\_lib\EdgeDriver.ps1"
 
 Function Main()
 {
@@ -29,11 +26,9 @@ Function Main()
     {
         try
         {
-            $driver = New-Object -TypeName 'EdgeDriver'
-            
-            $driver.Navigate("https://www.google.com")
+            $global:Common.BlockMouseInput()
             start-sleep -Seconds 10
-            $driver.CloseWindow()
+            $global:Common.UnBlockMouseInput()
             $result = $SUCCESS_CODE
         }
         catch
