@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OracleDriver - ORACLEデータベース操作クラス</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OracleDriver</h1>
+            <p>ORACLEデータベース操作クラス</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">ホーム</a></li>
+                <li><a href="common.html">Common</a></li>
+                <li><a href="webdriver.html">WebDriver</a></li>
+                <li><a href="worddriver.html">WordDriver</a></li>
+                <li><a href="exceldriver.html">ExcelDriver</a></li>
+                <li><a href="powerpointdriver.html">PowerPointDriver</a></li>
+                <li><a href="chromedriver.html">ChromeDriver</a></li>
+                <li><a href="edgedriver.html">EdgeDriver</a></li>
+                <li><a href="oracledriver.html" class="active">OracleDriver</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section class="overview">
+                <h2>概要</h2>
+                <p>OracleDriverクラスは、ORACLEデータベースに対する操作を提供するPowerShellクラスです。DML、DDL、DCL、TCLの各操作を分けてメソッドを実装し、安全で効率的なデータベース操作を可能にします。</p>
+                
+                <div class="features">
+                    <h3>主な機能</h3>
+                    <ul>
+                        <li><strong>DML操作</strong>: SELECT、INSERT、UPDATE、DELETE、MERGE</li>
+                        <li><strong>DDL操作</strong>: CREATE TABLE、ALTER TABLE、DROP TABLE、CREATE INDEX、CREATE VIEW、CREATE SEQUENCE</li>
+                        <li><strong>DCL操作</strong>: GRANT、REVOKE</li>
+                        <li><strong>TCL操作</strong>: トランザクション制御、SAVEPOINT</li>
+                        <li><strong>ユーティリティ</strong>: テーブル一覧取得、テーブル構造取得</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="installation">
+                <h2>インストール・セットアップ</h2>
+                <div class="code-block">
+                    <h4>必要な依存関係</h4>
+                    <ul>
+                        <li>Oracle Client（Oracle.ManagedDataAccess.Client）</li>
+                        <li>PowerShell 5.1以上</li>
+                        <li>ORACLEデータベースへの接続権限</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <h4>ライブラリのインポート</h4>
+                    <pre><code># 共通ライブラリをインポート
+. "$PSScriptRoot\_lib\Common.ps1"
+
+# OracleDriverライブラリをインポート
+. "$PSScriptRoot\_lib\OracleDriver.ps1"</code></pre>
+                </div>
+            </section>
+
+            <section class="usage">
+                <h2>基本的な使用方法</h2>
+                
+                <div class="code-block">
+                    <h4>1. インスタンス作成と接続</h4>
+                    <pre><code># OracleDriverインスタンスを作成
+$oracleDriver = [OracleDriver]::new()
+
+# 接続パラメータを設定
+$oracleDriver.SetConnectionParameters(
+    "localhost",    # サーバー
+    "1521",         # ポート
+    "XE",           # サービス名
+    "username",     # ユーザー名
+    "password",     # パスワード
+    "schema"        # スキーマ（オプション）
+)
+
+# データベースに接続
+$oracleDriver.Connect()</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>2. DML操作の例</h4>
+                    <pre><code># SELECT文の実行
+$sql = "SELECT * FROM employees WHERE department_id = :dept_id"
+$params = @{":dept_id" = 10}
+$result = $oracleDriver.ExecuteSelect($sql, $params)
+
+# INSERT文の実行
+$insertSQL = @"
+INSERT INTO employees (employee_id, first_name, last_name, email)
+VALUES (:emp_id, :first_name, :last_name, :email)
+"@
+$insertParams = @{
+    ":emp_id" = 1001
+    ":first_name" = "John"
+    ":last_name" = "Doe"
+    ":email" = "john.doe@example.com"
+}
+$affectedRows = $oracleDriver.ExecuteInsert($insertSQL, $insertParams)
+
+# UPDATE文の実行
+$updateSQL = "UPDATE employees SET salary = :salary WHERE employee_id = :emp_id"
+$updateParams = @{":salary" = 55000; ":emp_id" = 1001}
+$affectedRows = $oracleDriver.ExecuteUpdate($updateSQL, $updateParams)
+
+# DELETE文の実行
+$deleteSQL = "DELETE FROM employees WHERE employee_id = :emp_id"
+$deleteParams = @{":emp_id" = 1001}
+$affectedRows = $oracleDriver.ExecuteDelete($deleteSQL, $deleteParams)</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>3. DDL操作の例</h4>
+                    <pre><code># テーブルの作成
+$createTableSQL = @"
+CREATE TABLE test_table (
+    id NUMBER(6) PRIMARY KEY,
+    name VARCHAR2(50) NOT NULL,
+    created_date DATE DEFAULT SYSDATE
+)
+"@
+$oracleDriver.ExecuteCreateTable($createTableSQL)
+
+# インデックスの作成
+$createIndexSQL = "CREATE INDEX idx_test_name ON test_table(name)"
+$oracleDriver.ExecuteCreateIndex($createIndexSQL)
+
+# ビューの作成
+$createViewSQL = "CREATE VIEW v_test AS SELECT id, name FROM test_table"
+$oracleDriver.ExecuteCreateView($createViewSQL)
+
+# シーケンスの作成
+$createSequenceSQL = "CREATE SEQUENCE seq_test_id START WITH 1 INCREMENT BY 1"
+$oracleDriver.ExecuteCreateSequence($createSequenceSQL)</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>4. トランザクション制御の例</h4>
+                    <pre><code># トランザクションを開始
+$oracleDriver.BeginTransaction()
+
+try {
+    # 複数の操作を実行
+    $oracleDriver.ExecuteInsert($insertSQL, $insertParams)
+    $oracleDriver.ExecuteUpdate($updateSQL, $updateParams)
+    
+    # SAVEPOINTを作成
+    $oracleDriver.CreateSavepoint("checkpoint1")
+    
+    # 追加の操作
+    $oracleDriver.ExecuteDelete($deleteSQL, $deleteParams)
+    
+    # トランザクションをコミット
+    $oracleDriver.CommitTransaction()
+}
+catch {
+    # エラーが発生した場合はロールバック
+    $oracleDriver.RollbackTransaction()
+    throw
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="methods">
+                <h2>メソッド一覧</h2>
+                
+                <div class="method-group">
+                    <h3>初期化・接続関連</h3>
+                    <div class="method">
+                        <h4>SetConnectionParameters([string]$server, [string]$port, [string]$service_name, [string]$username, [string]$password, [string]$schema)</h4>
+                        <p>データベース接続パラメータを設定します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>Connect()</h4>
+                        <p>ORACLEデータベースに接続します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>Disconnect()</h4>
+                        <p>データベース接続を切断します。</p>
+                    </div>
+                </div>
+
+                <div class="method-group">
+                    <h3>DML操作</h3>
+                    <div class="method">
+                        <h4>ExecuteSelect([string]$sql, [hashtable]$parameters)</h4>
+                        <p>SELECT文を実行し、DataTableを返します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteInsert([string]$sql, [hashtable]$parameters)</h4>
+                        <p>INSERT文を実行し、影響を受けた行数を返します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteUpdate([string]$sql, [hashtable]$parameters)</h4>
+                        <p>UPDATE文を実行し、影響を受けた行数を返します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteDelete([string]$sql, [hashtable]$parameters)</h4>
+                        <p>DELETE文を実行し、影響を受けた行数を返します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteMerge([string]$sql, [hashtable]$parameters)</h4>
+                        <p>MERGE文を実行し、影響を受けた行数を返します。</p>
+                    </div>
+                </div>
+
+                <div class="method-group">
+                    <h3>DDL操作</h3>
+                    <div class="method">
+                        <h4>ExecuteCreateTable([string]$sql)</h4>
+                        <p>CREATE TABLE文を実行します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteAlterTable([string]$sql)</h4>
+                        <p>ALTER TABLE文を実行します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteDropTable([string]$tableName)</h4>
+                        <p>DROP TABLE文を実行します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteCreateIndex([string]$sql)</h4>
+                        <p>CREATE INDEX文を実行します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteCreateView([string]$sql)</h4>
+                        <p>CREATE VIEW文を実行します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteCreateSequence([string]$sql)</h4>
+                        <p>CREATE SEQUENCE文を実行します。</p>
+                    </div>
+                </div>
+
+                <div class="method-group">
+                    <h3>DCL操作</h3>
+                    <div class="method">
+                        <h4>ExecuteGrant([string]$sql)</h4>
+                        <p>GRANT文を実行します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>ExecuteRevoke([string]$sql)</h4>
+                        <p>REVOKE文を実行します。</p>
+                    </div>
+                </div>
+
+                <div class="method-group">
+                    <h3>TCL操作</h3>
+                    <div class="method">
+                        <h4>BeginTransaction()</h4>
+                        <p>トランザクションを開始します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>CommitTransaction()</h4>
+                        <p>トランザクションをコミットします。</p>
+                    </div>
+                    <div class="method">
+                        <h4>RollbackTransaction()</h4>
+                        <p>トランザクションをロールバックします。</p>
+                    </div>
+                    <div class="method">
+                        <h4>CreateSavepoint([string]$savepointName)</h4>
+                        <p>SAVEPOINTを作成します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>RollbackToSavepoint([string]$savepointName)</h4>
+                        <p>指定したSAVEPOINTにロールバックします。</p>
+                    </div>
+                </div>
+
+                <div class="method-group">
+                    <h3>ユーティリティメソッド</h3>
+                    <div class="method">
+                        <h4>GetTableList([string]$schema)</h4>
+                        <p>指定したスキーマのテーブル一覧を取得します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>GetTableStructure([string]$tableName, [string]$schema)</h4>
+                        <p>指定したテーブルの構造を取得します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>IsConnected()</h4>
+                        <p>接続状態を確認します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>IsTransactionActive()</h4>
+                        <p>トランザクション状態を確認します。</p>
+                    </div>
+                    <div class="method">
+                        <h4>GetLastErrorMessage()</h4>
+                        <p>最後のエラーメッセージを取得します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="examples">
+                <h2>使用例</h2>
+                
+                <div class="example">
+                    <h3>従業員データの一括処理</h3>
+                    <pre><code># 従業員データの一括挿入
+$oracleDriver.BeginTransaction()
+
+try {
+    $employees = @(
+        @{id = 1001; name = "John Doe"; email = "john@example.com"},
+        @{id = 1002; name = "Jane Smith"; email = "jane@example.com"},
+        @{id = 1003; name = "Bob Johnson"; email = "bob@example.com"}
+    )
+    
+    $insertSQL = "INSERT INTO employees (id, name, email) VALUES (:id, :name, :email)"
+    
+    foreach ($emp in $employees) {
+        $params = @{
+            ":id" = $emp.id
+            ":name" = $emp.name
+            ":email" = $emp.email
+        }
+        $oracleDriver.ExecuteInsert($insertSQL, $params)
+    }
+    
+    $oracleDriver.CommitTransaction()
+    Write-Host "従業員データの一括挿入が完了しました。"
+}
+catch {
+    $oracleDriver.RollbackTransaction()
+    Write-Error "エラーが発生しました: $($_.Exception.Message)"
+}</code></pre>
+                </div>
+
+                <div class="example">
+                    <h3>データベース構造の確認</h3>
+                    <pre><code># テーブル一覧の取得
+$tableList = $oracleDriver.GetTableList("HR")
+Write-Host "テーブル数: $($tableList.Rows.Count)"
+
+foreach ($table in $tableList.Rows) {
+    Write-Host "テーブル: $($table['TABLE_NAME'])"
+    
+    # 各テーブルの構造を取得
+    $structure = $oracleDriver.GetTableStructure($table['TABLE_NAME'], "HR")
+    Write-Host "  カラム数: $($structure.Rows.Count)"
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="error-handling">
+                <h2>エラーハンドリング</h2>
+                <p>OracleDriverクラスは、共通ライブラリのエラーハンドリング機能を利用して、詳細なエラー情報をログに記録します。</p>
+                
+                <div class="code-block">
+                    <h4>エラーハンドリングの例</h4>
+                    <pre><code>try {
+    $oracleDriver.Connect()
+    $result = $oracleDriver.ExecuteSelect("SELECT * FROM non_existent_table")
+}
+catch {
+    # エラーメッセージを取得
+    $errorMessage = $oracleDriver.GetLastErrorMessage()
+    Write-Host "エラーが発生しました: $errorMessage"
+    
+    # エラーログは自動的に記録されます
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="best-practices">
+                <h2>ベストプラクティス</h2>
+                <ul>
+                    <li><strong>接続管理</strong>: 使用後は必ずDisconnect()を呼び出してリソースを解放してください。</li>
+                    <li><strong>トランザクション制御</strong>: 複数の操作を行う場合は、適切にトランザクションを制御してください。</li>
+                    <li><strong>パラメータ化クエリ</strong>: SQLインジェクション攻撃を防ぐため、パラメータ化クエリを使用してください。</li>
+                    <li><strong>エラーハンドリング</strong>: try-catch文を使用して適切にエラーを処理してください。</li>
+                    <li><strong>リソース管理</strong>: using文またはfinally句を使用してリソースを確実に解放してください。</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 PowerShell Driver Library. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html> 

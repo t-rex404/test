@@ -112,6 +112,16 @@
                     </div>
                     <a href="pages/common.html" class="card-link">詳細を見る</a>
                 </div>
+
+                <!-- OracleDriver -->
+                <div class="card">
+                    <h2>OracleDriver.ps1</h2>
+                    <p>ORACLEデータベースに対する操作を提供するクラス。DML、DDL、DCL、TCLの各操作を分けてメソッドを実装し、安全で効率的なデータベース操作を可能にします。</p>
+                    <div class="highlight">
+                        <strong>主要機能:</strong> データベース操作、トランザクション制御、SQL実行、ユーティリティ
+                    </div>
+                    <a href="pages/oracledriver.html" class="card-link">詳細を見る</a>
+                </div>
             </div>
 
             <!-- 使用方法 -->
@@ -127,6 +137,7 @@
 . "$PSScriptRoot\_lib\WordDriver.ps1"
 . "$PSScriptRoot\_lib\ExcelDriver.ps1"
 . "$PSScriptRoot\_lib\PowerPointDriver.ps1"
+. "$PSScriptRoot\_lib\OracleDriver.ps1"
 . "$PSScriptRoot\_lib\Common.ps1"</pre>
                 </div>
 
@@ -192,6 +203,24 @@ $powerPointDriver.SavePresentation("C:\output\presentation.pptx")
 
 # PowerPointDriverを閉じる
 $powerPointDriver.Dispose()</pre>
+                </div>
+
+                <h3>6. OracleDriverの使用例</h3>
+                <div class="code-block">
+                    <pre># OracleDriverの初期化
+$oracleDriver = [OracleDriver]::new()
+
+# 接続パラメータを設定
+$oracleDriver.SetConnectionParameters("localhost", "1521", "XE", "username", "password")
+
+# データベースに接続
+$oracleDriver.Connect()
+
+# SELECT文を実行
+$result = $oracleDriver.ExecuteSelect("SELECT * FROM employees WHERE dept_id = :dept_id", @{":dept_id" = 10})
+
+# 接続を切断
+$oracleDriver.Disconnect()</pre>
                 </div>
 
                 <div class="warning-box">
