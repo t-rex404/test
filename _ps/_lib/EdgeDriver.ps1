@@ -237,6 +237,7 @@ class EdgeDriver : WebDriver
             # 親クラスのDisposeを呼び出し　
             #[WebDriver]::Dispose($this)
             ([WebDriver]$this).Dispose()
+
             # Edge固有のクリーンアップ
             $this.CleanupOnInitializationFailure()
             
