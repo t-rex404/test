@@ -1,4 +1,4 @@
-﻿# EdgeDriverエラー管理モジュールをインポート
+# EdgeDriverエラー管理モジュールをインポート
 #import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
 
 # 共通ライブラリをインポート
@@ -234,9 +234,9 @@ class EdgeDriver : WebDriver
         {
             Write-Host "EdgeDriverのリソースを解放します。" -ForegroundColor Cyan
             
-            # 親クラスのDisposeを呼び出し
-            [WebDriver]::Dispose($this)
-            
+            # 親クラスのDisposeを呼び出し　
+            #[WebDriver]::Dispose($this)
+            ([WebDriver]$this).Dispose()
             # Edge固有のクリーンアップ
             $this.CleanupOnInitializationFailure()
             
