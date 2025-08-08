@@ -1,4 +1,4 @@
-﻿# ChromeDriverエラー管理モジュールをインポート
+# ChromeDriverエラー管理モジュールをインポート
 #import-module "$PSScriptRoot\ChromeDriverErrors.psm1"
 
 # 共通ライブラリをインポート
@@ -239,8 +239,9 @@ class ChromeDriver : WebDriver
             Write-Host "ChromeDriverのリソースを解放します。" -ForegroundColor Cyan
             
             # 親クラスのDisposeを呼び出し
-            [WebDriver]::Dispose($this)
-            
+            #[WebDriver]::Dispose($this)
+            ([WebDriver]$this).Dispose()
+
             # Chrome固有のクリーンアップ
             $this.CleanupOnInitializationFailure()
             
