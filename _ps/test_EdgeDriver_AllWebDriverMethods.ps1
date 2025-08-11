@@ -64,7 +64,7 @@ try {
     Invoke-TestStep -Name 'StartBrowser (EdgeDriver経由)' -ScriptBlock { Write-Host "EdgeDriver経由でブラウザが起動済み" }
     
     # WebSocket情報取得
-    Invoke-TestStep -Name 'GetWebSocketInfomation' -ScriptBlock { $driver.GetWebSocketInfomation($driver.web_socket_debugger_url) }
+    #Invoke-TestStep -Name 'GetWebSocketInfomation' -ScriptBlock { $driver.GetWebSocketInfomation($driver.web_socket_debugger_url) }
     
     # ターゲット発見
     Invoke-TestStep -Name 'DiscoverTargets' -ScriptBlock { $driver.DiscoverTargets() }
@@ -217,8 +217,11 @@ try {
         Invoke-TestStep -Name 'ResizeWindow(1024x768)' -ScriptBlock { $driver.ResizeWindow(1024, 768, $handle) }
         Invoke-TestStep -Name 'NormalWindow()'         -ScriptBlock { $driver.NormalWindow($handle) }
         Invoke-TestStep -Name 'MaximizeWindow()'       -ScriptBlock { $driver.MaximizeWindow($handle) }
+        Invoke-TestStep -Name 'NormalWindow()'         -ScriptBlock { $driver.NormalWindow($handle) }
         Invoke-TestStep -Name 'MinimizeWindow()'       -ScriptBlock { $driver.MinimizeWindow($handle) }
+        Invoke-TestStep -Name 'NormalWindow()'         -ScriptBlock { $driver.NormalWindow($handle) }
         Invoke-TestStep -Name 'FullscreenWindow()'     -ScriptBlock { $driver.FullscreenWindow($handle) }
+        Invoke-TestStep -Name 'NormalWindow()'         -ScriptBlock { $driver.NormalWindow($handle) }
         Invoke-TestStep -Name 'MoveWindow(10,10)'      -ScriptBlock { $driver.MoveWindow(10, 10, $handle) }
     }
     Invoke-TestStep -Name 'GetWindowHandles()' -ScriptBlock { $driver.GetWindowHandles() }

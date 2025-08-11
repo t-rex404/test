@@ -120,6 +120,8 @@ class WebDriver
             {
                 try
                 {
+                    Write-Host "タブ情報を取得中... ($($i+1)/$retry_count)" -ForegroundColor Yellow
+                    
                     $tabs = Invoke-RestMethod -Uri 'http://localhost:9222/json' -ErrorAction Stop -TimeoutSec 10
                     
                     if (-not $tabs)
@@ -136,20 +138,43 @@ class WebDriver
                     #        return $tab
                     #    }
                     #}
-
+                    Write-Host "取得したタブ数: $($tabs.Count)" -ForegroundColor Cyan
+                    
                     # まず "about:blank" の page を優先し、なければ最初の page、さらに無ければ先頭要素を返す
                     $tab = $tabs | Where-Object { $_.type -eq 'page' -and $_.title -eq 'about:blank' } | Select-Object -First 1
                     if (-not $tab) {
+                        Write-Host "about:blankタブが見つからないため、最初のpageタブを検索中..." -ForegroundColor Yellow
                         $tab = $tabs | Where-Object { $_.type -eq 'page' } | Select-Object -First 1
                     }
                     if (-not $tab) {
+                        Write-Host "pageタブが見つからないため、最初のタブを選択中..." -ForegroundColor Yellow
                         $tab = $tabs | Select-Object -First 1
                     }
-                    if ($tab) { return $tab }
+                    
+                    if ($tab) { 
+                        Write-Host "選択されたタブ: type=$($tab.type), title=$($tab.title), id=$($tab.id)" -ForegroundColor Green
+                        
+                        # webSocketDebuggerUrlの存在確認
+                        if ([string]::IsNullOrEmpty($tab.webSocketDebuggerUrl))
+                        {
+                            Write-Host "警告: webSocketDebuggerUrlが空です。タブ情報を再取得します。" -ForegroundColor Yellow
+                            if ($i -lt $retry_count - 1)
+                            {
+                                Start-Sleep -Seconds $retry_delay
+                                continue
+                            }
+                            else
+                            {
+                                throw 'webSocketDebuggerUrlが取得できません。'
+                            }
+                        }
+                        
+                        return $tab 
+                    }
                     
                     if ($i -lt $retry_count - 1)
                     {
-                        Write-Host "条件に合致するタブが見つかりません。再試行します... ($($i+1)/$retry_count)"
+                        Write-Host "条件に合致するタブが見つかりません。再試行します... ($($i+1)/$retry_count)" -ForegroundColor Yellow
                         Start-Sleep -Seconds $retry_delay
                     }
                     else
@@ -161,16 +186,18 @@ class WebDriver
                 {
                     if ($i -lt $retry_count - 1)
                     {
-                        Write-Host "タブ情報の取得に失敗しました。再試行します... ($($i+1)/$retry_count)"
+                        Write-Host "タブ情報の取得に失敗しました。再試行します... ($($i+1)/$retry_count)" -ForegroundColor Yellow
+                        Write-Host "エラー詳細: $($_.Exception.Message)" -ForegroundColor Red
                         Start-Sleep -Seconds $retry_delay
                     }
                     else
                     {
+                        Write-Host "最大再試行回数に達しました。最後のエラーを再スローします。" -ForegroundColor Red
                         throw
                     }
                 }
             }
-            throw
+            throw "タブ情報の取得に失敗しました。"
         }
         catch
         {
@@ -190,6 +217,8 @@ class WebDriver
                 throw "WebSocketデバッガーURLが指定されていません。"
             }
 
+            Write-Host "WebSocket接続を開始します: $web_socket_debugger_url" -ForegroundColor Yellow
+
             $retry_count = 3
             $retry_delay = 2  # 秒
             
@@ -198,6 +227,8 @@ class WebDriver
                 $cancellationTokenSource = $null
                 try
                 {
+                    Write-Host "WebSocket接続試行中... ($($i+1)/$retry_count)" -ForegroundColor Yellow
+                    
                     # WebSocket接続の準備
                     $this.web_socket = [System.Net.WebSockets.ClientWebSocket]::new()
                     $uri = [System.Uri]::new($web_socket_debugger_url)
@@ -206,12 +237,13 @@ class WebDriver
                     $cancellationTokenSource = [System.Threading.CancellationTokenSource]::new()
                     $cancellationTokenSource.CancelAfter([TimeSpan]::FromSeconds(10))
                     
+                    Write-Host "WebSocket接続を確立中..." -ForegroundColor Yellow
                     $this.web_socket.ConnectAsync($uri, $cancellationTokenSource.Token).Wait()
                     
                     if ($this.web_socket.State -eq [System.Net.WebSockets.WebSocketState]::Open)
                     {
                         $this.is_initialized = $true
-                        Write-Host "WebSocket接続が確立されました。"
+                        Write-Host "WebSocket接続が確立されました。" -ForegroundColor Green
                         return
                     }
                     else
@@ -221,19 +253,29 @@ class WebDriver
                 }
                 catch
                 {
+                    Write-Host "WebSocket接続エラー（試行 $($i+1)/$retry_count）: $($_.Exception.Message)" -ForegroundColor Red
+                    
                     if ($this.web_socket)
                     {
-                        $this.web_socket.Dispose()
+                        try
+                        {
+                            $this.web_socket.Dispose()
+                        }
+                        catch
+                        {
+                            Write-Host "WebSocketの破棄中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                        }
                         $this.web_socket = $null
                     }
                     
                     if ($i -lt $retry_count - 1)
                     {
-                        Write-Host "WebSocket接続に失敗しました。再試行します... ($($i+1)/$retry_count)"
+                        Write-Host "WebSocket接続に失敗しました。再試行します... ($($i+1)/$retry_count)" -ForegroundColor Yellow
                         Start-Sleep -Seconds $retry_delay
                     }
                     else
                     {
+                        Write-Host "最大再試行回数に達しました。" -ForegroundColor Red
                         throw
                     }
                 }
