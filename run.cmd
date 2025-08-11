@@ -4,7 +4,7 @@ SET START_TIME=%TIME%
 
 PUSHD %~dp0
 REM powershell -ExecutionPolicy Bypass %~dp0\_ps\main.ps1
-powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test.ps1"
+powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_EdgeDriver_AllWebDriverMethods.ps1"
 REM powershell.exe -ExecutionPolicy Bypass -file %~dp0\_ps\hoge.ps1
 POPD
 

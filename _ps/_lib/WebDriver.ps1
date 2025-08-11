@@ -127,24 +127,34 @@ class WebDriver
                         throw 'タブ情報を取得できません。'
                     }
 
-                    $tab = $null
-                    # 「about:blank」を選択
-                    foreach ($tab in $tabs)
-                    {
-                        if ($tab.title -like 'about:blank' -and $tab.type -like 'page')
-                        {
-                            return $tab
-                        }
+                    #$tab = $null
+                    ##「about:blank」を選択
+                    #foreach ($tab in $tabs)
+                    #{
+                    #    if ($tab.type -eq 'page' -and $tab.title -eq 'about:blank')
+                    #    {
+                    #        return $tab
+                    #    }
+                    #}
+
+                    # まず "about:blank" の page を優先し、なければ最初の page、さらに無ければ先頭要素を返す
+                    $tab = $tabs | Where-Object { $_.type -eq 'page' -and $_.title -eq 'about:blank' } | Select-Object -First 1
+                    if (-not $tab) {
+                        $tab = $tabs | Where-Object { $_.type -eq 'page' } | Select-Object -First 1
                     }
+                    if (-not $tab) {
+                        $tab = $tabs | Select-Object -First 1
+                    }
+                    if ($tab) { return $tab }
                     
                     if ($i -lt $retry_count - 1)
                     {
-                        Write-Host "about:blankタブが見つかりません。再試行します... ($($i+1)/$retry_count)"
+                        Write-Host "条件に合致するタブが見つかりません。再試行します... ($($i+1)/$retry_count)"
                         Start-Sleep -Seconds $retry_delay
                     }
                     else
                     {
-                        throw 'about:blankタブが見つかりません。'
+                        throw '条件に合致するタブが見つかりません。'
                     }
                 }
                 catch
@@ -422,34 +432,32 @@ class WebDriver
     {
         try
         {
-            Write-Host "Step1: ページ遷移"
             if ([string]::IsNullOrEmpty($url))
             {
                 throw "URLが指定されていません。"
             }
-            Write-Host "Step2: WebDriverが初期化されているか確認"
             if (-not $this.is_initialized)
             {
                 throw "WebDriverが初期化されていません。"
             }
-            Write-Host "Step3: URLの形式を検証"
+
             # URLの形式を検証
             if (-not [System.Uri]::IsWellFormedUriString($url, [System.UriKind]::RelativeOrAbsolute))
             {
                 throw "無効なURL形式です: $url"
             }
-            Write-Host "Step4: ページ遷移リクエスト送信"
+
             # ページ遷移リクエスト送信
             $this.SendWebSocketMessage('Page.navigate', @{ url = $url })
             $response = $this.ReceiveWebSocketMessage()
-            Write-Host "Step5: レスポンスのエラーチェック"
+
             # レスポンスのエラーチェック
             $response_obj = $response | ConvertFrom-Json
             if ($response_obj.error)
             {
                 throw "ページ遷移エラー: $($response_obj.error.message)"
             }
-            Write-Host "Step6: ページロード完了待機"
+
             # ページロード完了待機
             $timeout = [datetime]::Now.AddSeconds(60)
             $retry_count = 0
@@ -501,7 +509,7 @@ class WebDriver
             {
                 Write-Host "ページイベントの有効化に失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-            Write-Host "Step7: 利用可能なタブ情報を取得"
+
             # 利用可能なタブ情報を取得
             try
             {
@@ -511,7 +519,7 @@ class WebDriver
             {
                 Write-Host "ターゲット発見に失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-            Write-Host "Step8: JavaScript実行環境を有効化し、`document` オブジェクトにアクセスできるようにする"
+
             # JavaScript実行環境を有効化し、`document` オブジェクトにアクセスできるようにする
             try
             {
@@ -522,7 +530,7 @@ class WebDriver
             {
                 Write-Host "Runtime.enableに失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-            Write-Host "Step9: 現在のページのDOMツリーを取得し、documentノード直下の要素まで取得"
+
             # 現在のページのDOMツリーを取得し、documentノード直下の要素まで取得
             try
             {
@@ -533,7 +541,7 @@ class WebDriver
             {
                 Write-Host "DOM.getDocumentに失敗しましたが、処理を続行します: $($_.Exception.Message)"
             }
-            Write-Host "Step10: ページ遷移が完了しました"
+
             Write-Host "ページ遷移が完了しました: $url"
         }
         catch
@@ -646,7 +654,7 @@ class WebDriver
                     $cancellationTokenSource = [System.Threading.CancellationTokenSource]::new()
                     $cancellationTokenSource.CancelAfter([TimeSpan]::FromSeconds(5))
                     
-                    $this.web_socket.CloseAsync('NormalClosure', 'Closing', $cancellationTokenSource.Token).Wait()
+                    $this.web_socket.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, 'Closing', $cancellationTokenSource.Token).Wait()
                     Write-Host "WebSocket接続を正常に閉じました。"
                 }
                 catch
@@ -737,7 +745,7 @@ class WebDriver
     
     # 現在開かれているすべてのターゲット（タブやページ）の情報を取得
     # ターゲットには、タブのID、URL、タイトル、タイプなどが含まれる
-    [hashtable] GetAvailableTabs()
+    [pscustomobject] GetAvailableTabs()
     {
         try
         {
@@ -754,7 +762,8 @@ class WebDriver
                 throw "タブ情報取得エラー: $($response_json.error.message)"
             }
             
-            return $response_json.result
+            # PSCustomObject をそのまま返す（変換しない）
+            return [pscustomobject]$response_json.result
         }
         catch
         {
@@ -823,6 +832,96 @@ class WebDriver
             # ウィンドウ・タブ操作関連エラー (1084)
             $global:Common.HandleError("1084", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
             throw "タブの切断に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # セッション管理（attach/detach）
+    # ターゲットにアタッチして sessionId を取得
+    [string] AttachToTargetAndGetSessionId([string]$target_id, [bool]$flatten = $true)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($target_id))
+            {
+                throw "タブID（targetId）が指定されていません。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $this.SendWebSocketMessage('Target.attachToTarget', @{ targetId = $target_id; flatten = $flatten })
+            $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+
+            if ($response.error)
+            {
+                throw "ターゲットアタッチエラー: $($response.error.message)"
+            }
+
+            if ((-not $response.result) -or (-not $response.result.sessionId))
+            {
+                throw 'attach の応答に sessionId が含まれていません。'
+            }
+
+            return [string]$response.result.sessionId
+        }
+        catch
+        {
+            # ウィンドウ・タブ操作関連エラー (1086)
+            $global:Common.HandleError("1086", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "ターゲットへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 現在のタブにアタッチして sessionId を取得
+    [string] AttachToCurrentTabAndGetSessionId([bool]$flatten = $true)
+    {
+        try
+        {
+            $tab = $this.GetTabInfomation()
+            if (-not $tab -or [string]::IsNullOrEmpty($tab.id))
+            {
+                throw '現在タブの取得に失敗しました。'
+            }
+            return $this.AttachToTargetAndGetSessionId($tab.id, $flatten)
+        }
+        catch
+        {
+            # ウィンドウ・タブ操作関連エラー (1086)
+            $global:Common.HandleError("1086", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "現在タブへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # セッション（attach）をデタッチして解放
+    [void] DetachSession([string]$session_id)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($session_id))
+            {
+                throw "sessionId が指定されていません。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            $this.SendWebSocketMessage('Target.detachFromTarget', @{ sessionId = $session_id })
+            $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+
+            if ($response.error)
+            {
+                throw "セッションデタッチエラー: $($response.error.message)"
+            }
+        }
+        catch
+        {
+            # ウィンドウ・タブ操作関連エラー (1087)
+            $global:Common.HandleError("1087", "セッションデタッチエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            throw "セッションのデタッチに失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -2079,13 +2178,20 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = -1 })
+            # 履歴を取得し、1つ前の entryId に移動
+            $this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            $history = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            if ($history.error) { throw "履歴取得エラー: $($history.error.message)" }
+
+            $currentIndex = $history.result.currentIndex
+            $entries      = $history.result.entries
+            if ($null -eq $currentIndex -or $null -eq $entries -or $entries.Count -eq 0) { return }
+            if ($currentIndex -le 0) { return }
+
+            $targetEntryId = $entries[$currentIndex - 1].id
+            $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = $targetEntryId })
             $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-            
-            if ($response.error)
-            {
-                throw "ブラウザ履歴移動エラー: $($response.error.message)"
-            }
+            if ($response.error) { throw "ブラウザ履歴移動エラー: $($response.error.message)" }
         }
         catch
         {
@@ -2105,13 +2211,20 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = 1 })
+            # 履歴を取得し、1つ先の entryId に移動
+            $this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            $history = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            if ($history.error) { throw "履歴取得エラー: $($history.error.message)" }
+
+            $currentIndex = $history.result.currentIndex
+            $entries      = $history.result.entries
+            if ($null -eq $currentIndex -or $null -eq $entries -or $entries.Count -eq 0) { return }
+            if ($currentIndex -ge ($entries.Count - 1)) { return }
+
+            $targetEntryId = $entries[$currentIndex + 1].id
+            $this.SendWebSocketMessage('Page.navigateToHistoryEntry', @{ entryId = $targetEntryId })
             $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
-            
-            if ($response.error)
-            {
-                throw "ブラウザ履歴移動エラー: $($response.error.message)"
-            }
+            if ($response.error) { throw "ブラウザ履歴移動エラー: $($response.error.message)" }
         }
         catch
         {
@@ -2161,7 +2274,8 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            #$this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            $this.SendWebSocketMessage('Runtime.evaluate', @{ expression = "document.URL"; returnByValue = $true })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2169,12 +2283,17 @@ class WebDriver
                 throw "URL取得エラー: $($response_json.error.message)"
             }
             
-            if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
+            #if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
+            #{
+            #    throw "ナビゲーション履歴が空です。"
+            #}
+            if ($null -eq $response_json.result.result.value)
             {
-                throw "ナビゲーション履歴が空です。"
+                throw "URLが取得できませんでした。"
             }
             
-            return $response_json.result.entries[0].url
+            #return $response_json.result.entries[0].url
+            return $response_json.result.result.value
         }
         catch
         {
@@ -2194,7 +2313,8 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            #$this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            $this.SendWebSocketMessage('Runtime.evaluate', @{ expression = "document.title"; returnByValue = $true })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2202,12 +2322,17 @@ class WebDriver
                 throw "タイトル取得エラー: $($response_json.error.message)"
             }
             
-            if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
+            #if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
+            #{
+            #    throw "ナビゲーション履歴が空です。"
+            #}
+            if ($null -eq $response_json.result.result.value)
             {
-                throw "ナビゲーション履歴が空です。"
+                throw "タイトルが取得できませんでした。"
             }
             
-            return $response_json.result.entries[0].title
+            #return $response_json.result.entries[0].title
+            return $response_json.result.result.value
         }
         catch
         {
@@ -2255,7 +2380,9 @@ class WebDriver
                 throw "WebDriverが初期化されていません。"
             }
 
-            $this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            # 現在のターゲットの windowId を取得
+            #$this.SendWebSocketMessage('Page.getNavigationHistory', @{ })
+            $this.SendWebSocketMessage('Browser.getWindowForTarget', @{ })
             $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
             
             if ($response_json.error)
@@ -2263,12 +2390,13 @@ class WebDriver
                 throw "ウィンドウハンドル取得エラー: $($response_json.error.message)"
             }
             
-            if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
-            {
-                throw "ナビゲーション履歴が空です。"
-            }
+            #if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
+            #{
+            #    throw "ナビゲーション履歴が空です。"
+            #}
             
-            return $response_json.result.entries[0].windowId
+            #return $response_json.result.entries[0].windowId
+            return $response_json.result.windowId
         }
         catch
         {
