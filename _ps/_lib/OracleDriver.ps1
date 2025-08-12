@@ -14,6 +14,7 @@ class OracleDriver
     [bool]$is_transaction_active
     [string]$last_error_message
     [hashtable]$connection_parameters
+    [string]$sqlplus_path
 
     # ========================================
     # 初期化・接続関連
@@ -27,13 +28,29 @@ class OracleDriver
             $this.is_transaction_active = $false
             $this.last_error_message = ""
             $this.connection_parameters = @{}
+            $this.sqlplus_path = "sqlplus"
             
             Write-Host "OracleDriverの初期化が完了しました。"
         }
         catch
         {
-            $global:Common.HandleError("6001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "OracleDriverの初期化に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # SQLPLUSのパスを設定
+    [void] SetSqlPlusPath([string]$path)
+    {
+        try
+        {
+            $this.sqlplus_path = $path
+            Write-Host "SQLPLUSのパスを設定しました: $path"
+        }
+        catch
+        {
+            $global:Common.HandleError("7002", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            throw "SQLPLUSパスの設定に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -58,8 +75,171 @@ class OracleDriver
         }
         catch
         {
-            $global:Common.HandleError("6002", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7010", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "接続パラメータの設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # SQLPLUSで接続（ユーザ名、パスワード、サービス名を指定）
+    [void] ConnectWithSqlPlus([string]$username, [string]$password, [string]$service_name)
+    {
+        try
+        {
+            if ($this.is_connected)
+            {
+                Write-Host "既に接続されています。" -ForegroundColor Yellow
+                return
+            }
+
+            # 接続パラメータを保存
+            $this.connection_parameters.Username = $username
+            $this.connection_parameters.Password = $password
+            $this.connection_parameters.ServiceName = $service_name
+
+            # SQLPLUS接続文字列を構築
+            $connectionString = "$username/$password@$service_name"
+            
+            # SQLPLUSプロセスを開始
+            $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $processInfo.FileName = $this.sqlplus_path
+            $processInfo.Arguments = $connectionString
+            $processInfo.UseShellExecute = $false
+            $processInfo.RedirectStandardInput = $true
+            $processInfo.RedirectStandardOutput = $true
+            $processInfo.RedirectStandardError = $true
+            $processInfo.CreateNoWindow = $false
+
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $processInfo
+            $process.Start()
+
+            # 接続テスト用のSQLを実行
+            $process.StandardInput.WriteLine("SELECT 1 FROM DUAL;")
+            $process.StandardInput.WriteLine("EXIT;")
+            
+            $output = $process.StandardOutput.ReadToEnd()
+            $error = $process.StandardError.ReadToEnd()
+            
+            $process.WaitForExit()
+            $process.Close()
+
+            if ($process.ExitCode -eq 0 -and $output -match "1")
+            {
+                $this.is_connected = $true
+                Write-Host "SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name" -ForegroundColor Green
+            }
+            else
+            {
+                throw "SQLPLUS接続に失敗しました。エラー: $error"
+            }
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            $global:Common.HandleError("7020", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            throw "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # SQLPLUSで接続（接続文字列を指定）
+    [void] ConnectWithSqlPlusString([string]$connectionString)
+    {
+        try
+        {
+            if ($this.is_connected)
+            {
+                Write-Host "既に接続されています。" -ForegroundColor Yellow
+                return
+            }
+
+            # SQLPLUSプロセスを開始
+            $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $processInfo.FileName = $this.sqlplus_path
+            $processInfo.Arguments = $connectionString
+            $processInfo.UseShellExecute = $false
+            $processInfo.RedirectStandardInput = $true
+            $processInfo.RedirectStandardOutput = $true
+            $processInfo.RedirectStandardError = $true
+            $processInfo.CreateNoWindow = $false
+
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $processInfo
+            $process.Start()
+
+            # 接続テスト用のSQLを実行
+            $process.StandardInput.WriteLine("SELECT 1 FROM DUAL;")
+            $process.StandardInput.WriteLine("EXIT;")
+            
+            $output = $process.StandardOutput.ReadToEnd()
+            $error = $process.StandardError.ReadToEnd()
+            
+            $process.WaitForExit()
+            $process.Close()
+
+            if ($process.ExitCode -eq 0 -and $output -match "1")
+            {
+                $this.is_connected = $true
+                Write-Host "SQLPLUSでORACLEデータベースに接続しました。接続文字列: $connectionString" -ForegroundColor Green
+            }
+            else
+            {
+                throw "SQLPLUS接続に失敗しました。エラー: $error"
+            }
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            $global:Common.HandleError("7021", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            throw "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # SQLPLUSでSQLを実行
+    [string] ExecuteSqlPlus([string]$sql, [string]$username, [string]$password, [string]$service_name)
+    {
+        try
+        {
+            $connectionString = "$username/$password@$service_name"
+            
+            # SQLPLUSプロセスを開始
+            $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $processInfo.FileName = $this.sqlplus_path
+            $processInfo.Arguments = $connectionString
+            $processInfo.UseShellExecute = $false
+            $processInfo.RedirectStandardInput = $true
+            $processInfo.RedirectStandardOutput = $true
+            $processInfo.RedirectStandardError = $true
+            $processInfo.CreateNoWindow = $false
+
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $processInfo
+            $process.Start()
+
+            # SQLを実行
+            $process.StandardInput.WriteLine($sql)
+            $process.StandardInput.WriteLine("EXIT;")
+            
+            $output = $process.StandardOutput.ReadToEnd()
+            $error = $process.StandardError.ReadToEnd()
+            
+            $process.WaitForExit()
+            $process.Close()
+
+            if ($process.ExitCode -eq 0)
+            {
+                Write-Host "SQLPLUSでSQLを実行しました。" -ForegroundColor Green
+                return $output
+            }
+            else
+            {
+                throw "SQLPLUSでのSQL実行に失敗しました。エラー: $error"
+            }
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            $global:Common.HandleError("7022", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            throw "SQLPLUSでのSQL実行に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -88,7 +268,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6003", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7011", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "データベースへの接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -113,7 +293,7 @@ class OracleDriver
         }
         catch
         {
-            $global:Common.HandleError("6004", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7012", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "接続の切断に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -150,7 +330,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6005", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7100", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "SELECT文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -181,7 +361,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6006", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7110", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "INSERT文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -212,7 +392,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6007", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7120", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "UPDATE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -243,7 +423,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6008", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7130", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "DELETE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -274,7 +454,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6009", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7140", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "MERGE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -301,7 +481,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6010", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7200", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "CREATE TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -324,7 +504,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6011", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7201", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "ALTER TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -348,7 +528,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6012", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7202", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "DROP TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -371,7 +551,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6013", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7210", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "CREATE INDEX文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -394,7 +574,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6014", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7220", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "CREATE VIEW文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -417,7 +597,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6015", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7230", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "CREATE SEQUENCE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -444,7 +624,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6016", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7300", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "GRANT文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -467,7 +647,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6017", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7301", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "REVOKE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -500,7 +680,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6018", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7400", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "トランザクションの開始に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -525,7 +705,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6019", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7401", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "トランザクションのコミットに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -550,7 +730,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6020", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7402", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "トランザクションのロールバックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -574,7 +754,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6021", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7410", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "SAVEPOINTの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -598,7 +778,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6022", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7411", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "SAVEPOINTへのロールバックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -633,7 +813,7 @@ ORDER BY TABLE_NAME
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6023", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7500", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "テーブル一覧の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -665,7 +845,7 @@ ORDER BY COLUMN_ID
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("6024", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("7501", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
             throw "テーブル構造の取得に失敗しました: $($_.Exception.Message)"
         }
     }
