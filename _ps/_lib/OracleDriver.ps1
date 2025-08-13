@@ -5,6 +5,8 @@
 #. "$PSScriptRoot\Common.ps1"
 #$Common = New-Object -TypeName 'Common'
 
+Add-Type -AssemblyName "System.Data.OracleClient"
+
 class OracleDriver
 {
     [string]$ConnectionString
