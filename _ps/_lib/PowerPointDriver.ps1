@@ -53,7 +53,8 @@ class PowerPointDriver
         try
         {
             $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-            $temp_dir = Join-Path $env:TEMP "PowerPointDriver_$timestamp"
+            #$temp_dir = Join-Path $env:TEMP "PowerPointDriver_$timestamp"
+            $temp_dir = Join-Path "C:\temp" "PowerPointDriver"
             if (-not (Test-Path $temp_dir))
             {
                 New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null

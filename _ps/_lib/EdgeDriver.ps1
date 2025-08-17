@@ -160,7 +160,7 @@ class EdgeDriver : WebDriver
                 $base_dir = "C:\temp"
             }
             
-            $user_data_dir = Join-Path $base_dir "EdgeDriver_UserData_$(Get-Random)"
+            $user_data_dir = Join-Path $base_dir "EdgeDriver_UserData"
             
             # 既存のディレクトリが存在する場合は削除
             if (Test-Path $user_data_dir)
