@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インベーダーゲーム - PowerShell ドキュメント</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .game-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .start-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .start-screen h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .start-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .game-canvas {
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            background: linear-gradient(180deg, #0c0c0c 0%, #1a1a2e 100%);
+            display: none;
+        }
+        
+        .game-ui {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .score-display {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px;
+            display: inline-block;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .restart-button {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .restart-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="../index.html">ホーム</a> &gt; インベーダーゲーム
+        </nav>
+        
+        <header>
+            <h1>🚀 インベーダーゲーム</h1>
+            <p>クラシックなスペースシューティングゲームで遊ぼう！</p>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </header>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="ゲーム内を検索..." onkeyup="filterContent()">
+        </div>
+        
+        <div class="game-container">
+            <div class="start-screen" id="startScreen">
+                <h2>🌟 インベーダーゲーム 🌟</h2>
+                <div class="instructions">
+                    <h3>🎮 操作方法</h3>
+                    <p><strong>← →</strong> キー: プレイヤーを左右に移動</p>
+                    <p><strong>スペース</strong> キー: 弾を発射</p>
+                    <p><strong>P</strong> キー: 一時停止/再開</p>
+                </div>
+                <div class="instructions">
+                    <h3>🎯 ゲームの目的</h3>
+                    <p>宇宙船を操作して、上から降ってくるインベーダーを全て倒そう！</p>
+                    <p>インベーダーが下に到達する前に倒すことが重要です。</p>
+                </div>
+                <button class="start-button" onclick="startGame()">ゲームスタート！ 🚀</button>
+            </div>
+            
+            <canvas id="gameCanvas" class="game-canvas" width="800" height="600"></canvas>
+            
+            <div class="game-ui" id="gameUI">
+                <div class="score-display">スコア: <span id="score">0</span></div>
+                <div class="score-display">ライフ: <span id="lives">3</span></div>
+                <div class="score-display">レベル: <span id="level">1</span></div>
+            </div>
+            
+            <div class="game-over" id="gameOver">
+                <h2>ゲームオーバー</h2>
+                <p>最終スコア: <span id="finalScore">0</span></p>
+                <button class="restart-button" onclick="restartGame()">もう一度プレイ</button>
+                <button class="restart-button" onclick="showStartScreen()">タイトルに戻る</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p><a href="../index.html">ホームに戻る</a> | PowerShell ドキュメント v1.0</p>
+    </footer>
+    
+    <script src="../js/script.js"></script>
+    <script>
+        // ゲーム変数
+        let canvas, ctx;
+        let gameRunning = false;
+        let gamePaused = false;
+        let score = 0;
+        let lives = 3;
+        let level = 1;
+        
+        // プレイヤー
+        let player = {
+            x: 400,
+            y: 550,
+            width: 50,
+            height: 30,
+            speed: 5
+        };
+        
+        // 弾
+        let bullets = [];
+        let bulletSpeed = 7;
+        
+        // インベーダー
+        let invaders = [];
+        let invaderSpeed = 1;
+        let invaderDirection = 1;
+        
+        // キー入力
+        let keys = {};
+        
+        // ゲーム開始
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameCanvas').style.display = 'block';
+            document.getElementById('gameUI').style.display = 'block';
+            
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            initGame();
+            gameLoop();
+        }
+        
+        // ゲーム初期化
+        function initGame() {
+            gameRunning = true;
+            score = 0;
+            lives = 3;
+            level = 1;
+            
+            // インベーダー初期化
+            invaders = [];
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 10; col++) {
+                    invaders.push({
+                        x: col * 70 + 50,
+                        y: row * 50 + 50,
+                        width: 60,
+                        height: 40,
+                        alive: true
+                    });
+                }
+            }
+            
+            // キーイベント設定
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+        }
+        
+        // キー押下処理
+        function handleKeyDown(e) {
+            keys[e.key] = true;
+            
+            if (e.key === ' ' && gameRunning && !gamePaused) {
+                shootBullet();
+            }
+            
+            if (e.key === 'p' || e.key === 'P') {
+                togglePause();
+            }
+        }
+        
+        // キー離上処理
+        function handleKeyUp(e) {
+            keys[e.key] = false;
+        }
+        
+        // 弾発射
+        function shootBullet() {
+            bullets.push({
+                x: player.x + player.width / 2 - 2,
+                y: player.y,
+                width: 4,
+                height: 10
+            });
+        }
+        
+        // 一時停止切り替え
+        function togglePause() {
+            gamePaused = !gamePaused;
+        }
+        
+        // ゲームループ
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            if (!gamePaused) {
+                updateGame();
+            }
+            
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // ゲーム更新
+        function updateGame() {
+            // プレイヤー移動
+            if (keys['ArrowLeft'] && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys['ArrowRight'] && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+            
+            // 弾移動
+            bullets.forEach((bullet, index) => {
+                bullet.y -= bulletSpeed;
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+            
+            // インベーダー移動
+            let shouldChangeDirection = false;
+            invaders.forEach(invader => {
+                if (invader.alive) {
+                    invader.x += invaderSpeed * invaderDirection;
+                    
+                    if (invader.x <= 0 || invader.x >= canvas.width - invader.width) {
+                        shouldChangeDirection = true;
+                    }
+                }
+            });
+            
+            if (shouldChangeDirection) {
+                invaderDirection *= -1;
+                invaders.forEach(invader => {
+                    if (invader.alive) {
+                        invader.y += 20;
+                    }
+                });
+            }
+            
+            // 衝突判定
+            checkCollisions();
+            
+            // ゲームオーバー判定
+            checkGameOver();
+        }
+        
+        // 衝突判定
+        function checkCollisions() {
+            bullets.forEach((bullet, bulletIndex) => {
+                invaders.forEach((invader, invaderIndex) => {
+                    if (invader.alive && 
+                        bullet.x < invader.x + invader.width &&
+                        bullet.x + bullet.width > invader.x &&
+                        bullet.y < invader.y + invader.height &&
+                        bullet.y + bullet.height > invader.y) {
+                        
+                        invader.alive = false;
+                        bullets.splice(bulletIndex, 1);
+                        score += 100;
+                        
+                        // レベルアップ判定
+                        if (invaders.every(inv => !inv.alive)) {
+                            levelUp();
+                        }
+                    }
+                });
+            });
+            
+            // インベーダーが下に到達
+            invaders.forEach(invader => {
+                if (invader.alive && invader.y > player.y - 50) {
+                    gameOver();
+                }
+            });
+        }
+        
+        // レベルアップ
+        function levelUp() {
+            level++;
+            invaderSpeed += 0.5;
+            
+            // 新しいインベーダー生成
+            invaders = [];
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 10; col++) {
+                    invaders.push({
+                        x: col * 70 + 50,
+                        y: row * 50 + 50,
+                        width: 60,
+                        height: 40,
+                        alive: true
+                    });
+                }
+            }
+        }
+        
+        // ゲームオーバー判定
+        function checkGameOver() {
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
+        
+        // ゲームオーバー
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // ゲーム描画
+        function drawGame() {
+            // 背景クリア
+            ctx.fillStyle = '#0c0c0c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 星を描画
+            drawStars();
+            
+            // プレイヤー描画
+            ctx.fillStyle = '#00ff88';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            // プレイヤーの詳細
+            ctx.fillStyle = '#00cc66';
+            ctx.fillRect(player.x + 5, player.y + 5, 40, 20);
+            
+            // 弾描画
+            ctx.fillStyle = '#ffff00';
+            bullets.forEach(bullet => {
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+            
+            // インベーダー描画
+            invaders.forEach(invader => {
+                if (invader.alive) {
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.fillRect(invader.x, invader.y, invader.width, invader.height);
+                    
+                    // インベーダーの詳細
+                    ctx.fillStyle = '#ff4757';
+                    ctx.fillRect(invader.x + 10, invader.y + 10, 40, 20);
+                }
+            });
+            
+            // UI更新
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('level').textContent = level;
+        }
+        
+        // 星描画
+        function drawStars() {
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 50; i++) {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                ctx.fillRect(x, y, 1, 1);
+            }
+        }
+        
+        // ゲーム再開
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            initGame();
+        }
+        
+        // スタート画面表示
+        function showStartScreen() {
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+            document.getElementById('gameCanvas').style.display = 'none';
+            document.getElementById('gameUI').style.display = 'none';
+            
+            gameRunning = false;
+        }
+        
+        // 検索機能
+        function filterContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            // ゲーム内の検索機能（必要に応じて実装）
+        }
+    </script>
+</body>
+</html>

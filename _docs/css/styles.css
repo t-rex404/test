@@ -298,6 +298,99 @@ body.dark-mode .theme-text {
     transition: height 0.3s ease;
 }
 
+/* ========================================
+   ゲームカード
+   ======================================== */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.game-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.game-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-2);
+    transition: height 0.3s ease;
+}
+
+.game-card:hover::before {
+    height: 8px;
+}
+
+.game-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.game-icon {
+    font-size: 2.5em;
+    animation: bounce 2s infinite;
+}
+
+.game-card h3 {
+    font-size: 1.5em;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.game-description {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.game-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.game-link {
+    display: inline-block;
+    background: var(--gradient-2);
+    color: white;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-medium);
+}
+
+.game-link:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-heavy);
+}
+
 .class-card:hover::before {
     height: 100%;
     opacity: 0.1;
