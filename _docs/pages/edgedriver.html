@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdgeDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>EdgeDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🔷</span>
+                EdgeDriver クラス
+                <span class="emoji">🔷</span>
+            </h1>
+            <p class="subtitle">Microsoft Edgeブラウザを自動操作するためのパワフルなツール 🌊</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>EdgeDriverクラスは、WebDriverクラスを継承し、Microsoft Edgeブラウザを自動操作するための専用機能を提供します。企業環境での利用に最適化されています。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>企業向けWebアプリケーションのテスト</li>
+                    <li>Microsoft 365連携の自動化</li>
+                    <li>セキュアな環境でのWeb自動操作</li>
+                    <li>Internet Explorer モードでのレガシーサイト対応</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 初期化・接続関連 -->
+        <section class="method-section" data-searchable="初期化 接続 Constructor">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">EdgeDriver() - コンストラクタ</div>
+                <p>EdgeDriverインスタンスを作成し、Edgeブラウザを起動します。</p>
+                
+                <div class="code-example">
+                    <pre><code># EdgeDriverのインスタンスを作成
+$driver = [EdgeDriver]::new()
+
+# ブラウザが自動的に起動され、デバッグモードが有効になります</code></pre>
+                </div>
+                
+                <div class="note-card warning">
+                    <h4>⚠️ 注意事項</h4>
+                    <ul>
+                        <li>Microsoft Edgeがインストールされている必要があります</li>
+                        <li>初期化に失敗した場合、エラーコード2001が記録されます</li>
+                        <li>一時的なユーザープロファイルが作成されます</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetEdgeExecutablePath() - Edge実行パス取得</div>
+                <p>システムにインストールされているEdgeの実行ファイルパスを自動的に検出します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 内部的に呼び出されるメソッド（通常は直接呼び出さない）
+# レジストリや一般的なインストール先から自動検出</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetUserDataDirectory() - ユーザーデータディレクトリ取得</div>
+                <p>Edge用の一時的なユーザーデータディレクトリを作成します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 内部的に呼び出されるメソッド
+# C:\temp\EdgeDriver_UserData_[ランダム番号] が作成されます</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 設定・初期化関連 -->
+        <section class="method-section" data-searchable="設定 デバッグ">
+            <h2 class="section-title">
+                <span class="icon">⚙️</span> 設定・初期化関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">EnableDebugMode() - デバッグモード有効化</div>
+                <p>Edgeのデバッグモードを有効にし、開発者ツールの機能を利用可能にします。</p>
+                
+                <div class="code-example">
+                    <pre><code># デバッグモードは自動的に有効化されますが、
+# 必要に応じて再度有効化できます
+$driver.EnableDebugMode()
+Write-Host "デバッグモードが有効になりました"</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- WebDriver継承メソッド -->
+        <section class="method-section" data-searchable="ナビゲーション 操作">
+            <h2 class="section-title">
+                <span class="icon">🌐</span> WebDriver継承メソッド（主要な操作）
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">Navigate([string]$url) - ページ遷移</div>
+                <p>指定したURLにページを遷移させます。</p>
+                
+                <div class="code-example">
+                    <pre><code># Microsoft 365ポータルを開く
+$driver.Navigate("https://portal.office.com")
+
+# 社内ポータルを開く
+$driver.Navigate("https://intranet.company.com")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindElement([string]$selector) - 要素の検索</div>
+                <p>CSSセレクタを使用して要素を検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ログインフォームの要素を検索
+$username = $driver.FindElement("input[name='loginfmt']")
+$password = $driver.FindElement("input[name='passwd']")
+$loginButton = $driver.FindElement("input[type='submit']")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetText([string]$selector, [string]$text) - テキスト入力</div>
+                <p>指定した要素にテキストを入力します。</p>
+                
+                <div class="code-example">
+                    <pre><code># Microsoft 365にログイン
+$driver.SetText("input[name='loginfmt']", "user@company.com")
+$driver.SetText("input[name='passwd']", "SecurePassword")
+$driver.Click("input[type='submit']")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: Microsoft 365へのログイン自動化</div>
+                
+                <div class="code-example">
+                    <pre><code># EdgeDriverを初期化
+$driver = [EdgeDriver]::new()
+
+try {
+    # Office 365ポータルを開く
+    $driver.Navigate("https://portal.office.com")
+    
+    # ログイン情報を入力
+    $driver.SetText("input[name='loginfmt']", "user@company.com")
+    $driver.Click("#idSIButton9")  # 次へボタン
+    
+    Start-Sleep -Seconds 2
+    
+    $driver.SetText("input[name='passwd']", "YourPassword")
+    $driver.Click("#idSIButton9")  # サインインボタン
+    
+    # MFA認証が必要な場合は待機
+    Write-Host "MFA認証を完了してください..."
+    Start-Sleep -Seconds 10
+    
+    Write-Host "ログインが完了しました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: 社内ポータルのデータ収集</div>
+                
+                <div class="code-example">
+                    <pre><code># EdgeDriverを初期化
+$driver = [EdgeDriver]::new()
+
+try {
+    # 社内ポータルを開く
+    $driver.Navigate("https://intranet.company.com")
+    
+    # Windows統合認証の場合は自動的にログイン
+    Start-Sleep -Seconds 3
+    
+    # データを収集
+    $announcements = $driver.FindElements(".announcement-title")
+    foreach ($announcement in $announcements) {
+        $title = $driver.GetText($announcement)
+        Write-Host "お知らせ: $title"
+    }
+    
+    # スクリーンショットを保存
+    $driver.TakeScreenshot("C:\Reports\portal_$(Get-Date -Format 'yyyyMMdd').png")
+    
+    Write-Host "データ収集が完了しました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーハンドリング -->
+        <section class="method-section" data-searchable="エラー処理 クリーンアップ">
+            <h2 class="section-title">
+                <span class="icon">⚠️</span> エラーハンドリング・クリーンアップ
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CleanupOnInitializationFailure() - 初期化失敗時のクリーンアップ</div>
+                <p>初期化に失敗した場合、リソースを適切にクリーンアップします。</p>
+                
+                <div class="code-example">
+                    <pre><code># このメソッドは内部的に自動呼び出しされます
+# WebSocket接続のクローズ
+# ブラウザプロセスの終了
+# 一時ディレクトリの削除</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Dispose() - リソース解放</div>
+                <p>EdgeDriverのリソースを解放し、ブラウザを終了します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 使用後は必ずDisposeを呼び出す
+$driver = [EdgeDriver]::new()
+
+try {
+    # 処理を実行
+    $driver.Navigate("https://example.com")
+    # ...
+}
+finally {
+    # リソースを確実に解放
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> EdgeDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <table class="error-table">
+                    <tr>
+                        <td class="range">2001</td>
+                        <td>EdgeDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">2002</td>
+                        <td>Edge実行ファイルパス取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">2003</td>
+                        <td>ユーザーデータディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">2004</td>
+                        <td>デバッグモード有効化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">2005</td>
+                        <td>EdgeDriver Disposeエラー</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">EdgeDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html> 

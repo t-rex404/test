@@ -98,10 +98,11 @@ class Common
             $this.ErrorCodes = @{}
             foreach ($module in $jsonObject.PSObject.Properties.Name)
             {
-                $this.ErrorCodes[$module] = @{}
+                $moduleKey = $module.ToUpper()
+                $this.ErrorCodes[$moduleKey] = @{}
                 foreach ($errorCode in $jsonObject.$module.PSObject.Properties.Name)
                 {
-                    $this.ErrorCodes[$module][$errorCode] = $jsonObject.$module.$errorCode
+                    $this.ErrorCodes[$moduleKey][$errorCode] = $jsonObject.$module.$errorCode
                 }
             }
 

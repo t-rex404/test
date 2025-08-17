@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShell Driver Classes Documentation 🚀</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">✨</span>
+                PowerShell Driver Classes
+                <span class="emoji">✨</span>
+            </h1>
+            <p class="subtitle">PowerShellで様々なアプリケーションを操作するための魔法のツールセット 🪄</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="クラス名やメソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- Class Overview Section -->
+        <section class="class-overview">
+            <h2 class="section-title">
+                <span class="icon">📚</span> クラス一覧
+            </h2>
+            
+            <div class="class-grid">
+                <!-- WebDriver -->
+                <div class="class-card" data-searchable="WebDriver ウェブドライバー ブラウザ操作">
+                    <div class="card-header">
+                        <span class="card-icon">🌐</span>
+                        <h3>WebDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        ブラウザ操作の基底クラス。ChromeDriverとEdgeDriverの親クラスとして、共通のWeb操作機能を提供します。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">🎯 要素操作</span>
+                        <span class="feature-tag">📸 スクリーンショット</span>
+                        <span class="feature-tag">🍪 Cookie管理</span>
+                    </div>
+                    <a href="pages/webdriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- ChromeDriver -->
+                <div class="class-card" data-searchable="ChromeDriver クロームドライバー Chrome操作">
+                    <div class="card-header">
+                        <span class="card-icon">🔵</span>
+                        <h3>ChromeDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Google Chromeブラウザを自動操作するためのドライバークラス。WebDriverを継承し、Chrome固有の機能を追加。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">🚀 高速実行</span>
+                        <span class="feature-tag">🛠️ デバッグモード</span>
+                        <span class="feature-tag">📱 レスポンシブ対応</span>
+                    </div>
+                    <a href="pages/chromedriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- EdgeDriver -->
+                <div class="class-card" data-searchable="EdgeDriver エッジドライバー Edge操作">
+                    <div class="card-header">
+                        <span class="card-icon">🔷</span>
+                        <h3>EdgeDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Microsoft Edgeブラウザを自動操作するためのドライバークラス。WebDriverを継承し、Edge固有の機能を追加。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">🔒 セキュア</span>
+                        <span class="feature-tag">💼 企業向け</span>
+                        <span class="feature-tag">🔄 互換性</span>
+                    </div>
+                    <a href="pages/edgedriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- ExcelDriver -->
+                <div class="class-card" data-searchable="ExcelDriver エクセルドライバー Excel操作">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <h3>ExcelDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Microsoft Excelを操作するためのドライバークラス。セル操作、書式設定、ワークシート管理などが可能。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">📈 データ処理</span>
+                        <span class="feature-tag">🎨 書式設定</span>
+                        <span class="feature-tag">📑 シート管理</span>
+                    </div>
+                    <a href="pages/exceldriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- WordDriver -->
+                <div class="class-card" data-searchable="WordDriver ワードドライバー Word操作 文書作成">
+                    <div class="card-header">
+                        <span class="card-icon">📝</span>
+                        <h3>WordDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Microsoft Wordを操作するためのドライバークラス。文書作成、書式設定、表や画像の挿入などが可能。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">📄 文書作成</span>
+                        <span class="feature-tag">📋 目次生成</span>
+                        <span class="feature-tag">🖼️ 画像挿入</span>
+                    </div>
+                    <a href="pages/worddriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- PowerPointDriver -->
+                <div class="class-card" data-searchable="PowerPointDriver パワーポイントドライバー PowerPoint操作 プレゼン">
+                    <div class="card-header">
+                        <span class="card-icon">🎯</span>
+                        <h3>PowerPointDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Microsoft PowerPointを操作するためのドライバークラス。スライド作成、図形挿入、デザイン設定が可能。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">🎨 スライド作成</span>
+                        <span class="feature-tag">🔺 図形挿入</span>
+                        <span class="feature-tag">🎯 レイアウト</span>
+                    </div>
+                    <a href="pages/powerpointdriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- OracleDriver -->
+                <div class="class-card" data-searchable="OracleDriver オラクルドライバー Oracle データベース操作">
+                    <div class="card-header">
+                        <span class="card-icon">🗄️</span>
+                        <h3>OracleDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Oracleデータベースを操作するためのドライバークラス。SQL実行、トランザクション管理、テーブル操作が可能。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">💾 データ操作</span>
+                        <span class="feature-tag">🔄 トランザクション</span>
+                        <span class="feature-tag">📊 テーブル管理</span>
+                    </div>
+                    <a href="pages/oracledriver.html" class="card-link">詳細を見る →</a>
+                </div>
+
+                <!-- Common -->
+                <div class="class-card" data-searchable="Common コモン 共通機能 ログ エラー">
+                    <div class="card-header">
+                        <span class="card-icon">🔧</span>
+                        <h3>Common</h3>
+                    </div>
+                    <p class="card-description">
+                        全ドライバークラスで使用する共通機能を提供。ログ出力、エラーハンドリングなどの基本機能。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">📝 ログ出力</span>
+                        <span class="feature-tag">⚠️ エラー処理</span>
+                        <span class="feature-tag">🔍 エラーコード管理</span>
+                    </div>
+                    <a href="pages/common.html" class="card-link">詳細を見る →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Important Notes Section -->
+        <section class="important-notes">
+            <h2 class="section-title">
+                <span class="icon">⚠️</span> 重要な注意事項
+            </h2>
+            
+            <div class="note-cards">
+                <div class="note-card warning">
+                    <h3>🔐 セキュリティについて</h3>
+                    <ul>
+                        <li>パスワードやトークンは安全に管理してください</li>
+                        <li>ブラウザ操作時は個人情報の取り扱いに注意</li>
+                        <li>本番環境での使用前に十分なテストを実施</li>
+                    </ul>
+                </div>
+
+                <div class="note-card info">
+                    <h3>💡 使用前の準備</h3>
+                    <ul>
+                        <li>必要なアプリケーション（Chrome、Office等）のインストール</li>
+                        <li>PowerShell 5.1以上の環境が必要</li>
+                        <li>管理者権限での実行が必要な場合があります</li>
+                    </ul>
+                </div>
+
+                <div class="note-card success">
+                    <h3>✅ ベストプラクティス</h3>
+                    <ul>
+                        <li>使用後は必ずDispose()メソッドでリソースを解放</li>
+                        <li>エラー処理を適切に実装してください</li>
+                        <li>ログを活用してデバッグを効率化</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error Codes Section -->
+        <section class="error-codes">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> エラーコード一覧
+            </h2>
+            
+            <div class="error-summary">
+                <p>各ドライバークラスには固有のエラーコードが設定されています。エラーコードを確認することで、問題の原因を特定しやすくなります。</p>
+            </div>
+
+            <div class="error-ranges">
+                <div class="error-range-card">
+                    <h3>エラーコード範囲</h3>
+                    <table class="error-table">
+                        <tr>
+                            <td class="range">1000番台</td>
+                            <td class="class-name">WebDriver関連</td>
+                        </tr>
+                        <tr>
+                            <td class="range">2000番台</td>
+                            <td class="class-name">EdgeDriver関連</td>
+                        </tr>
+                        <tr>
+                            <td class="range">3000番台</td>
+                            <td class="class-name">ChromeDriver関連</td>
+                        </tr>
+                        <tr>
+                            <td class="range">4000番台</td>
+                            <td class="class-name">WordDriver関連</td>
+                        </tr>
+                        <tr>
+                            <td class="range">5000番台</td>
+                            <td class="class-name">ExcelDriver関連</td>
+                        </tr>
+                        <tr>
+                            <td class="range">6000番台</td>
+                            <td class="class-name">PowerPointDriver関連</td>
+                        </tr>
+                        <tr>
+                            <td class="range">7000番台</td>
+                            <td class="class-name">OracleDriver関連</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="error-handling-tips">
+                    <h3>🔧 エラー対処のヒント</h3>
+                    <ol>
+                        <li>エラーコードを確認して原因を特定</li>
+                        <li>AllDrivers_Error.logファイルで詳細を確認</li>
+                        <li>必要に応じて再試行ロジックを実装</li>
+                        <li>リソースの解放を確実に実行</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>Made with 💖 by PowerShell Driver Classes Team</p>
+                <p class="version">Version 1.0.0 | Last Updated: 2024</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

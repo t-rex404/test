@@ -28,22 +28,60 @@ class ChromeDriver : WebDriver
             $this.browser_user_data_dir = $this.GetUserDataDirectory()
             
             # ブラウザの実行
+            Write-Host "ブラウザを起動しています..." -ForegroundColor Yellow
             $this.StartBrowser($this.browser_exe_path, $this.browser_user_data_dir)
 
-            # タブ情報を取得
-            $tab_infomation = $this.GetTabInfomation()
+            # タブ情報を取得（リトライ機能付き）
+            Write-Host "タブ情報を取得しています..." -ForegroundColor Yellow
+            $tab_infomation = $null
+            $retry_count = 0
+            $max_retries = 5
+            
+            while ($retry_count -lt $max_retries -and -not $tab_infomation)
+            {
+                try
+                {
+                    Start-Sleep -Seconds 2
+                    $tab_infomation = $this.GetTabInfomation()
+                    
+                    if ($tab_infomation -and $tab_infomation.webSocketDebuggerUrl)
+                    {
+                        Write-Host "タブ情報の取得に成功しました。" -ForegroundColor Green
+                        break
+                    }
+                    else
+                    {
+                        Write-Host "タブ情報の取得に失敗しました。再試行中... ($($retry_count + 1)/$max_retries)" -ForegroundColor Yellow
+                        $tab_infomation = $null
+                    }
+                }
+                catch
+                {
+                    Write-Host "タブ情報取得エラー（再試行 $($retry_count + 1)/$max_retries）: $($_.Exception.Message)" -ForegroundColor Yellow
+                    $tab_infomation = $null
+                }
+                $retry_count++
+            }
+            
+            if (-not $tab_infomation -or [string]::IsNullOrEmpty($tab_infomation.webSocketDebuggerUrl))
+            {
+                throw "タブ情報の取得に失敗しました。WebSocketデバッガーURLが取得できません。"
+            }
 
             # WebSocket接続
+            Write-Host "WebSocket接続を確立しています..." -ForegroundColor Yellow
             $this.GetWebSocketInfomation($tab_infomation.webSocketDebuggerUrl)
 
             # タブをアクティブにする
+            Write-Host "タブをアクティブにしています..." -ForegroundColor Yellow
             $this.SetActiveTab($tab_infomation.id)
 
             # デバッグモードを有効化
+            Write-Host "デバッグモードを有効化しています..." -ForegroundColor Yellow
             $this.EnableDebugMode()
 
             $this.is_chrome_initialized = $true
-            Write-Host "ChromeDriverの初期化が完了しました。"
+            Write-Host "ChromeDriverの初期化が完了しました。" -ForegroundColor Green
         }
         catch
         {
@@ -119,15 +157,39 @@ class ChromeDriver : WebDriver
         try
         {
             # ユーザーデータディレクトリのパスを生成
-            #$user_data_dir = Join-Path $env:TEMP "ChromeDriver_UserData_$(Get-Random)"
-            $user_data_dir = 'C:\temp\ChromeDriver_UserData'
-            
-            if (Test-Path $user_data_dir)
+            $base_dir = "C:\temp"
+            if (-not (Test-Path $base_dir))
             {
-                Remove-Item -Path $user_data_dir -Recurse -Force
+                $base_dir = "C:\temp"
             }
 
-            Write-Host "Chromeユーザーデータディレクトリを作成しました: $user_data_dir"
+            $user_data_dir = Join-Path $base_dir "ChromeDriver_UserData_$(Get-Random)"
+
+            # 既存のディレクトリが存在する場合は削除
+            if (Test-Path $user_data_dir)
+            {
+                try
+                {
+                    Remove-Item -Path $user_data_dir -Recurse -Force -ErrorAction Stop
+                    Write-Host "既存のユーザーデータディレクトリを削除しました: $user_data_dir" -ForegroundColor Yellow
+                }
+                catch
+                {
+                    Write-Host "既存のユーザーデータディレクトリの削除に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            
+            # 新しいディレクトリを作成
+            try
+            {
+                New-Item -ItemType Directory -Path $user_data_dir -Force -ErrorAction Stop | Out-Null
+                Write-Host "Chromeユーザーデータディレクトリを作成しました: $user_data_dir" -ForegroundColor Green
+            }
+            catch
+            {
+                throw "ユーザーデータディレクトリの作成に失敗しました: $user_data_dir - $($_.Exception.Message)"
+            }
+            
             return $user_data_dir
         }
         catch

@@ -9,8 +9,8 @@ Add-Type -AssemblyName Microsoft.Office.Interop.PowerPoint
 class PowerPointDriver
 {
     [Microsoft.Office.Interop.PowerPoint.Application]$powerpoint_app
-    [Microsoft.Office.Interop.PowerPoint.Presentation]$powerpoint_presentation
-    [Microsoft.Office.Interop.PowerPoint.Slide]$powerpoint_slide
+    [object]$powerpoint_presentation
+    [object]$powerpoint_slide
     [string]$file_path
     [bool]$is_initialized
     [bool]$is_saved
@@ -75,8 +75,8 @@ class PowerPointDriver
         try
         {
             $this.powerpoint_app = New-Object -ComObject PowerPoint.Application
-            $this.powerpoint_app.Visible = $false
-            $this.powerpoint_app.DisplayAlerts = $false
+            $this.powerpoint_app.Visible = [Microsoft.Office.Core.MsoTriState]::msoTrue
+            $this.powerpoint_app.DisplayAlerts = [Microsoft.Office.Interop.PowerPoint.PpAlertLevel]::ppAlertsNone
             
             Write-Host "PowerPointアプリケーションを初期化しました。"
         }
@@ -459,15 +459,8 @@ class PowerPointDriver
 
             if ($this.powerpoint_presentation -ne $null)
             {
-                if (-not $this.is_saved)
-                {
-                    $this.powerpoint_presentation.Close()
-                }
-                else
-                {
-                    $this.powerpoint_presentation.Save()
-                    $this.powerpoint_presentation.Close()
-                }
+                # 既に保存済みでも再保存は行わない（読み取り専用エラー回避）
+                $this.powerpoint_presentation.Close()
                 $this.powerpoint_presentation = $null
             }
 
@@ -477,10 +470,10 @@ class PowerPointDriver
                 $this.powerpoint_app = $null
             }
 
-            # COMオブジェクトの解放
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.powerpoint_slide) | Out-Null
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.powerpoint_presentation) | Out-Null
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.powerpoint_app) | Out-Null
+            # COMオブジェクトの解放（null チェック）
+            if ($this.powerpoint_slide) { [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.powerpoint_slide) | Out-Null }
+            if ($this.powerpoint_presentation) { [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.powerpoint_presentation) | Out-Null }
+            if ($this.powerpoint_app) { [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.powerpoint_app) | Out-Null }
             [System.GC]::Collect()
             [System.GC]::WaitForPendingFinalizers()
 

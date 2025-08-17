@@ -154,7 +154,7 @@ class EdgeDriver : WebDriver
         try
         {
             # ユーザーデータディレクトリのパスを生成
-            $base_dir = $env:TEMP
+            $base_dir = "C:\temp"
             if (-not (Test-Path $base_dir))
             {
                 $base_dir = "C:\temp"
@@ -297,7 +297,7 @@ class EdgeDriver : WebDriver
         {
             Write-Host "EdgeDriverのリソースを解放します。" -ForegroundColor Cyan
             
-            # 親クラスのDisposeを呼び出し　
+            # 親クラスのDisposeを呼び出し
             #[WebDriver]::Dispose($this)
             ([WebDriver]$this).Dispose()
 

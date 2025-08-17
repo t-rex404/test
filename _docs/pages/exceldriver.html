@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExcelDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>ExcelDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">📊</span>
+                ExcelDriver クラス
+                <span class="emoji">📊</span>
+            </h1>
+            <p class="subtitle">Microsoft Excelでデータを美しく整理・分析する強力なツール 📈</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>ExcelDriverクラスは、Microsoft Excelを自動操作するためのドライバークラスです。セル操作、書式設定、ワークシート管理など、Excelの豊富な機能をPowerShellから簡単に利用できます。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>データの自動集計・分析</li>
+                    <li>レポートの自動生成</li>
+                    <li>大量データの処理・変換</li>
+                    <li>定型帳票の作成</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 初期化関連 -->
+        <section class="method-section" data-searchable="初期化 接続">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">ExcelDriver() - コンストラクタ</div>
+                <p>ExcelDriverインスタンスを作成し、Excelアプリケーションを初期化します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ExcelDriverのインスタンスを作成
+$driver = [ExcelDriver]::new()
+
+# 自動的に以下が実行されます：
+# - Excelアプリケーションの起動（非表示）
+# - 新規ワークブックの作成
+# - 一時ディレクトリの作成</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- セル操作関連 -->
+        <section class="method-section" data-searchable="セル 値 範囲">
+            <h2 class="section-title">
+                <span class="icon">📝</span> セル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SetCellValue([string]$cell, [object]$value) - セル値設定</div>
+                <p>指定したセルに値を設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 単一セルに値を設定
+$driver.SetCellValue("A1", "商品名")
+$driver.SetCellValue("B1", "価格")
+$driver.SetCellValue("B2", 1500)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetCellValue([string]$cell) - セル値取得</div>
+                <p>指定したセルの値を取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># セルの値を取得
+$value = $driver.GetCellValue("A1")
+Write-Host "A1の値: $value"</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetRangeValue([string]$range, [object[,]]$values) - 範囲値設定</div>
+                <p>指定した範囲に2次元配列の値を一括設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 2次元配列を準備
+$data = New-Object 'object[,]' 3,3
+$data[0,0] = "名前"
+$data[0,1] = "年齢"
+$data[0,2] = "部署"
+$data[1,0] = "田中"
+$data[1,1] = 30
+$data[1,2] = "営業"
+$data[2,0] = "鈴木"
+$data[2,1] = 25
+$data[2,2] = "開発"
+
+# 範囲に一括設定
+$driver.SetRangeValue("A1:C3", $data)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- フォーマット関連 -->
+        <section class="method-section" data-searchable="フォント 書式 色">
+            <h2 class="section-title">
+                <span class="icon">🎨</span> フォーマット関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SetCellFont([string]$cell, [string]$fontName, [int]$fontSize) - フォント設定</div>
+                <p>セルのフォントとサイズを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># フォントを設定
+$driver.SetCellFont("A1", "メイリオ", 14)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetCellBold([string]$cell, [bool]$isBold) - 太字設定</div>
+                <p>セルのテキストを太字にします。</p>
+                
+                <div class="code-example">
+                    <pre><code># セルを太字にする
+$driver.SetCellBold("A1", $true)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetCellBackgroundColor([string]$cell, [int]$colorIndex) - 背景色設定</div>
+                <p>セルの背景色を設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 背景色を設定（ColorIndexを使用）
+$driver.SetCellBackgroundColor("A1", 6)  # 黄色
+$driver.SetCellBackgroundColor("B1", 5)  # 青
+$driver.SetCellBackgroundColor("C1", 3)  # 赤</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ワークシート操作関連 -->
+        <section class="method-section" data-searchable="ワークシート シート">
+            <h2 class="section-title">
+                <span class="icon">📑</span> ワークシート操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AddWorksheet([string]$sheetName) - ワークシート追加</div>
+                <p>新しいワークシートを追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 新しいワークシートを追加
+$driver.AddWorksheet("売上データ")
+$driver.AddWorksheet("集計結果")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SelectWorksheet([string]$sheetName) - ワークシート選択</div>
+                <p>指定した名前のワークシートを選択します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ワークシートを選択
+$driver.SelectWorksheet("売上データ")
+$driver.SetCellValue("A1", "商品コード")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ファイル操作関連 -->
+        <section class="method-section" data-searchable="保存 ファイル">
+            <h2 class="section-title">
+                <span class="icon">💾</span> ファイル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SaveWorkbook([string]$filePath) - ワークブック保存</div>
+                <p>作成したワークブックを保存します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ワークブックを保存
+$driver.SaveWorkbook("C:\Reports\sales_report.xlsx")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">OpenWorkbook([string]$filePath) - ワークブックを開く</div>
+                <p>既存のExcelファイルを開きます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 既存のファイルを開く
+$driver.OpenWorkbook("C:\Data\template.xlsx")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例: 売上レポートの自動生成</div>
+                
+                <div class="code-example">
+                    <pre><code># ExcelDriverを初期化
+$driver = [ExcelDriver]::new()
+
+try {
+    # ヘッダー行を作成
+    $driver.SetCellValue("A1", "日付")
+    $driver.SetCellValue("B1", "商品名")
+    $driver.SetCellValue("C1", "数量")
+    $driver.SetCellValue("D1", "単価")
+    $driver.SetCellValue("E1", "売上")
+    
+    # ヘッダーを装飾
+    foreach ($col in @("A1", "B1", "C1", "D1", "E1")) {
+        $driver.SetCellBold($col, $true)
+        $driver.SetCellBackgroundColor($col, 15)
+    }
+    
+    # データを入力
+    $driver.SetCellValue("A2", "2024/01/01")
+    $driver.SetCellValue("B2", "商品A")
+    $driver.SetCellValue("C2", 10)
+    $driver.SetCellValue("D2", 1000)
+    $driver.SetCellValue("E2", "=C2*D2")
+    
+    # 保存
+    $driver.SaveWorkbook("C:\Reports\sales_report.xlsx")
+    Write-Host "レポートが作成されました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> ExcelDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <table class="error-table">
+                    <tr>
+                        <td class="range">5001</td>
+                        <td>ExcelDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">5002</td>
+                        <td>一時ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">5003</td>
+                        <td>Excelアプリケーション初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">5004-5016</td>
+                        <td>各種操作エラー</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">ExcelDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

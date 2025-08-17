@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>WordDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">📝</span>
+                WordDriver クラス
+                <span class="emoji">📝</span>
+            </h1>
+            <p class="subtitle">Microsoft Wordで美しい文書を自動作成する魔法のツール ✨</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>WordDriverクラスは、Microsoft Wordを自動操作するためのドライバークラスです。文書の作成、書式設定、表や画像の挿入など、Wordの豊富な機能をPowerShellから簡単に利用できます。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>レポートの自動生成</li>
+                    <li>定型文書の大量作成</li>
+                    <li>データから文書への自動変換</li>
+                    <li>契約書・請求書などのビジネス文書作成</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 初期化関連 -->
+        <section class="method-section" data-searchable="初期化 接続">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">WordDriver() - コンストラクタ</div>
+                <p>WordDriverインスタンスを作成し、Wordアプリケーションを初期化します。</p>
+                
+                <div class="code-example">
+                    <pre><code># WordDriverのインスタンスを作成
+$driver = [WordDriver]::new()
+
+# 自動的に以下が実行されます：
+# - Wordアプリケーションの起動
+# - 新規ドキュメントの作成
+# - フッターにページ番号の設定</code></pre>
+                </div>
+                
+                <div class="note-card warning">
+                    <h4>⚠️ 注意事項</h4>
+                    <ul>
+                        <li>Microsoft Wordがインストールされている必要があります</li>
+                        <li>初期化時にエラーコード4001が記録される場合があります</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- コンテンツ追加関連 -->
+        <section class="method-section" data-searchable="テキスト 文書 追加">
+            <h2 class="section-title">
+                <span class="icon">✏️</span> コンテンツ追加関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AddText([string]$text) - テキスト追加</div>
+                <p>文書にテキストを追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># シンプルなテキストを追加
+$driver.AddText("これは本文のテキストです。")
+
+# 改行を含むテキスト
+$driver.AddText("1行目のテキスト`r`n2行目のテキスト")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddHeading([string]$text, [int]$level) - 見出し追加</div>
+                <p>指定したレベルの見出しを追加します（レベル1〜9）。</p>
+                
+                <div class="code-example">
+                    <pre><code># 大見出し（レベル1）
+$driver.AddHeading("第1章 はじめに", 1)
+
+# 中見出し（レベル2）
+$driver.AddHeading("1.1 背景", 2)
+
+# 小見出し（レベル3）
+$driver.AddHeading("1.1.1 詳細説明", 3)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddParagraph([string]$text) - 段落追加</div>
+                <p>新しい段落として文章を追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 段落を追加
+$driver.AddParagraph("これは新しい段落です。")
+
+# 複数の段落を追加
+$driver.AddParagraph("第1段落の内容です。")
+$driver.AddParagraph("第2段落の内容です。")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddTable([object[,]]$data, [string]$title) - 表の追加</div>
+                <p>2次元配列データから表を作成して追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 表データを準備
+$tableData = New-Object 'object[,]' 3,3
+$tableData[0,0] = "名前"
+$tableData[0,1] = "年齢"
+$tableData[0,2] = "部署"
+$tableData[1,0] = "田中太郎"
+$tableData[1,1] = "30"
+$tableData[1,2] = "営業部"
+$tableData[2,0] = "鈴木花子"
+$tableData[2,1] = "25"
+$tableData[2,2] = "開発部"
+
+# 表を追加
+$driver.AddTable($tableData, "社員リスト")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddImage([string]$image_path) - 画像追加</div>
+                <p>指定したパスの画像を文書に挿入します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 画像を追加
+$driver.AddImage("C:\Images\chart.png")
+
+# 複数の画像を追加
+$driver.AddImage("C:\Images\logo.jpg")
+$driver.AddParagraph("図1: 会社ロゴ")
+$driver.AddImage("C:\Images\graph.png")
+$driver.AddParagraph("図2: 売上グラフ")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddPageBreak() - ページ区切り追加</div>
+                <p>新しいページを開始します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ページ区切りを追加
+$driver.AddHeading("第1章", 1)
+$driver.AddParagraph("第1章の内容...")
+$driver.AddPageBreak()
+
+$driver.AddHeading("第2章", 1)
+$driver.AddParagraph("第2章の内容...")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 目次・スタイル関連 -->
+        <section class="method-section" data-searchable="目次 フォント スタイル">
+            <h2 class="section-title">
+                <span class="icon">🎨</span> 目次・スタイル関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AddTableOfContents() - 目次追加</div>
+                <p>文書の先頭に目次を自動生成します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 目次を追加（通常は文書の最初に）
+$driver.AddTableOfContents()
+
+# 見出しを追加後、目次を更新
+$driver.AddHeading("第1章", 1)
+$driver.AddHeading("第2章", 1)
+$driver.UpdateTableOfContents()</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetFont([string]$font_name, [double]$font_size) - フォント設定</div>
+                <p>文書全体のフォントとサイズを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># フォントを設定
+$driver.SetFont("メイリオ", 10.5)
+
+# ビジネス文書向けの設定
+$driver.SetFont("游明朝", 11)
+
+# 英語文書向けの設定
+$driver.SetFont("Times New Roman", 12)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetPageOrientation([string]$orientation) - ページ向き設定</div>
+                <p>ページの向きを縦向きまたは横向きに設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 横向きに設定
+$driver.SetPageOrientation("Landscape")
+
+# 縦向きに設定
+$driver.SetPageOrientation("Portrait")
+
+# 日本語でも指定可能
+$driver.SetPageOrientation("横")
+$driver.SetPageOrientation("縦")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ファイル操作関連 -->
+        <section class="method-section" data-searchable="保存 ファイル">
+            <h2 class="section-title">
+                <span class="icon">💾</span> ファイル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SaveDocument([string]$file_path) - 文書保存</div>
+                <p>作成した文書を指定したパスに保存します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 文書を保存
+$driver.SaveDocument("C:\Documents\report.docx")
+
+# タイムスタンプ付きで保存
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$driver.SaveDocument("C:\Documents\report_$timestamp.docx")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">OpenDocument([string]$file_path) - 文書を開く</div>
+                <p>既存のWord文書を開きます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 既存の文書を開く
+$driver.OpenDocument("C:\Documents\template.docx")
+
+# 開いた文書に追記
+$driver.AddParagraph("追加のテキスト")
+$driver.SaveDocument("C:\Documents\updated.docx")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: レポートの自動生成</div>
+                
+                <div class="code-example">
+                    <pre><code># WordDriverを初期化
+$driver = [WordDriver]::new()
+
+try {
+    # タイトルページ
+    $driver.SetFont("游ゴシック", 14)
+    $driver.AddHeading("月次売上レポート", 1)
+    $driver.AddParagraph("作成日: $(Get-Date -Format 'yyyy年MM月dd日')")
+    $driver.AddPageBreak()
+    
+    # 目次
+    $driver.AddTableOfContents()
+    $driver.AddPageBreak()
+    
+    # 第1章
+    $driver.AddHeading("1. 売上概要", 1)
+    $driver.AddParagraph("今月の売上は前月比10%増加しました。")
+    
+    # データテーブル
+    $salesData = New-Object 'object[,]' 4,3
+    $salesData[0,0] = "月"
+    $salesData[0,1] = "売上（万円）"
+    $salesData[0,2] = "前月比"
+    $salesData[1,0] = "4月"
+    $salesData[1,1] = "1000"
+    $salesData[1,2] = "+5%"
+    $salesData[2,0] = "5月"
+    $salesData[2,1] = "1100"
+    $salesData[2,2] = "+10%"
+    $salesData[3,0] = "6月"
+    $salesData[3,1] = "1200"
+    $salesData[3,2] = "+9%"
+    
+    $driver.AddTable($salesData, "四半期売上推移")
+    
+    # グラフ画像
+    $driver.AddImage("C:\Reports\sales_chart.png")
+    $driver.AddParagraph("図1: 売上推移グラフ")
+    
+    # 目次を更新
+    $driver.UpdateTableOfContents()
+    
+    # 保存
+    $driver.SaveDocument("C:\Reports\monthly_report.docx")
+    Write-Host "レポートが作成されました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: 契約書テンプレートの作成</div>
+                
+                <div class="code-example">
+                    <pre><code># 契約書の自動生成
+$driver = [WordDriver]::new()
+
+try {
+    # フォント設定
+    $driver.SetFont("明朝", 10.5)
+    
+    # タイトル
+    $driver.AddHeading("業務委託契約書", 1)
+    
+    # 契約者情報
+    $driver.AddParagraph("")
+    $driver.AddText("甲: 株式会社ABC")
+    $driver.AddText("乙: 株式会社XYZ")
+    $driver.AddParagraph("")
+    
+    # 契約条項
+    $driver.AddHeading("第1条（目的）", 2)
+    $driver.AddParagraph("本契約は、甲が乙に対して業務を委託し...")
+    
+    $driver.AddHeading("第2条（業務内容）", 2)
+    $driver.AddParagraph("乙は以下の業務を遂行するものとする。")
+    
+    # 日付
+    $driver.AddParagraph("")
+    $driver.AddParagraph("契約締結日: $(Get-Date -Format 'yyyy年MM月dd日')")
+    
+    # 署名欄
+    $driver.AddPageBreak()
+    $driver.AddParagraph("甲: ________________")
+    $driver.AddParagraph("")
+    $driver.AddParagraph("乙: ________________")
+    
+    # 保存
+    $driver.SaveDocument("C:\Contracts\contract_template.docx")
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> WordDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <table class="error-table">
+                    <tr>
+                        <td class="range">4001</td>
+                        <td>WordDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">4002</td>
+                        <td>一時ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">4003</td>
+                        <td>Wordアプリケーション初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">4004</td>
+                        <td>新規ドキュメント作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">4005-4017</td>
+                        <td>各種操作エラー</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">WordDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

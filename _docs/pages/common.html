@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>Common</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🔧</span>
+                Common クラス
+                <span class="emoji">🔧</span>
+            </h1>
+            <p class="subtitle">全ドライバークラスで使用する共通機能とユーティリティ 🛠️</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>Commonクラスは、すべてのドライバークラスで共通して使用される機能を提供する基盤クラスです。</p>
+            
+            <div class="note-card info">
+                <h3>🌟 主な機能</h3>
+                <ul>
+                    <li>統一されたログ出力システム</li>
+                    <li>エラーコードの一元管理</li>
+                    <li>エラーハンドリングの標準化</li>
+                    <li>JSONファイルからのエラーコード読み込み</li>
+                </ul>
+            </div>
+
+            <div class="note-card success">
+                <h3>✨ グローバルインスタンス</h3>
+                <p>Commonクラスは自動的にグローバルインスタンス <code>$global:Common</code> として初期化されます。</p>
+                <div class="code-example">
+                    <pre><code># 既に初期化済みのグローバルインスタンスを使用
+$global:Common.WriteLog("処理を開始します", "INFO")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 初期化関連 -->
+        <section class="method-section" data-searchable="初期化 コンストラクタ">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">Common() - コンストラクタ</div>
+                <p>Commonクラスのインスタンスを作成し、エラーコードJSONファイルを自動的に読み込みます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 通常は自動的に初期化されるため、明示的な作成は不要
+# ただし、必要に応じて新しいインスタンスを作成可能
+$myCommon = [Common]::new()
+
+# グローバルインスタンスはモジュール読み込み時に自動作成
+# $global:Common として利用可能</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">LoadErrorCodes() - エラーコード読み込み</div>
+                <p>ErrorCode.jsonファイルからエラーコード情報を読み込みます。</p>
+                
+                <div class="code-example">
+                    <pre><code># コンストラクタで自動的に呼び出される
+# 手動での再読み込みも可能
+$global:Common.LoadErrorCodes()
+
+# JSONファイルのパス: _json\ErrorCode.json</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ログ出力関連 -->
+        <section class="method-section" data-searchable="ログ WriteLog">
+            <h2 class="section-title">
+                <span class="icon">📝</span> ログ出力関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">WriteLog([string]$message, [string]$level) - ログ出力</div>
+                <p>統一されたフォーマットでログメッセージを出力します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 情報ログを出力
+$global:Common.WriteLog("処理を開始しました", "INFO")
+
+# 警告ログを出力
+$global:Common.WriteLog("ファイルが見つかりません", "WARNING")
+
+# エラーログを出力
+$global:Common.WriteLog("データベース接続に失敗", "ERROR")
+
+# デバッグログを出力
+$global:Common.WriteLog("変数の値: $value", "DEBUG")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーハンドリング関連 -->
+        <section class="method-section" data-searchable="エラー HandleError">
+            <h2 class="section-title">
+                <span class="icon">⚠️</span> エラーハンドリング関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">HandleError([string]$errorCode, [string]$message, [string]$module, [string]$logFile) - エラー処理</div>
+                <p>統一されたフォーマットでエラーを処理し、詳細なエラー情報をログファイルに記録します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的な使用方法
+$global:Common.HandleError("1001", "初期化に失敗しました")
+
+# モジュール名を指定
+$global:Common.HandleError("3001", "Chrome起動エラー", "ChromeDriver")
+
+# カスタムログファイルを指定
+$global:Common.HandleError(
+    "5001", 
+    "Excelファイルが開けません", 
+    "ExcelDriver",
+    ".\CustomError.log"
+)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetErrorTitle([string]$errorCode, [string]$module) - エラータイトル取得</div>
+                <p>エラーコードとモジュール名から、対応するエラータイトルを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># エラータイトルを取得
+$title = $global:Common.GetErrorTitle("1001", "WebDriver")
+Write-Host "エラー: $title"
+# 出力: エラー: WebDriver初期化エラー</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例: カスタムスクリプトでのログ記録</div>
+                
+                <div class="code-example">
+                    <pre><code># スクリプトの開始と終了を記録
+function Start-MyProcess {
+    $global:Common.WriteLog("========================================", "INFO")
+    $global:Common.WriteLog("処理を開始します", "INFO")
+    $global:Common.WriteLog("実行ユーザー: $env:USERNAME", "INFO")
+    
+    try {
+        # 処理を実行
+        $result = SomeFunction
+        $global:Common.WriteLog("処理が正常に完了しました", "INFO")
+        return $result
+    }
+    catch {
+        $global:Common.HandleError(
+            "9001",
+            "処理中にエラーが発生: $($_.Exception.Message)",
+            "MyScript",
+            ".\MyScript_Error.log"
+        )
+        throw
+    }
+    finally {
+        $global:Common.WriteLog("処理を終了します", "INFO")
+        $global:Common.WriteLog("========================================", "INFO")
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ベストプラクティス -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">✅</span> ベストプラクティス
+            </h2>
+            
+            <div class="note-card success">
+                <h3>推奨される使用方法</h3>
+                <ul>
+                    <li><strong>ログレベルの適切な使用</strong>
+                        <ul>
+                            <li>INFO: 通常の処理フロー</li>
+                            <li>WARNING: 注意が必要だが処理は継続</li>
+                            <li>ERROR: エラーが発生し処理が失敗</li>
+                            <li>DEBUG: 開発・デバッグ時の詳細情報</li>
+                        </ul>
+                    </li>
+                    <li><strong>エラーコードの体系的な管理</strong>
+                        <ul>
+                            <li>モジュールごとに番号帯を分ける</li>
+                            <li>意味のあるエラータイトルを付ける</li>
+                            <li>JSONファイルで一元管理</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">Common Class Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

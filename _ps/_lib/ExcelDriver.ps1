@@ -9,8 +9,8 @@ Add-Type -AssemblyName Microsoft.Office.Interop.Excel
 class ExcelDriver
 {
     [Microsoft.Office.Interop.Excel.Application]$excel_app
-    [Microsoft.Office.Interop.Excel.Workbook]$excel_workbook
-    [Microsoft.Office.Interop.Excel.Worksheet]$excel_worksheet
+    [object]$excel_workbook
+    [object]$excel_worksheet
     [string]$file_path
     [bool]$is_initialized
     [bool]$is_saved
@@ -186,8 +186,8 @@ class ExcelDriver
         }
     }
 
-    # セル範囲の値を取得
-    [object[,]] GetRangeValue([string]$range)
+    # セル範囲の値を取得（戻りは可変: 単一値 / 配列 / 2次元配列）
+    [object] GetRangeValue([string]$range)
     {
         try
         {
@@ -476,10 +476,10 @@ class ExcelDriver
                 $this.excel_app = $null
             }
 
-            # COMオブジェクトの解放
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.excel_worksheet) | Out-Null
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.excel_workbook) | Out-Null
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.excel_app) | Out-Null
+            # COMオブジェクトの解放（null チェック）
+            if ($this.excel_worksheet) { [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.excel_worksheet) | Out-Null }
+            if ($this.excel_workbook) { [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.excel_workbook) | Out-Null }
+            if ($this.excel_app) { [System.Runtime.Interopservices.Marshal]::ReleaseComObject($this.excel_app) | Out-Null }
             [System.GC]::Collect()
             [System.GC]::WaitForPendingFinalizers()
 

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPointDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>PowerPointDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🎯</span>
+                PowerPointDriver クラス
+                <span class="emoji">🎯</span>
+            </h1>
+            <p class="subtitle">Microsoft PowerPointで魅力的なプレゼンテーションを自動作成する魔法のツール ✨</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>PowerPointDriverクラスは、Microsoft PowerPointを自動操作するためのドライバークラスです。スライド作成、図形挿入、デザイン設定など、PowerPointの豊富な機能をPowerShellから簡単に利用できます。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>プレゼンテーションの自動生成</li>
+                    <li>データからスライドへの自動変換</li>
+                    <li>定型スライドの大量作成</li>
+                    <li>企業向けプレゼンテーションテンプレート作成</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 初期化関連 -->
+        <section class="method-section" data-searchable="初期化 接続">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">PowerPointDriver() - コンストラクタ</div>
+                <p>PowerPointDriverインスタンスを作成し、PowerPointアプリケーションを初期化します。</p>
+                
+                <div class="code-example">
+                    <pre><code># PowerPointDriverのインスタンスを作成
+$driver = [PowerPointDriver]::new()
+
+# 自動的に以下が実行されます：
+# - PowerPointアプリケーションの起動（非表示）
+# - 新規プレゼンテーションの作成
+# - 一時ディレクトリの作成</code></pre>
+                </div>
+                
+                <div class="note-card warning">
+                    <h4>⚠️ 注意事項</h4>
+                    <ul>
+                        <li>Microsoft PowerPointがインストールされている必要があります</li>
+                        <li>初期化時にエラーコード6001が記録される場合があります</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- スライド操作関連 -->
+        <section class="method-section" data-searchable="スライド 追加 選択">
+            <h2 class="section-title">
+                <span class="icon">📑</span> スライド操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AddSlide([string]$layout) - スライド追加</div>
+                <p>指定したレイアウトで新しいスライドを追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># タイトルスライドを追加
+$driver.AddSlide("Title Slide")
+
+# コンテンツスライドを追加
+$driver.AddSlide("Content")
+
+# 比較スライドを追加
+$driver.AddSlide("Comparison")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SelectSlide([int]$slideIndex) - スライド選択</div>
+                <p>指定したインデックスのスライドを選択します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 1番目のスライドを選択（0ベース）
+$driver.SelectSlide(0)
+
+# 3番目のスライドを選択
+$driver.SelectSlide(2)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- テキスト追加関連 -->
+        <section class="method-section" data-searchable="テキスト タイトル 追加">
+            <h2 class="section-title">
+                <span class="icon">✏️</span> テキスト追加関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AddTitle([string]$text) - タイトル追加</div>
+                <p>現在のスライドにタイトルを追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># スライドにタイトルを追加
+$driver.AddTitle("第1章 はじめに")
+$driver.AddTitle("プロジェクト概要")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddText([string]$text) - テキスト追加</div>
+                <p>現在のスライドにテキストを追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># スライドにテキストを追加
+$driver.AddText("これは本文のテキストです。")
+$driver.AddText("重要なポイントを記載します。")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 図形・画像関連 -->
+        <section class="method-section" data-searchable="図形 画像 挿入">
+            <h2 class="section-title">
+                <span class="icon">🔺</span> 図形・画像関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AddShape([string]$shapeType) - 図形追加</div>
+                <p>指定したタイプの図形をスライドに追加します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的な図形を追加
+$driver.AddShape("Rectangle")
+$driver.AddShape("Circle")
+$driver.AddShape("Triangle")
+
+# 矢印図形を追加
+$driver.AddShape("Arrow")
+$driver.AddShape("Line")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AddImage([string]$imagePath) - 画像追加</div>
+                <p>指定したパスの画像をスライドに挿入します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 画像を追加
+$driver.AddImage("C:\Images\chart.png")
+$driver.AddImage("C:\Images\logo.jpg")
+
+# 複数の画像を追加
+$driver.AddImage("C:\Images\graph1.png")
+$driver.AddImage("C:\Images\graph2.png")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- フォーマット関連 -->
+        <section class="method-section" data-searchable="フォント 背景 色">
+            <h2 class="section-title">
+                <span class="icon">🎨</span> フォーマット関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SetFont([string]$fontName, [double]$fontSize) - フォント設定</div>
+                <p>スライド全体のフォントとサイズを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># フォントを設定
+$driver.SetFont("メイリオ", 12)
+$driver.SetFont("游ゴシック", 14)
+
+# 英語フォント
+$driver.SetFont("Arial", 11)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetBackgroundColor([int]$colorIndex) - 背景色設定</div>
+                <p>スライドの背景色を設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 背景色を設定
+$driver.SetBackgroundColor(15)  # 白
+$driver.SetBackgroundColor(6)   # 黄色
+$driver.SetBackgroundColor(5)   # 青</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ファイル操作関連 -->
+        <section class="method-section" data-searchable="保存 ファイル">
+            <h2 class="section-title">
+                <span class="icon">💾</span> ファイル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SavePresentation([string]$filePath) - プレゼンテーション保存</div>
+                <p>作成したプレゼンテーションを保存します。</p>
+                
+                <div class="code-example">
+                    <pre><code># プレゼンテーションを保存
+$driver.SavePresentation("C:\Presentations\report.pptx")
+
+# タイムスタンプ付きで保存
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$driver.SavePresentation("C:\Presentations\report_$timestamp.pptx")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">OpenPresentation([string]$filePath) - プレゼンテーションを開く</div>
+                <p>既存のPowerPointファイルを開きます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 既存のファイルを開く
+$driver.OpenPresentation("C:\Templates\template.pptx")
+
+# 開いたファイルに追記
+$driver.AddSlide("Content")
+$driver.AddTitle("追加スライド")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: 月次レポートプレゼンテーションの自動生成</div>
+                
+                <div class="code-example">
+                    <pre><code># PowerPointDriverを初期化
+$driver = [PowerPointDriver]::new()
+
+try {
+    # フォント設定
+    $driver.SetFont("游ゴシック", 14)
+    
+    # タイトルスライド
+    $driver.AddSlide("Title Slide")
+    $driver.AddTitle("月次売上レポート")
+    $driver.AddText("$(Get-Date -Format 'yyyy年MM月')")
+    
+    # 概要スライド
+    $driver.AddSlide("Content")
+    $driver.AddTitle("今月の概要")
+    $driver.AddText("売上は前月比10%増加")
+    $driver.AddText("新規顧客獲得数: 150名")
+    
+    # グラフスライド
+    $driver.AddSlide("Content")
+    $driver.AddTitle("売上推移")
+    $driver.AddImage("C:\Reports\sales_chart.png")
+    
+    # 保存
+    $driver.SavePresentation("C:\Presentations\monthly_report.pptx")
+    Write-Host "プレゼンテーションが作成されました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: プロジェクト提案書の作成</div>
+                
+                <div class="code-example">
+                    <pre><code># プロジェクト提案書の自動生成
+$driver = [PowerPointDriver]::new()
+
+try {
+    # タイトルスライド
+    $driver.AddSlide("Title Slide")
+    $driver.AddTitle("新システム開発プロジェクト")
+    $driver.AddText("提案書")
+    
+    # 背景・課題
+    $driver.AddSlide("Content")
+    $driver.AddTitle("現状の課題")
+    $driver.AddText("• 手作業によるデータ入力")
+    $driver.AddText("• レポート作成に時間がかかる")
+    $driver.AddText("• データの整合性が保てない")
+    
+    # 解決策
+    $driver.AddSlide("Content")
+    $driver.AddTitle("提案する解決策")
+    $driver.AddText("• 自動化システムの導入")
+    $driver.AddText("• リアルタイムデータ更新")
+    $driver.AddText("• 統合ダッシュボード")
+    
+    # 保存
+    $driver.SavePresentation("C:\Proposals\system_proposal.pptx")
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> PowerPointDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <table class="error-table">
+                    <tr>
+                        <td class="range">6001</td>
+                        <td>PowerPointDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">6002</td>
+                        <td>一時ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">6003</td>
+                        <td>PowerPointアプリケーション初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">6004-6016</td>
+                        <td>各種操作エラー</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">PowerPointDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html> 

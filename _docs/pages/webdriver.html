@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>WebDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🌐</span>
+                WebDriver クラス
+                <span class="emoji">🌐</span>
+            </h1>
+            <p class="subtitle">ブラウザ操作の基盤となる強力なWeb自動化ツール 🚀</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>WebDriverクラスは、ブラウザ操作の基底クラスとして、ChromeDriverとEdgeDriverの親クラスとなっています。共通のWeb操作機能を提供し、Webサイトの自動化に必要な基本的な機能を備えています。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>Webサイトの自動テスト</li>
+                    <li>Webスクレイピング・データ収集</li>
+                    <li>フォームの自動入力</li>
+                    <li>Webアプリケーションの操作自動化</li>
+                </ul>
+            </div>
+
+            <div class="note-card success">
+                <h3>✨ 継承関係</h3>
+                <p>ChromeDriverとEdgeDriverは、このWebDriverクラスを継承して、ブラウザ固有の機能を追加しています。</p>
+            </div>
+        </section>
+
+        <!-- 初期化・接続関連 -->
+        <section class="method-section" data-searchable="初期化 接続 ブラウザ">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">StartBrowser([string]$browserPath, [string]$userDataDir) - ブラウザ起動</div>
+                <p>指定したパスのブラウザを起動し、WebSocket接続を確立します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ブラウザを起動（通常は子クラスで自動呼び出し）
+$driver.StartBrowser("C:\Program Files\Chrome\chrome.exe", "C:\temp\userdata")
+
+# 起動後、WebSocket接続が自動的に確立されます</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">ConnectToWebSocket([int]$port) - WebSocket接続</div>
+                <p>指定したポートでWebSocket接続を確立します。</p>
+                
+                <div class="code-example">
+                    <pre><code># デフォルトポート9222で接続
+$driver.ConnectToWebSocket(9222)
+
+# カスタムポートで接続
+$driver.ConnectToWebSocket(9223)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ナビゲーション関連 -->
+        <section class="method-section" data-searchable="ナビゲーション ページ 移動">
+            <h2 class="section-title">
+                <span class="icon">🧭</span> ナビゲーション関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">Navigate([string]$url) - ページ遷移</div>
+                <p>指定したURLにページを遷移させます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的なページ遷移
+$driver.Navigate("https://www.google.com")
+$driver.Navigate("https://example.com")
+
+# ローカルファイルも開けます
+$driver.Navigate("file:///C:/test/index.html")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GoBack() - 戻る</div>
+                <p>ブラウザの履歴で前のページに戻ります。</p>
+                
+                <div class="code-example">
+                    <pre><code># 前のページに戻る
+$driver.Navigate("https://example.com")
+$driver.Navigate("https://example.com/page2")
+$driver.GoBack()  # example.comに戻る</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GoForward() - 進む</div>
+                <p>ブラウザの履歴で次のページに進みます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 次のページに進む
+$driver.GoBack()   # 前のページに戻る
+$driver.GoForward() # 元のページに戻る</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Refresh() - ページ更新</div>
+                <p>現在のページを更新します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ページを更新
+$driver.Refresh()
+
+# データが更新されるまで待機してから更新
+Start-Sleep -Seconds 5
+$driver.Refresh()</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 要素操作関連 -->
+        <section class="method-section" data-searchable="要素 検索 操作">
+            <h2 class="section-title">
+                <span class="icon">🎯</span> 要素操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">FindElement([string]$selector) - 要素の検索</div>
+                <p>CSSセレクタを使用して要素を検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 様々なセレクタで要素を検索
+$searchBox = $driver.FindElement("input[name='q']")
+$button = $driver.FindElement("#submit-button")
+$element = $driver.FindElement(".container")
+$link = $driver.FindElement("a[href='/about']")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Click([string]$selector) - 要素をクリック</div>
+                <p>指定した要素をクリックします。</p>
+                
+                <div class="code-example">
+                    <pre><code># ボタンをクリック
+$driver.Click("input[type='submit']")
+$driver.Click("#login-button")
+
+# リンクをクリック
+$driver.Click("a[href='/login']")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetText([string]$selector, [string]$text) - テキスト入力</div>
+                <p>指定した要素にテキストを入力します。</p>
+                
+                <div class="code-example">
+                    <pre><code># フォームにテキストを入力
+$driver.SetText("input[name='username']", "user@example.com")
+$driver.SetText("input[name='password']", "SecurePassword123")
+$driver.SetText("textarea[name='comment']", "コメントを入力")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetText([string]$selector) - テキスト取得</div>
+                <p>指定した要素のテキストを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 要素のテキストを取得
+$title = $driver.GetText("h1")
+$message = $driver.GetText(".alert-message")
+$price = $driver.GetText(".price")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 待機・同期関連 -->
+        <section class="method-section" data-searchable="待機 同期 要素">
+            <h2 class="section-title">
+                <span class="icon">⏰</span> 待機・同期関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">WaitForElement([string]$selector, [int]$timeout) - 要素待機</div>
+                <p>指定した要素が表示されるまで待機します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 要素が表示されるまで最大10秒待機
+$driver.WaitForElement("input[name='username']", 10)
+
+# ローディング完了まで待機
+$driver.WaitForElement(".loading-spinner", 30)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">WaitForPageLoad([int]$timeout) - ページ読み込み待機</div>
+                <p>ページの読み込みが完了するまで待機します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ページ読み込み完了まで待機
+$driver.Navigate("https://example.com")
+$driver.WaitForPageLoad(30)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- スクリーンショット関連 -->
+        <section class="method-section" data-searchable="スクリーンショット 画像 保存">
+            <h2 class="section-title">
+                <span class="icon">📸</span> スクリーンショット関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">TakeScreenshot([string]$filePath) - スクリーンショット</div>
+                <p>現在のページのスクリーンショットを保存します。</p>
+                
+                <div class="code-example">
+                    <pre><code># スクリーンショットを保存
+$driver.TakeScreenshot("C:\Screenshots\page.png")
+
+# タイムスタンプ付きで保存
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$driver.TakeScreenshot("C:\Screenshots\screenshot_$timestamp.png")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: ログインフォームの自動入力</div>
+                
+                <div class="code-example">
+                    <pre><code># WebDriverを初期化（子クラスを使用）
+$driver = [ChromeDriver]::new()
+
+try {
+    # ログインページを開く
+    $driver.Navigate("https://example.com/login")
+    
+    # ページ読み込み完了まで待機
+    $driver.WaitForPageLoad(30)
+    
+    # ログインフォームに情報を入力
+    $driver.SetText("input[name='username']", "user@example.com")
+    $driver.SetText("input[name='password']", "SecurePassword")
+    
+    # ログインボタンをクリック
+    $driver.Click("input[type='submit']")
+    
+    # ログイン後のページ読み込みを待機
+    $driver.WaitForElement(".dashboard", 30)
+    
+    Write-Host "ログインが完了しました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: データ収集とスクリーンショット</div>
+                
+                <div class="code-example">
+                    <pre><code># データ収集の自動化
+$driver = [EdgeDriver]::new()
+
+try {
+    # 対象サイトを開く
+    $driver.Navigate("https://example.com/data")
+    
+    # データが表示されるまで待機
+    $driver.WaitForElement(".data-table", 30)
+    
+    # データを収集
+    $rows = $driver.FindElements(".data-table tr")
+    foreach ($row in $rows) {
+        $cells = $driver.FindElements("td", $row)
+        foreach ($cell in $cells) {
+            $text = $driver.GetText($cell)
+            Write-Host $text
+        }
+    }
+    
+    # スクリーンショットを保存
+    $driver.TakeScreenshot("C:\Reports\data_collection.png")
+    
+    Write-Host "データ収集が完了しました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーハンドリング -->
+        <section class="method-section" data-searchable="エラー処理 クリーンアップ">
+            <h2 class="section-title">
+                <span class="icon">⚠️</span> エラーハンドリング・クリーンアップ
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">Dispose() - リソース解放</div>
+                <p>WebDriverのリソースを解放し、ブラウザを終了します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 使用後は必ずDisposeを呼び出す
+$driver = [ChromeDriver]::new()
+
+try {
+    # 処理を実行
+    $driver.Navigate("https://example.com")
+    # ...
+}
+finally {
+    # リソースを確実に解放
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> WebDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <table class="error-table">
+                    <tr>
+                        <td class="range">1001</td>
+                        <td>WebDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">1002</td>
+                        <td>ブラウザ起動エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">1003</td>
+                        <td>WebSocket接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">1004</td>
+                        <td>ページ遷移エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">1005</td>
+                        <td>要素検索エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">1006</td>
+                        <td>スクリーンショットエラー</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">WebDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html> 

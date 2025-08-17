@@ -1,0 +1,567 @@
+/* ========================================
+   基本設定とカスタムプロパティ
+   ======================================== */
+:root {
+    /* ライトモードのカラー */
+    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-secondary: #ffffff;
+    --bg-card: linear-gradient(145deg, #ffffff, #f3f4f6);
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-accent: #667eea;
+    --border-color: rgba(102, 126, 234, 0.2);
+    --shadow-light: 0 4px 6px rgba(102, 126, 234, 0.1);
+    --shadow-medium: 0 10px 15px rgba(102, 126, 234, 0.15);
+    --shadow-heavy: 0 20px 25px rgba(102, 126, 234, 0.2);
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --hover-transform: translateY(-5px);
+}
+
+/* ダークモード */
+body.dark-mode {
+    --bg-primary: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    --bg-secondary: #1a202c;
+    --bg-card: linear-gradient(145deg, #2d3748, #1a202c);
+    --text-primary: #f7fafc;
+    --text-secondary: #cbd5e0;
+    --text-accent: #9f7aea;
+    --border-color: rgba(159, 122, 234, 0.3);
+    --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.4);
+    --shadow-heavy: 0 20px 25px rgba(0, 0, 0, 0.5);
+    --card-bg: rgba(45, 55, 72, 0.95);
+}
+
+/* ========================================
+   基本スタイル
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(159, 122, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(245, 87, 108, 0.2) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ========================================
+   ヘッダー
+   ======================================== */
+header {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--card-bg);
+    border-radius: 30px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow-heavy);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.main-title {
+    font-size: 3.5em;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 15px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.emoji {
+    display: inline-block;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+}
+
+.subtitle {
+    font-size: 1.3em;
+    color: var(--text-secondary);
+    margin-top: 10px;
+}
+
+/* ========================================
+   テーマトグル
+   ======================================== */
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.theme-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-medium);
+}
+
+.theme-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.theme-icon {
+    font-size: 1.2em;
+    display: inline-block;
+    animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+body.dark-mode .theme-icon {
+    animation: none;
+}
+
+body.dark-mode .theme-text {
+    content: 'ライトモード';
+}
+
+/* ========================================
+   検索ボックス
+   ======================================== */
+.search-container {
+    margin-bottom: 40px;
+}
+
+.search-box {
+    background: var(--card-bg);
+    border-radius: 50px;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(10px);
+    max-width: 600px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-heavy);
+}
+
+.search-icon {
+    font-size: 1.5em;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+#searchInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1.1em;
+    color: var(--text-primary);
+    outline: none;
+}
+
+#searchInput::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* ========================================
+   セクションタイトル
+   ======================================== */
+.section-title {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.section-title .icon {
+    display: inline-block;
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+}
+
+/* ========================================
+   クラスカード
+   ======================================== */
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.class-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.class-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-1);
+    transition: height 0.3s ease;
+}
+
+.class-card:hover::before {
+    height: 100%;
+    opacity: 0.1;
+}
+
+.class-card:hover {
+    transform: var(--hover-transform);
+    box-shadow: var(--shadow-heavy);
+}
+
+.class-card.hidden {
+    display: none;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.card-icon {
+    font-size: 2.5em;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.card-header h3 {
+    font-size: 1.8em;
+    color: var(--text-primary);
+}
+
+.card-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.card-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.feature-tag {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(159, 122, 234, 0.2));
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    border: 1px solid var(--border-color);
+}
+
+.card-link {
+    display: inline-block;
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.card-link:hover {
+    transform: translateX(5px);
+}
+
+/* ========================================
+   注意事項カード
+   ======================================== */
+.note-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.note-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.note-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+}
+
+.note-card.warning::before {
+    background: linear-gradient(90deg, #f5576c, #f093fb);
+}
+
+.note-card.info::before {
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+}
+
+.note-card.success::before {
+    background: linear-gradient(90deg, #43e97b, #38f9d7);
+}
+
+.note-card h3 {
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.note-card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.note-card li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+.note-card li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--text-accent);
+}
+
+/* ========================================
+   エラーコードセクション
+   ======================================== */
+.error-summary {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+    color: var(--text-secondary);
+}
+
+.error-ranges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+}
+
+.error-range-card, .error-handling-tips {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(10px);
+}
+
+.error-table {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.error-table tr {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.error-table td {
+    padding: 12px;
+}
+
+.error-table .range {
+    font-weight: bold;
+    color: var(--text-accent);
+}
+
+.error-handling-tips h3 {
+    margin-bottom: 15px;
+}
+
+.error-handling-tips ol {
+    padding-left: 20px;
+}
+
+.error-handling-tips li {
+    padding: 8px 0;
+    color: var(--text-secondary);
+}
+
+/* ========================================
+   フッター
+   ======================================== */
+footer {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin-top: 60px;
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(10px);
+}
+
+.footer-content p {
+    margin: 5px 0;
+}
+
+.version {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+/* ========================================
+   レスポンシブデザイン
+   ======================================== */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2.5em;
+    }
+    
+    .class-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .theme-toggle {
+        position: static;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   アニメーション
+   ======================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.class-card, .note-card, .error-range-card, .error-handling-tips {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* ========================================
+   スクロールバー
+   ======================================== */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-1);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-2);
+}

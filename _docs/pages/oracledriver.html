@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OracleDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>OracleDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🗄️</span>
+                OracleDriver クラス
+                <span class="emoji">🗄️</span>
+            </h1>
+            <p class="subtitle">OracleデータベースをPowerShellから操作するための強力なツール 💾</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>OracleDriverクラスは、Oracleデータベースを操作するためのドライバークラスです。SQL実行、トランザクション管理、テーブル操作など、Oracleの豊富な機能をPowerShellから簡単に利用できます。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>データベースの自動バックアップ</li>
+                    <li>大量データの一括処理</li>
+                    <li>レポート用データの抽出</li>
+                    <li>データベースメンテナンス作業の自動化</li>
+                </ul>
+            </div>
+
+            <div class="note-card warning">
+                <h3>⚠️ 前提条件</h3>
+                <ul>
+                    <li>Oracle Clientのインストールが必要</li>
+                    <li>Oracleデータベースへの接続権限が必要</li>
+                    <li>適切なネットワーク設定が必要</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 初期化・接続関連 -->
+        <section class="method-section" data-searchable="初期化 接続 データベース">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">OracleDriver() - コンストラクタ</div>
+                <p>OracleDriverインスタンスを作成し、データベース接続の準備を行います。</p>
+                
+                <div class="code-example">
+                    <pre><code># OracleDriverのインスタンスを作成
+$driver = [OracleDriver]::new()
+
+# 接続パラメータを設定
+$driver.SetConnectionString("localhost", "1521", "XE", "username", "password")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetConnectionString([string]$server, [string]$port, [string]$service, [string]$username, [string]$password) - 接続文字列設定</div>
+                <p>Oracleデータベースへの接続パラメータを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的な接続設定
+$driver.SetConnectionString("localhost", "1521", "XE", "system", "password")
+
+# 本番環境への接続
+$driver.SetConnectionString("prod-db.company.com", "1521", "PROD", "app_user", "SecurePass123")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Connect() - データベース接続</div>
+                <p>設定されたパラメータでOracleデータベースに接続します。</p>
+                
+                <div class="code-example">
+                    <pre><code># データベースに接続
+$driver.Connect()
+
+# 接続確認
+if ($driver.IsConnected) {
+    Write-Host "データベースに接続されました"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- DML操作関連 -->
+        <section class="method-section" data-searchable="DML SELECT INSERT UPDATE DELETE">
+            <h2 class="section-title">
+                <span class="icon">📝</span> DML操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">ExecuteQuery([string]$sql) - SELECT文実行</div>
+                <p>SELECT文を実行し、結果を返します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的なSELECT文
+$result = $driver.ExecuteQuery("SELECT * FROM employees WHERE department = 'IT'")
+
+# 条件付きクエリ
+$result = $driver.ExecuteQuery("SELECT name, salary FROM employees WHERE salary > 50000")
+
+# 集計クエリ
+$result = $driver.ExecuteQuery("SELECT department, AVG(salary) FROM employees GROUP BY department")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">ExecuteNonQuery([string]$sql) - INSERT/UPDATE/DELETE文実行</div>
+                <p>データを変更するSQL文を実行し、影響を受けた行数を返します。</p>
+                
+                <div class="code-example">
+                    <pre><code># INSERT文
+$affectedRows = $driver.ExecuteNonQuery("INSERT INTO employees (name, department, salary) VALUES ('田中太郎', '営業', 400000)")
+
+# UPDATE文
+$affectedRows = $driver.ExecuteNonQuery("UPDATE employees SET salary = 450000 WHERE name = '田中太郎'")
+
+# DELETE文
+$affectedRows = $driver.ExecuteNonQuery("DELETE FROM employees WHERE department = '廃止部署'")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">ExecuteScalar([string]$sql) - 単一値取得</div>
+                <p>クエリの結果から単一の値を取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># レコード数を取得
+$count = $driver.ExecuteScalar("SELECT COUNT(*) FROM employees")
+
+# 最大値を取得
+$maxSalary = $driver.ExecuteScalar("SELECT MAX(salary) FROM employees")
+
+# 存在確認
+$exists = $driver.ExecuteScalar("SELECT 1 FROM employees WHERE name = '田中太郎'")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- DDL操作関連 -->
+        <section class="method-section" data-searchable="DDL CREATE ALTER DROP テーブル">
+            <h2 class="section-title">
+                <span class="icon">🏗️</span> DDL操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CreateTable([string]$tableName, [string]$columns) - テーブル作成</div>
+                <p>新しいテーブルを作成します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的なテーブル作成
+$columns = "id NUMBER PRIMARY KEY, name VARCHAR2(100), created_date DATE DEFAULT SYSDATE"
+$driver.CreateTable("new_employees", $columns)
+
+# 複雑なテーブル作成
+$columns = "id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name VARCHAR2(100) NOT NULL, email VARCHAR2(255) UNIQUE, salary NUMBER(10,2)"
+$driver.CreateTable("employees_v2", $columns)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">AlterTable([string]$tableName, [string]$alterStatement) - テーブル変更</div>
+                <p>既存のテーブルを変更します。</p>
+                
+                <div class="code-example">
+                    <pre><code># カラム追加
+$driver.AlterTable("employees", "ADD phone VARCHAR2(20)")
+
+# カラム変更
+$driver.AlterTable("employees", "MODIFY name VARCHAR2(150)")
+
+# カラム削除
+$driver.AlterTable("employees", "DROP COLUMN old_column")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DropTable([string]$tableName) - テーブル削除</div>
+                <p>指定したテーブルを削除します。</p>
+                
+                <div class="code-example">
+                    <pre><code># テーブル削除
+$driver.DropTable("temp_employees")
+
+# 注意: この操作は取り消しできません</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- トランザクション管理 -->
+        <section class="method-section" data-searchable="トランザクション COMMIT ROLLBACK">
+            <h2 class="section-title">
+                <span class="icon">🔄</span> トランザクション管理
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">BeginTransaction() - トランザクション開始</div>
+                <p>新しいトランザクションを開始します。</p>
+                
+                <div class="code-example">
+                    <pre><code># トランザクションを開始
+$driver.BeginTransaction()
+
+# 複数の操作を実行
+$driver.ExecuteNonQuery("INSERT INTO employees (name, department) VALUES ('山田花子', '開発')")
+$driver.ExecuteNonQuery("UPDATE departments SET employee_count = employee_count + 1 WHERE name = '開発'")
+
+# コミットまたはロールバック</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Commit() - トランザクションコミット</div>
+                <p>現在のトランザクションをコミットします。</p>
+                
+                <div class="code-example">
+                    <pre><code># トランザクションをコミット
+$driver.Commit()
+Write-Host "トランザクションがコミットされました"</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Rollback() - トランザクションロールバック</div>
+                <p>現在のトランザクションをロールバックします。</p>
+                
+                <div class="code-example">
+                    <pre><code># エラーが発生した場合のロールバック
+try {
+    $driver.BeginTransaction()
+    $driver.ExecuteNonQuery("INSERT INTO employees (name, department) VALUES ('テスト', 'テスト')")
+    $driver.Commit()
+}
+catch {
+    $driver.Rollback()
+    Write-Host "エラーが発生したため、ロールバックしました"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: 従業員データの一括更新</div>
+                
+                <div class="code-example">
+                    <pre><code># OracleDriverを初期化
+$driver = [OracleDriver]::new()
+
+try {
+    # 接続設定
+    $driver.SetConnectionString("localhost", "1521", "XE", "hr", "password")
+    $driver.Connect()
+    
+    # トランザクション開始
+    $driver.BeginTransaction()
+    
+    # 給与の一括更新
+    $updateSql = "UPDATE employees SET salary = salary * 1.1 WHERE department = 'IT'"
+    $affectedRows = $driver.ExecuteNonQuery($updateSql)
+    
+    # 更新履歴を記録
+    $logSql = "INSERT INTO salary_updates (department, update_date, affected_rows) VALUES ('IT', SYSDATE, $affectedRows)"
+    $driver.ExecuteNonQuery($logSql)
+    
+    # コミット
+    $driver.Commit()
+    Write-Host "IT部門の給与を10%増額しました。影響を受けた行数: $affectedRows"
+}
+catch {
+    $driver.Rollback()
+    Write-Host "エラーが発生したため、ロールバックしました: $($_.Exception.Message)"
+}
+finally {
+    $driver.Disconnect()
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: 月次レポートデータの抽出</div>
+                
+                <div class="code-example">
+                    <pre><code># 月次レポート用データの抽出
+$driver = [OracleDriver]::new()
+
+try {
+    $driver.SetConnectionString("localhost", "1521", "XE", "report_user", "password")
+    $driver.Connect()
+    
+    # 今月の売上データを抽出
+    $currentMonth = Get-Date -Format "yyyy-MM"
+    $salesQuery = @"
+        SELECT 
+            p.product_name,
+            SUM(s.quantity) as total_quantity,
+            SUM(s.quantity * s.unit_price) as total_sales
+        FROM sales s
+        JOIN products p ON s.product_id = p.product_id
+        WHERE TO_CHAR(s.sale_date, 'YYYY-MM') = '$currentMonth'
+        GROUP BY p.product_name
+        ORDER BY total_sales DESC
+"@
+    
+    $salesData = $driver.ExecuteQuery($salesQuery)
+    
+    # 結果をCSVファイルに出力
+    $csvPath = "C:\Reports\sales_report_$currentMonth.csv"
+    $salesData | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8
+    
+    Write-Host "売上レポートが作成されました: $csvPath"
+}
+finally {
+    $driver.Disconnect()
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> OracleDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <table class="error-table">
+                    <tr>
+                        <td class="range">7001</td>
+                        <td>OracleDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">7002</td>
+                        <td>接続文字列設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">7003</td>
+                        <td>データベース接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">7004</td>
+                        <td>SQL実行エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">7005</td>
+                        <td>トランザクション管理エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">7006</td>
+                        <td>接続切断エラー</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">OracleDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

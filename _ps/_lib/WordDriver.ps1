@@ -38,6 +38,9 @@ class WordDriver
             # 新規ドキュメントの作成
             $this.CreateNewDocument()
             
+            # フッターに総ページと現在のページを設定
+            $this.SetupFooterWithPageNumbers()
+            
             $this.is_initialized = $true
             Write-Host "WordDriverの初期化が完了しました。"
         }
@@ -107,6 +110,59 @@ class WordDriver
         }
     }
 
+    # フッターに総ページと現在のページを設定
+    [void] SetupFooterWithPageNumbers()
+    {
+        try
+        {
+            # 各セクションのフッターを設定
+            foreach ($section in $this.word_document.Sections)
+            {
+                # フッターを取得
+                $footer = $section.Footers.Item([Microsoft.Office.Interop.Word.WdHeaderFooterIndex]::wdHeaderFooterPrimary)
+                
+                # フッターの内容をクリア
+                $footer.Range.Text = ""
+                
+                # 中央揃えでページ番号を挿入
+                $footer.Range.ParagraphFormat.Alignment = [Microsoft.Office.Interop.Word.WdParagraphAlignment]::wdAlignParagraphCenter
+                
+                # 現在のページ番号フィールドを挿入
+                $pageField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage)
+                $pageField.Update()
+                
+                # " / " を挿入
+                $footer.Range.InsertAfter(" / ")
+                
+                # 総ページ数フィールドを挿入
+                $numPagesField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages)
+                $numPagesField.Update()
+                
+                # フィールドを更新
+                $footer.Range.Fields.Update()
+                
+                # 段落の後に改行を追加
+                $footer.Range.InsertParagraphAfter()
+            }
+            
+            # ドキュメント全体のフィールドを更新
+            $this.word_document.Fields.Update()
+            
+            # ドキュメントを再計算
+            $this.word_document.Repaginate()
+            
+            # フィールドの表示を確実にするために少し待機
+            Start-Sleep -Milliseconds 100
+            
+            Write-Host "フッターにページ番号を設定しました（中央揃え）。"
+        }
+        catch
+        {
+            $global:Common.HandleError("4018", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            throw "フッターのページ番号設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ========================================
     # コンテンツ追加関連
     # ========================================
@@ -163,7 +219,22 @@ class WordDriver
 
             $paragraph = $this.word_document.Content.Paragraphs.Add()
             $paragraph.Range.Text = $text
-            $paragraph.Range.Style = "Heading $level"
+
+            # ローカライズ非依存で見出しスタイルを適用（BuiltinStyle を直接代入）
+            $builtInStyle = switch ($level)
+            {
+                1 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading1 }
+                2 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading2 }
+                3 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading3 }
+                4 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading4 }
+                5 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading5 }
+                6 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading6 }
+                7 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading7 }
+                8 { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading8 }
+                default { [Microsoft.Office.Interop.Word.WdBuiltinStyle]::wdStyleHeading9 }
+            }
+
+            $paragraph.Range.Style = $builtInStyle
             $paragraph.Range.InsertParagraphAfter()
             
             Write-Host "見出しを追加しました: $text (レベル: $level)"
@@ -332,8 +403,21 @@ class WordDriver
             $range = $this.word_document.Content
             $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseStart)
 
-            # 目次を追加
-            $this.word_document.TablesOfContents.Add($range, $true, 1, 3, "", "", "", $true, "", $true, $true, 1)
+            # 目次を追加（明示的な型で渡して型不一致を回避）
+            $this.word_document.TablesOfContents.Add(
+                $range,
+                $true,   # UseHeadingStyles [bool]
+                1,       # UpperHeadingLevel [int]
+                3,       # LowerHeadingLevel [int]
+                $false,  # UseFields [bool]
+                "",      # TableID [string]
+                $true,   # RightAlignPageNumbers [bool]
+                $true,   # IncludePageNumbers [bool]
+                "",      # AddedStyles [string]
+                $true,   # UseHyperlinks [bool]
+                $true,   # HidePageNumbersInWeb [bool]
+                $true    # UseOutlineLevels [bool]
+            )
             
             Write-Host "目次を追加しました。"
         }
@@ -345,7 +429,7 @@ class WordDriver
     }
 
     # フォントを設定
-    [void] SetFont([string]$font_name, [int]$font_size)
+    [void] SetFont([string]$font_name, [double]$font_size)
     {
         try
         {
@@ -381,6 +465,48 @@ class WordDriver
         }
     }
 
+    # ページの向きを設定（Portrait または Landscape）
+    [void] SetPageOrientation([string]$orientation)
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            if ([string]::IsNullOrWhiteSpace($orientation))
+            {
+                throw "ページ向きが指定されていません。"
+            }
+
+            $normalized = $orientation.Trim().ToLower()
+            $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientPortrait
+            switch ($normalized)
+            {
+                'portrait' { $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientPortrait }
+                '縦' { $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientPortrait }
+                '縦向き' { $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientPortrait }
+                'landscape' { $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientLandscape }
+                '横' { $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientLandscape }
+                '横向き' { $wd = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientLandscape }
+                default { throw "サポートされていないページ向きです: $orientation" }
+            }
+
+            foreach ($section in $this.word_document.Sections)
+            {
+                $section.PageSetup.Orientation = $wd
+            }
+
+            Write-Host "ページ向きを設定しました: $orientation"
+        }
+        catch
+        {
+            $global:Common.HandleError("4017", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            throw "ページ向きの設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ========================================
     # ファイル操作関連
     # ========================================
@@ -395,15 +521,23 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
+            # 保存先パスの決定と更新
             if ([string]::IsNullOrEmpty($file_path))
             {
-                $this.file_path = $this.file_path
+                if ([string]::IsNullOrEmpty($this.file_path))
+                {
+                    throw "保存先のファイルパスが指定されていません。"
+                }
+            }
+            else
+            {
+                $this.file_path = $file_path
             }
 
-            $this.word_document.SaveAs($file_path)
+            $this.word_document.SaveAs($this.file_path)
             $this.is_saved = $true
             
-            Write-Host "ドキュメントを保存しました: $file_path"
+            Write-Host "ドキュメントを保存しました: $($this.file_path)"
         }
         catch
         {
