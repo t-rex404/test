@@ -322,7 +322,7 @@ class WordDriver
                     try
                     {
                         # ページ番号フィールドを挿入
-                        $pageField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage, $null, $true)
+                        $pageField = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage, $null, $true)
                         $pageField.Update()
                         $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
                         Write-Host "Test004"
@@ -333,7 +333,7 @@ class WordDriver
                         Write-Host "Test005"
                         
                         # 総ページ数フィールドを挿入
-                        $numPagesField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages, $null, $true)
+                        $numPagesField = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages, $null, $true)
                         $numPagesField.Update()
                         $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
                         Write-Host "Test006"                        
