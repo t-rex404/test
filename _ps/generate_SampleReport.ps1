@@ -14,6 +14,9 @@ $LibDir    = Join-Path $ScriptDir '_lib'
 . (Join-Path $LibDir 'Common.ps1')
 . (Join-Path $LibDir 'WordDriver.ps1')
 
+# Commonクラスのインスタンスをグローバル変数として作成
+$global:Common = [Common]::new()
+
 # 出力ディレクトリ
 $OutDir = Join-Path $RepoRoot '_out'
 if (-not (Test-Path $OutDir)) { New-Item -ItemType Directory -Path $OutDir -Force | Out-Null }
@@ -34,13 +37,17 @@ if (-not (Test-Path $ImgPath)) {
 	}
 }
 
-$reportPath = Join-Path $OutDir 'sample_report.docx'
+$documentName = 'sample_report_' + (Get-Date -Format 'yyyyMMdd_HHmmss') + '.docx'
+$reportPath = Join-Path $OutDir $documentName 
 
 $driver = $null
 try {
+	Write-Host "WordDriverの初期化を開始します..." -ForegroundColor Cyan
 	$driver = [WordDriver]::new()
+	Write-Host "WordDriverの初期化が完了しました" -ForegroundColor Green
 
 	# 表紙
+	Write-Host "表紙を作成中..." -ForegroundColor Cyan
 	$driver.SetFont('Calibri', 12)
 	$driver.AddHeading('AIレポート（サンプル）', 1)
 	$driver.AddParagraph("作成日: $(Get-Date -Format 'yyyy/MM/dd')")
@@ -48,12 +55,14 @@ try {
 	$driver.AddPageBreak()
 
 	# 目次
+	Write-Host "目次を作成中..." -ForegroundColor Cyan
 	$driver.AddHeading('目次', 2)
 	$driver.AddTableOfContents()
 	$driver.UpdateTableOfContents()
 	$driver.AddPageBreak()
 
 	# セクション1: 概要
+	Write-Host "セクション1（概要）を作成中..." -ForegroundColor Cyan
 	$driver.AddHeading('1. 概要', 2)
 	$introText = '本ドキュメントはWordDriverクラスを用いた疑似的な報告書のサンプルです。' +
 		' 機能デモとして、見出し・段落・表・画像・ページ区切り・目次等を自動生成します。'
@@ -61,8 +70,10 @@ try {
 	for ($i = 1; $i -le 8; $i++) {
 		$driver.AddText("ダミーテキスト段落 ${i}: この段落はレイアウト確認用のサンプルテキストです。ページ数を確保するために複数回追加しています。")
 	}
-
+	$driver.AddPageBreak()
+	
 	# セクション2: 基本指標（表）
+	Write-Host "セクション2（基本指標）を作成中..." -ForegroundColor Cyan
 	$driver.AddHeading('2. 基本指標', 2)
 	$rows = 5; $cols = 3
 	$data = New-Object 'object[,]' $rows, $cols
@@ -74,28 +85,51 @@ try {
 	$driver.AddTable($data, '基本指標（サマリ）')
 
 	# セクション3: 画像
+	Write-Host "セクション3（画像）を作成中..." -ForegroundColor Cyan
 	$driver.AddHeading('3. 画像', 2)
 	if (Test-Path $ImgPath) {
 		$driver.AddImage($ImgPath)
 	}
 
 	# セクション4: 追加テキストでページ数を稼ぐ
+	Write-Host "セクション4（詳細）を作成中..." -ForegroundColor Cyan
 	$driver.AddHeading('4. 詳細', 2)
 	for ($i = 1; $i -le 12; $i++) {
 		$driver.AddParagraph("詳細テキスト ${i}: これは詳細節のサンプル段落です。複数ページにわたることを想定しています。")
 	}
 
 	# 目次の最終更新（ページ数確定後）
+	Write-Host "目次を更新中..." -ForegroundColor Cyan
 	$driver.UpdateTableOfContents()
+	#$driver.SetupFooterWithPageNumbers()
+
 
 	# 保存
+	Write-Host "ドキュメントを保存中..." -ForegroundColor Cyan
 	$driver.SaveDocument($reportPath)
 
 	Write-Host "疑似報告書を作成しました: $reportPath" -ForegroundColor Green
 }
+catch {
+	Write-Host "エラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+	Write-Host "スタックトレース: $($_.ScriptStackTrace)" -ForegroundColor Red
+	
+	# Commonオブジェクトが利用可能な場合はエラーログに記録
+	if ($global:Common) {
+		try {
+			$global:Common.HandleError("9999", "サンプルレポート生成エラー: $($_.Exception.Message)", "generate_SampleReport", ".\SampleReport_Error.log")
+		} catch {
+			Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+		}
+	}
+	
+	throw
+}
 finally {
 	if ($driver) {
+		Write-Host "WordDriverのリソースを解放中..." -ForegroundColor Cyan
 		$driver.Dispose()
+		Write-Host "リソース解放が完了しました" -ForegroundColor Green
 	}
 }
 

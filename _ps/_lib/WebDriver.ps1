@@ -24,8 +24,27 @@ class WebDriver
         }
         catch
         {
+            # 初期化に失敗した場合のクリーンアップ
+            Write-Host "WebDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
+            $this.CleanupOnInitializationFailure()
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
             # 初期化・接続関連エラー (1001)
-            $global:Common.HandleError("1001", "WebDriver初期化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1001", "WebDriver初期化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "WebDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "WebDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -101,8 +120,24 @@ class WebDriver
         }
         catch
         {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
             # 初期化・接続関連エラー (1002)
-            $global:Common.HandleError("1002", "ブラウザ起動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1002", "ブラウザ起動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ブラウザの起動に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "ブラウザの起動に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -202,7 +237,21 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1003)
-            $global:Common.HandleError("1003", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1003", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "タブ情報の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "タブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -291,7 +340,21 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1004)
-            $global:Common.HandleError("1004", "WebSocket接続エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1004", "WebSocket接続エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "WebSocket接続エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "WebSocket接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -337,7 +400,21 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1005)
-            $global:Common.HandleError("1005", "WebSocket メッセージ送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1005", "WebSocket メッセージ送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "WebSocket メッセージ送信エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "WebSocketメッセージ送信に失敗しました: $($_.Exception.Message)"
         }
         finally
@@ -459,7 +536,21 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1006)
-            $global:Common.HandleError("1006", "WebSocket メッセージ受信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1006", "WebSocket メッセージ受信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "WebSocket メッセージ受信エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "WebSocketメッセージの受信に失敗しました: $($_.Exception.Message)"
         }
         return $response_json
@@ -589,7 +680,21 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1011)
-            $global:Common.HandleError("1011", "ページ遷移エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1011", "ページ遷移エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ページ遷移エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ページ遷移に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -644,7 +749,21 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1016)
-            $global:Common.HandleError("1016", "広告読み込み待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1016", "広告読み込み待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "広告読み込み待機エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "広告の読み込み待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -677,7 +796,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1077)
-            $global:Common.HandleError("1077", "ウィンドウを閉じるエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1077", "ウィンドウを閉じるエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウを閉じるエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             Write-Host "ウィンドウを閉じる際にエラーが発生しました: $($_.Exception.Message)"
         }
     }
@@ -747,7 +880,21 @@ class WebDriver
         catch
         {
             # 初期化・接続関連エラー (1007)
-            $global:Common.HandleError("1007", "Disposeエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1007", "Disposeエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Disposeエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             Write-Host "リソースの解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
@@ -780,7 +927,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1081)
-            $global:Common.HandleError("1081", "ターゲット発見エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1081", "ターゲット発見エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ターゲット発見エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ターゲットの発見に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -810,7 +971,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1082)
-            $global:Common.HandleError("1082", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1082", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "タブ情報取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "利用可能なタブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -841,7 +1016,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1083)
-            $global:Common.HandleError("1083", "タブアクティブ化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1083", "タブアクティブ化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "タブアクティブ化エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "タブのアクティブ化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -872,7 +1061,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1084)
-            $global:Common.HandleError("1084", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1084", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "タブ切断エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "タブの切断に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -911,7 +1114,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1086)
-            $global:Common.HandleError("1086", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1086", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ターゲットへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -931,7 +1148,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1086)
-            $global:Common.HandleError("1086", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1086", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "現在タブへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -962,7 +1193,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1087)
-            $global:Common.HandleError("1087", "セッションデタッチエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1087", "セッションデタッチエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セッションデタッチエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "セッションのデタッチに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -988,7 +1233,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1085)
-            $global:Common.HandleError("1085", "ページイベント有効化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1085", "ページイベント有効化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ページイベント有効化エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ページイベントの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1032,7 +1291,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1021)
-            $global:Common.HandleError("1021", "要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1021", "要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素検索エラー (CSS): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "CSSセレクタでの要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1072,7 +1345,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1028)
-            $global:Common.HandleError("1028", "複数要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1028", "複数要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数要素検索エラー (CSS): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "CSSセレクタでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1112,7 +1399,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1022)
-            $global:Common.HandleError("1022", "要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1022", "要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素検索エラー ($query_type): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "$query_type による要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1152,7 +1453,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1029)
-            $global:Common.HandleError("1029", "複数要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1029", "複数要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数要素検索エラー ($query_type): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "$query_type による複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1184,7 +1499,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1023)
-            $global:Common.HandleError("1023", "XPath単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1023", "XPath単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "XPath単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "XPathでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1215,7 +1544,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1024)
-            $global:Common.HandleError("1024", "ClassName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1024", "ClassName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ClassName単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ClassNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1246,7 +1589,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1025)
-            $global:Common.HandleError("1025", "Name単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1025", "Name単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Name単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "Nameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1272,7 +1629,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1026)
-            $global:Common.HandleError("1026", "Id単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1026", "Id単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Id単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "Idでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1303,7 +1674,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1027)
-            $global:Common.HandleError("1027", "TagName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1027", "TagName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "TagName単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "TagNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1347,7 +1732,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1030)
-            $global:Common.HandleError("1030", "複数要素検索エラー (ClassName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1030", "複数要素検索エラー (ClassName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数要素検索エラー (ClassName): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ClassNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1387,7 +1786,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1031)
-            $global:Common.HandleError("1031", "複数要素検索エラー (Name): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1031", "複数要素検索エラー (Name): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数要素検索エラー (Name): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "Nameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1427,7 +1840,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1032)
-            $global:Common.HandleError("1032", "複数要素検索エラー (TagName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1032", "複数要素検索エラー (TagName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数要素検索エラー (TagName): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "TagNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1467,7 +1894,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1033)
-            $global:Common.HandleError("1033", "要素存在確認エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1033", "要素存在確認エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素存在確認エラー ($query_type): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "$query_type による要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1488,7 +1929,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1034)
-            $global:Common.HandleError("1034", "XPath要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1034", "XPath要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "XPath要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "XPathでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1514,7 +1969,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1035)
-            $global:Common.HandleError("1035", "ClassName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1035", "ClassName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ClassName要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ClassNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1535,7 +2004,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1036)
-            $global:Common.HandleError("1036", "Id要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1036", "Id要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Id要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "Idでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1561,7 +2044,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1037)
-            $global:Common.HandleError("1037", "Name要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1037", "Name要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Name要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "Nameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1587,7 +2084,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1038)
-            $global:Common.HandleError("1038", "TagName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1038", "TagName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "TagName要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "TagNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1624,7 +2135,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1051)
-            $global:Common.HandleError("1051", "要素テキスト取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1051", "要素テキスト取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素テキスト取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のテキスト取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1655,7 +2180,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1052)
-            $global:Common.HandleError("1052", "要素テキスト設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1052", "要素テキスト設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素テキスト設定エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素へのテキスト入力に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1686,7 +2225,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1054)
-            $global:Common.HandleError("1054", "要素クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1054", "要素クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素クリックエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のクリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1724,7 +2277,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1060)
-            $global:Common.HandleError("1060", "要素属性取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1060", "要素属性取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素属性取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素の属性取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1760,7 +2327,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1061)
-            $global:Common.HandleError("1061", "要素属性設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1061", "要素属性設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素属性設定エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素の属性設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1794,7 +2375,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1064)
-            $global:Common.HandleError("1064", "href取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1064", "href取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "href取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "hrefの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1832,7 +2427,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1062)
-            $global:Common.HandleError("1062", "CSSプロパティ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1062", "CSSプロパティ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CSSプロパティ取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のCSSプロパティ取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1868,7 +2477,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1063)
-            $global:Common.HandleError("1063", "CSSプロパティ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1063", "CSSプロパティ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CSSプロパティ設定エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のCSSプロパティ設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1908,7 +2531,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1065)
-            $global:Common.HandleError("1065", "オプション選択エラー (インデックス): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1065", "オプション選択エラー (インデックス): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "オプション選択エラー (インデックス): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "インデックスによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1944,7 +2581,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1066)
-            $global:Common.HandleError("1066", "オプション選択エラー (テキスト): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1066", "オプション選択エラー (テキスト): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "オプション選択エラー (テキスト): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "テキストによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1975,7 +2626,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1067)
-            $global:Common.HandleError("1067", "オプション未選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1067", "オプション未選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "オプション未選択エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "オプションの未選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2006,7 +2671,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1053)
-            $global:Common.HandleError("1053", "要素クリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1053", "要素クリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素クリアエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のクリアに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2046,7 +2725,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1071)
-            $global:Common.HandleError("1071", "ウィンドウリサイズエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1071", "ウィンドウリサイズエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウリサイズエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウのリサイズに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2077,7 +2770,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1072)
-            $global:Common.HandleError("1072", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1072", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウの通常状態への変更に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2108,7 +2815,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1073)
-            $global:Common.HandleError("1073", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1073", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウの最大化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2139,7 +2860,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1074)
-            $global:Common.HandleError("1074", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1074", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウの最小化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2170,7 +2905,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1075)
-            $global:Common.HandleError("1075", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1075", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウのフルスクリーン化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2201,7 +2950,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1076)
-            $global:Common.HandleError("1076", "ウィンドウ移動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1076", "ウィンドウ移動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウ移動エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウの移動に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2238,7 +3001,21 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1012)
-            $global:Common.HandleError("1012", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1012", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ブラウザの履歴を戻る操作に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2271,7 +3048,21 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1013)
-            $global:Common.HandleError("1013", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1013", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ブラウザの履歴を進む操作に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2297,7 +3088,21 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1014)
-            $global:Common.HandleError("1014", "ブラウザ更新エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1014", "ブラウザ更新エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ブラウザ更新エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ブラウザの更新に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2340,7 +3145,21 @@ class WebDriver
         catch
         {
             # 情報取得関連エラー (1091)
-            $global:Common.HandleError("1091", "URL取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1091", "URL取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "URL取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "URLの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2379,7 +3198,21 @@ class WebDriver
         catch
         {
             # 情報取得関連エラー (1092)
-            $global:Common.HandleError("1092", "タイトル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1092", "タイトル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "タイトル取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "タイトルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2407,7 +3240,21 @@ class WebDriver
         catch
         {
             # 情報取得関連エラー (1093)
-            $global:Common.HandleError("1093", "ソースコード取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1093", "ソースコード取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ソースコード取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ソースコードの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2443,7 +3290,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1078)
-            $global:Common.HandleError("1078", "ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1078", "ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウハンドル取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2480,7 +3341,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1079)
-            $global:Common.HandleError("1079", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1079", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "複数のウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2511,7 +3386,21 @@ class WebDriver
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1080)
-            $global:Common.HandleError("1080", "ウィンドウサイズ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1080", "ウィンドウサイズ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ウィンドウサイズ取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ウィンドウサイズの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2622,7 +3511,21 @@ class WebDriver
         catch
         {
             # スクリーンショット関連エラー (1101)
-            $global:Common.HandleError("1101", "スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1101", "スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "スクリーンショットの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2719,7 +3622,21 @@ class WebDriver
         catch
         {
             # スクリーンショット関連エラー (1102)
-            $global:Common.HandleError("1102", "要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1102", "要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
 
@@ -2813,7 +3730,21 @@ class WebDriver
         catch
         {
             # スクリーンショット関連エラー (1103)
-            $global:Common.HandleError("1103", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1103", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "複数要素スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "複数要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2870,7 +3801,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1039)
-            $global:Common.HandleError("1039", "要素表示待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1039", "要素表示待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素表示待機エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素の表示待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2933,7 +3878,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1040)
-            $global:Common.HandleError("1040", "要素クリック可能性待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1040", "要素クリック可能性待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "要素クリック可能性待機エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "要素のクリック可能性待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2981,7 +3940,21 @@ class WebDriver
         catch
         {
             # ナビゲーション関連エラー (1015)
-            $global:Common.HandleError("1015", "ページロード待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1015", "ページロード待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ページロード待機エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ページロードの待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3034,7 +4007,21 @@ class WebDriver
         catch
         {
             # 要素検索関連エラー (1041)
-            $global:Common.HandleError("1041", "カスタム条件待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1041", "カスタム条件待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "カスタム条件待機エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "カスタム条件の待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3074,7 +4061,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1058)
-            $global:Common.HandleError("1058", "キーボード入力エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1058", "キーボード入力エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "キーボード入力エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "キーボード入力に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3145,7 +4146,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1059)
-            $global:Common.HandleError("1059", "特殊キー送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1059", "特殊キー送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "特殊キー送信エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "特殊キーの送信に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3180,7 +4195,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1057)
-            $global:Common.HandleError("1057", "マウスホバーエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1057", "マウスホバーエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "マウスホバーエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "マウスホバーに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3211,7 +4240,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1055)
-            $global:Common.HandleError("1055", "ダブルクリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1055", "ダブルクリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ダブルクリックエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ダブルクリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3242,7 +4285,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1056)
-            $global:Common.HandleError("1056", "右クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1056", "右クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "右クリックエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "右クリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3277,7 +4334,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1068)
-            $global:Common.HandleError("1068", "チェックボックス設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1068", "チェックボックス設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "チェックボックス設定エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "チェックボックスの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3308,7 +4379,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1069)
-            $global:Common.HandleError("1069", "ラジオボタン選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1069", "ラジオボタン選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ラジオボタン選択エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ラジオボタンの選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3368,7 +4453,21 @@ class WebDriver
         catch
         {
             # 要素操作関連エラー (1070)
-            $global:Common.HandleError("1070", "ファイルアップロードエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1070", "ファイルアップロードエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ファイルアップロードエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ファイルアップロードに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3405,7 +4504,21 @@ class WebDriver
         catch
         {
             # JavaScript実行関連エラー (1111)
-            $global:Common.HandleError("1111", "JavaScript実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1111", "JavaScript実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "JavaScript実行エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "JavaScriptの実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3436,7 +4549,21 @@ class WebDriver
         catch
         {
             # JavaScript実行関連エラー (1112)
-            $global:Common.HandleError("1112", "JavaScript非同期実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1112", "JavaScript非同期実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "JavaScript非同期実行エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "JavaScriptの非同期実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3473,7 +4600,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1121)
-            $global:Common.HandleError("1121", "クッキー取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1121", "クッキー取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "クッキー取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "クッキーの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3512,7 +4653,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1122)
-            $global:Common.HandleError("1122", "クッキー設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1122", "クッキー設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "クッキー設定エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "クッキーの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3543,7 +4698,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1123)
-            $global:Common.HandleError("1123", "クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1123", "クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "クッキー削除エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3569,7 +4738,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1124)
-            $global:Common.HandleError("1124", "全クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1124", "全クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "全クッキー削除エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "全クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3606,7 +4789,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1125)
-            $global:Common.HandleError("1125", "ローカルストレージ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1125", "ローカルストレージ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ローカルストレージ取得エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ローカルストレージの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3637,7 +4834,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1126)
-            $global:Common.HandleError("1126", "ローカルストレージ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1126", "ローカルストレージ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ローカルストレージ設定エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ローカルストレージの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3668,7 +4879,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1127)
-            $global:Common.HandleError("1127", "ローカルストレージ削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1127", "ローカルストレージ削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ローカルストレージ削除エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ローカルストレージの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3694,7 +4919,21 @@ class WebDriver
         catch
         {
             # ストレージ操作関連エラー (1128)
-            $global:Common.HandleError("1128", "ローカルストレージクリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("1128", "ローカルストレージクリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ローカルストレージクリアエラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
             throw "ローカルストレージのクリアに失敗しました: $($_.Exception.Message)"
         }
     }

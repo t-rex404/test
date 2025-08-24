@@ -41,8 +41,27 @@ class PowerPointDriver
         }
         catch
         {
+            # 初期化失敗時のクリーンアップ
+            Write-Host "PowerPointDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("6001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "PowerPointDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "PowerPointDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -65,7 +84,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -83,7 +118,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6003", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6003", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "PowerPointアプリケーションの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "PowerPointアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -102,7 +153,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6004", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6004", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "新規プレゼンテーションの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "新規プレゼンテーションの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -127,7 +194,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6005", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6005", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "スライドの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "スライドの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -152,7 +235,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6006", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6006", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "スライドの選択に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "スライドの選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -181,7 +280,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6007", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6007", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "タイトルの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "タイトルの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -207,7 +322,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6008", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6008", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "テキストボックスの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "テキストボックスの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -233,7 +364,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6009", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6009", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "テキストの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "テキストの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -257,7 +404,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6010", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6010", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "図形の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "図形の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -287,7 +450,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6011", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6011", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "画像の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "画像の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -325,7 +504,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6012", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6012", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "フォントの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "フォントの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -345,7 +540,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6013", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6013", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "背景色の設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "背景色の設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -375,7 +586,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6014", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6014", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "プレゼンテーションの保存に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "プレゼンテーションの保存に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -407,7 +634,23 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6015", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6015", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "プレゼンテーションを開くのに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "プレゼンテーションを開くのに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -444,7 +687,24 @@ class PowerPointDriver
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6016", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 
@@ -482,8 +742,24 @@ class PowerPointDriver
         }
         catch
         {
-            $global:Common.HandleError("6016", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
-            Write-Host "リソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("6016", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "リソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "リソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 } 

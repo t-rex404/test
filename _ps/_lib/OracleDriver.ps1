@@ -36,7 +36,27 @@ class OracleDriver
         }
         catch
         {
-            $global:Common.HandleError("7001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # 初期化に失敗した場合のクリーンアップ
+            Write-Host "OracleDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
+            $this.CleanupOnInitializationFailure()
+
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "OracleDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "OracleDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -51,7 +71,23 @@ class OracleDriver
         }
         catch
         {
-            $global:Common.HandleError("7002", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7002", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SQLPLUSパスの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "SQLPLUSパスの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -77,7 +113,23 @@ class OracleDriver
         }
         catch
         {
-            $global:Common.HandleError("7010", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7010", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "接続パラメータの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "接続パラメータの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -138,7 +190,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7020", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7020", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -191,7 +259,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7021", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7021", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -240,7 +324,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7022", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7022", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SQLPLUSでのSQL実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "SQLPLUSでのSQL実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -270,7 +370,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7011", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7011", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "データベースへの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "データベースへの接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -295,7 +411,23 @@ class OracleDriver
         }
         catch
         {
-            $global:Common.HandleError("7012", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7012", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "接続の切断に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "接続の切断に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -332,7 +464,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7100", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7100", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SELECT文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "SELECT文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -363,7 +511,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7110", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7110", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "INSERT文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "INSERT文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -394,7 +558,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7120", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7120", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "UPDATE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "UPDATE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -425,7 +605,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7130", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7130", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "DELETE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "DELETE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -456,7 +652,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7140", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7140", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "MERGE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "MERGE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -483,7 +695,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7200", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7200", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CREATE TABLE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "CREATE TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -506,7 +734,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7201", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7201", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ALTER TABLE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ALTER TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -530,7 +774,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7202", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7202", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "DROP TABLE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "DROP TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -553,7 +813,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7210", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7210", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CREATE INDEX文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "CREATE INDEX文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -576,7 +852,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7220", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7220", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CREATE VIEW文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "CREATE VIEW文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -599,7 +891,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7230", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7230", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CREATE SEQUENCE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "CREATE SEQUENCE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -626,7 +934,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7300", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7300", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "GRANT文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "GRANT文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -649,7 +973,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7301", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7301", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "REVOKE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "REVOKE文の実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -682,7 +1022,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7400", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7400", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "トランザクションの開始に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "トランザクションの開始に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -707,7 +1063,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7401", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7401", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "トランザクションのコミットに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "トランザクションのコミットに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -732,7 +1104,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7402", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7402", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "トランザクションのロールバックに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "トランザクションのロールバックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -756,7 +1144,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7410", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7410", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SAVEPOINTの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "SAVEPOINTの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -780,7 +1184,23 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7411", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7411", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SAVEPOINTへのロールバックに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "SAVEPOINTへのロールバックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -815,7 +1235,23 @@ ORDER BY TABLE_NAME
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7500", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7500", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "テーブル一覧の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "テーブル一覧の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -847,7 +1283,23 @@ ORDER BY COLUMN_ID
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            $global:Common.HandleError("7501", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7501", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "テーブル構造の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "テーブル構造の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -879,7 +1331,24 @@ ORDER BY COLUMN_ID
         }
         catch
         {
-            Write-Host "OracleDriverの破棄中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("7600", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "OracleDriverの破棄中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "OracleDriverの破棄中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 }

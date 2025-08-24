@@ -225,6 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ツールチップ初期化
     initTooltips();
     
+    // リンクデバッグ用のコードを追加
+    initLinkDebug();
+    
     // パーティクル効果（オプション）
     // initParticles();
 });
@@ -298,6 +301,39 @@ function initTooltips() {
                     tooltip.remove();
                 }, 300);
             }, { once: true });
+        });
+    });
+}
+
+// リンクデバッグ用の初期化
+function initLinkDebug() {
+    // 全てのリンクにクリックイベントリスナーを追加
+    const allLinks = document.querySelectorAll('a[href]');
+    console.log(`Found ${allLinks.length} links on the page`);
+    
+    allLinks.forEach((link, index) => {
+        console.log(`Link ${index + 1}:`, link.href, link.textContent);
+        
+        link.addEventListener('click', (e) => {
+            console.log(`Link clicked:`, link.href, link.textContent);
+            
+            // 外部リンクやハッシュリンクでない場合は、リンクの動作を確認
+            if (!link.href.startsWith('http') && !link.href.startsWith('#')) {
+                console.log(`Internal link clicked:`, link.href);
+                
+                // リンク先のファイルが存在するかを確認
+                fetch(link.href)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`Link target exists:`, link.href);
+                        } else {
+                            console.error(`Link target not found:`, link.href, response.status);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error checking link target:`, link.href, error);
+                    });
+            }
         });
     });
 }

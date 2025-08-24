@@ -46,8 +46,26 @@ class WordDriver
         }
         catch
         {
+            Write-Host "WordDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("4001", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4001", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "WordDriver初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "WordDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -70,7 +88,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "一時ディレクトリ作成エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -80,15 +114,122 @@ class WordDriver
     {
         try
         {
+            Write-Host "Wordアプリケーションの初期化を開始します..." -ForegroundColor Cyan
+            
             $this.word_app = New-Object -ComObject Word.Application
+            Write-Host "Wordアプリケーションオブジェクトを作成しました" -ForegroundColor Green
+            
             $this.word_app.Visible = $false
             $this.word_app.DisplayAlerts = $false
+            $this.word_app.ScreenUpdating = $false
+            Write-Host "基本設定を適用しました" -ForegroundColor Green
             
-            Write-Host "Wordアプリケーションを初期化しました。"
+            # 応答性を向上させる設定（安全に実行）
+            try
+            {
+                Write-Host "応答性向上設定を適用中..." -ForegroundColor Cyan
+                
+                # 各オプションを個別に設定（エラーが発生しても続行）
+                if ($this.word_app.Options -ne $null)
+                {
+                    # 基本的な設定（ほとんどのバージョンで利用可能）
+                    try { $this.word_app.Options.CheckGrammarAsYouType = $false } catch { Write-Host "文法チェック設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    try { $this.word_app.Options.CheckSpellingAsYouType = $false } catch { Write-Host "スペルチェック設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    
+                    # 自動フォーマット関連の設定（バージョンによって利用できない場合がある）
+                    try { 
+                        if ($this.word_app.Options.PSObject.Properties.Name -contains 'AutoFormatAsYouTypeApplyFormatting') {
+                            $this.word_app.Options.AutoFormatAsYouTypeApplyFormatting = $false
+                            Write-Host "自動フォーマット設定を無効化しました" -ForegroundColor Green
+                        } else {
+                            Write-Host "自動フォーマット設定はこのバージョンでは利用できません" -ForegroundColor Yellow
+                        }
+                    } catch { Write-Host "自動フォーマット設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    
+                    try { 
+                        if ($this.word_app.Options.PSObject.Properties.Name -contains 'AutoFormatAsYouTypeApplyHeadings') {
+                            $this.word_app.Options.AutoFormatAsYouTypeApplyHeadings = $false
+                            Write-Host "自動見出し設定を無効化しました" -ForegroundColor Green
+                        } else {
+                            Write-Host "自動見出し設定はこのバージョンでは利用できません" -ForegroundColor Yellow
+                        }
+                    } catch { Write-Host "自動見出し設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    
+                    try { 
+                        if ($this.word_app.Options.PSObject.Properties.Name -contains 'AutoFormatAsYouTypeApplyBullets') {
+                            $this.word_app.Options.AutoFormatAsYouTypeApplyBullets = $false
+                            Write-Host "自動箇条書き設定を無効化しました" -ForegroundColor Green
+                        } else {
+                            Write-Host "自動箇条書き設定はこのバージョンでは利用できません" -ForegroundColor Yellow
+                        }
+                    } catch { Write-Host "自動箇条書き設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    
+                    try { 
+                        if ($this.word_app.Options.PSObject.Properties.Name -contains 'AutoFormatAsYouTypeApplyNumbering') {
+                            $this.word_app.Options.AutoFormatAsYouTypeApplyNumbering = $false
+                            Write-Host "自動番号設定を無効化しました" -ForegroundColor Green
+                        } else {
+                            Write-Host "自動番号設定はこのバージョンでは利用できません" -ForegroundColor Yellow
+                        }
+                    } catch { Write-Host "自動番号設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    
+                    # その他の応答性向上設定
+                    try { 
+                        if ($this.word_app.Options.PSObject.Properties.Name -contains 'ConfirmConversions') {
+                            $this.word_app.Options.ConfirmConversions = $false
+                            Write-Host "変換確認設定を無効化しました" -ForegroundColor Green
+                        }
+                    } catch { Write-Host "変換確認設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                    
+                    try { 
+                        if ($this.word_app.Options.PSObject.Properties.Name -contains 'UpdateLinksAtOpen') {
+                            $this.word_app.Options.UpdateLinksAtOpen = $false
+                            Write-Host "リンク更新設定を無効化しました" -ForegroundColor Green
+                        }
+                    } catch { Write-Host "リンク更新設定でエラー: $($_.Exception.Message)" -ForegroundColor Yellow }
+                }
+                else
+                {
+                    Write-Host "Wordアプリケーションのオプションが利用できません。基本設定のみで続行します。" -ForegroundColor Yellow
+                }
+                
+                Write-Host "応答性向上設定が完了しました" -ForegroundColor Green
+            }
+            catch
+            {
+                Write-Host "応答性向上設定でエラーが発生しましたが、基本機能は継続します: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+            
+            # 初期化完了を確認
+            Write-Host "初期化完了を確認中..." -ForegroundColor Cyan
+            Start-Sleep -Milliseconds 500
+            
+            # アプリケーションの状態を確認
+            if ($this.word_app -eq $null)
+            {
+                throw "Wordアプリケーションオブジェクトが作成されていません"
+            }
+            
+            Write-Host "Wordアプリケーションの初期化が完了しました。" -ForegroundColor Green
         }
         catch
         {
-            $global:Common.HandleError("4003", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            Write-Host "Wordアプリケーション初期化で致命的なエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try {
+                    $global:Common.HandleError("4003", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                } catch {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Wordアプリケーション初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "Wordアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -101,12 +242,28 @@ class WordDriver
             $this.word_document = $this.word_app.Documents.Add()
             $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
             $this.file_path = Join-Path $this.temp_directory "Document_$timestamp.docx"
-            
+            #$this.word_document.SaveAs([ref]$this.file_path)
             Write-Host "新規ドキュメントを作成しました。"
         }
         catch
         {
-            $global:Common.HandleError("4004", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4004", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "新規ドキュメント作成エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "新規ドキュメントの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -116,50 +273,212 @@ class WordDriver
     {
         try
         {
-            # 各セクションのフッターを設定
-            foreach ($section in $this.word_document.Sections)
+            Write-Host "フッターのページ番号設定を開始します..." -ForegroundColor Cyan
+            
+            # ドキュメントの状態を確認
+            if ($this.word_document -eq $null)
             {
-                # フッターを取得
-                $footer = $section.Footers.Item([Microsoft.Office.Interop.Word.WdHeaderFooterIndex]::wdHeaderFooterPrimary)
-                
-                # フッターの内容をクリア
-                $footer.Range.Text = ""
-                
-                # 中央揃えでページ番号を挿入
-                $footer.Range.ParagraphFormat.Alignment = [Microsoft.Office.Interop.Word.WdParagraphAlignment]::wdAlignParagraphCenter
-                
-                # 現在のページ番号フィールドを挿入
-                $pageField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage)
-                $pageField.Update()
-                
-                # " / " を挿入
-                $footer.Range.InsertAfter(" / ")
-                
-                # 総ページ数フィールドを挿入
-                $numPagesField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages)
-                $numPagesField.Update()
-                
-                # フィールドを更新
-                $footer.Range.Fields.Update()
-                
-                # 段落の後に改行を追加
-                $footer.Range.InsertParagraphAfter()
+                throw "Wordドキュメントが存在しません。"
+            }
+            
+            # セクション数を確認
+            $sectionCount = $this.word_document.Sections.Count
+            Write-Host "セクション数: $sectionCount" -ForegroundColor Yellow
+            
+            # 各セクションのフッターを設定
+            for ($i = 1; $i -le $sectionCount; $i++)
+            {
+                try
+                {
+                    Write-Host "セクション $i のフッターを設定中..." -ForegroundColor Yellow
+                    
+                    # セクションを安全に取得
+                    $section = $this.word_document.Sections.Item($i)
+                    if ($section -eq $null)
+                    {
+                        Write-Host "セクション $i の取得に失敗しました。スキップします。" -ForegroundColor Yellow
+                        continue
+                    }
+                    Write-Host "Test001"
+                    
+                    # フッターを安全に取得
+                    $footer = $section.Footers.Item([Microsoft.Office.Interop.Word.WdHeaderFooterIndex]::wdHeaderFooterPrimary)
+                    if ($footer -eq $null)
+                    {
+                        Write-Host "セクション $i のフッター取得に失敗しました。スキップします。" -ForegroundColor Yellow
+                        continue
+                    }
+                    Write-Host "Test002"
+
+                    # フッターの内容をクリア
+                    $footer.Range.Text = ""
+                    Write-Host "Test003"
+
+                    # フッターの最後に移動
+                    $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                    Write-Host "Test003"
+                    
+                    # Wordのクイックパーツ機能を使用してページ番号を挿入
+                    try
+                    {
+                        # ページ番号フィールドを挿入
+                        $pageField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage, $null, $true)
+                        $pageField.Update()
+                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        Write-Host "Test004"
+                        
+                        # " / " を挿入
+                        $footer.Range.InsertAfter(" / ")
+                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        Write-Host "Test005"
+                        
+                        # 総ページ数フィールドを挿入
+                        $numPagesField = $footer.Range.Fields.Add($footer.Range, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages, $null, $true)
+                        $numPagesField.Update()
+                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        Write-Host "Test006"                        
+
+                        # フッター内のフィールドを更新
+                        $footer.Range.Fields.Update()
+                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        Write-Host "Test007"
+
+                        ## フィールドを更新
+                        #$pageField.Update()
+                        #$numPagesField.Update()
+                        #$footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        #Write-Host "Test008"
+                        
+
+                    }
+                    catch
+                    {
+                        Write-Host "クイックパーツ機能でのページ番号挿入でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                        
+                        # フォールバック: フィールドコードを直接挿入
+                        Write-Host "フォールバック方法でページ番号を挿入します..." -ForegroundColor Yellow
+                        $footer.Range.InsertAfter("PAGE / NUMPAGES")
+                        $footer.Range.Fields.Update()
+
+                        Write-Host "Test009"
+                        Write-Host "Test010"
+                    }
+
+                    # 中央揃えでページ番号を挿入
+                    $footer.Range.ParagraphFormat.Alignment = [Microsoft.Office.Interop.Word.WdParagraphAlignment]::wdAlignParagraphCenter
+                    Write-Host "Test011"
+                    
+                    # フィールドの表示を確実にするための処理
+                    try
+                    {
+                        if ($footer.Range.Fields.Count -gt 0)
+                        {
+                            Write-Host "フィールド数: $($footer.Range.Fields.Count)" -ForegroundColor Cyan
+                            # 各フィールドを個別に更新
+                            foreach ($field in $footer.Range.Fields)
+                            {
+                                if ($field -ne $null)
+                                {
+                                    $field.Update()
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Write-Host "フィールドが挿入されていません。" -ForegroundColor Yellow
+                        }
+                    }
+                    catch
+                    {
+                        Write-Host "フィールドの更新でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                    }
+                    
+                    Write-Host "Test012"
+                    Write-Host "セクション $i のフッター設定完了" -ForegroundColor Green
+                }
+                catch
+                {
+                    Write-Host "セクション $i のフッター設定でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                    continue
+                }
             }
             
             # ドキュメント全体のフィールドを更新
+            Write-Host "ドキュメント全体のフィールドを更新中..." -ForegroundColor Cyan
             $this.word_document.Fields.Update()
             
             # ドキュメントを再計算
+            Write-Host "ドキュメントを再計算中..." -ForegroundColor Cyan
             $this.word_document.Repaginate()
             
             # フィールドの表示を確実にするために少し待機
-            Start-Sleep -Milliseconds 100
+            Start-Sleep -Milliseconds 500
             
-            Write-Host "フッターにページ番号を設定しました（中央揃え）。"
+            # 再度フィールドを更新（確実性のため）
+            $this.word_document.Fields.Update()
+            
+            # フィールドの表示を確実にするための追加設定
+            try
+            {
+                # 各セクションのフッター内のフィールドを個別に更新
+                for ($i = 1; $i -le $sectionCount; $i++)
+                {
+                    try
+                    {
+                        $section = $this.word_document.Sections.Item($i)
+                        if ($section -ne $null)
+                        {
+                            $footer = $section.Footers.Item([Microsoft.Office.Interop.Word.WdHeaderFooterIndex]::wdHeaderFooterPrimary)
+                            if ($footer -ne $null -and $footer.Range.Fields.Count -gt 0)
+                            {
+                                foreach ($field in $footer.Range.Fields)
+                                {
+                                    if ($field -ne $null)
+                                    {
+                                        $field.Update()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        Write-Host "セクション $i のフィールド更新でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                    }
+                }
+                
+                Write-Host "フィールドの個別更新が完了しました。" -ForegroundColor Green
+            }
+            catch
+            {
+                Write-Host "フィールドの個別更新でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+            
+            Write-Host "フィールドの更新が完了しました。" -ForegroundColor Green
+            
+            Write-Host "フッターにページ番号を設定しました（中央揃え）。" -ForegroundColor Green
         }
         catch
         {
-            $global:Common.HandleError("4018", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            Write-Host "フッターのページ番号設定でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4018", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "フッターのページ番号設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "フッターのページ番号設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -183,12 +502,36 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            $this.word_document.Content.Text += $text + "`r`n"
+            # より安全で確実な方法でテキストを追加
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            $range.InsertAfter($text)
+            $range.InsertParagraphAfter()
+            
+            # カーソル位置を最後に移動
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+
             Write-Host "テキストを追加しました: $text"
         }
         catch
         {
-            $global:Common.HandleError("4005", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4005", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "テキストの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "テキストの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -219,6 +562,7 @@ class WordDriver
             }
 
             $paragraph = $this.word_document.Content.Paragraphs.Add()
+
             $paragraph.Range.Text = $text
 
             # ローカライズ非依存で見出しスタイルを適用（BuiltinStyle を直接代入）
@@ -236,13 +580,32 @@ class WordDriver
             }
 
             $paragraph.Range.Style = $builtInStyle
+
             $paragraph.Range.InsertParagraphAfter()
             
             Write-Host "見出しを追加しました: $text (レベル: $level)"
         }
         catch
         {
-            $global:Common.HandleError("4006", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            Write-Host "見出しの追加でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4006", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "見出しの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "見出しの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -262,15 +625,36 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            $paragraph = $this.word_document.Content.Paragraphs.Add()
-            $paragraph.Range.Text = $text
-            $paragraph.Range.InsertParagraphAfter()
+            # より安全で確実な方法で段落を追加
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            $range.InsertAfter($text)
+            $range.InsertParagraphAfter()
+            
+            # カーソル位置を最後に移動
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
             
             Write-Host "段落を追加しました: $text"
         }
         catch
         {
-            $global:Common.HandleError("4007", "段落追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4007", "段落追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "段落の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "段落の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -309,8 +693,12 @@ class WordDriver
                 $this.AddHeading($title, 2)
             }
 
-            # テーブルを作成
-            $table = $this.word_document.Tables.Add($this.word_document.Content, $rows, $cols)
+            # ドキュメントの最後にテーブルを挿入するためのRangeを作成
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            
+            # テーブルを作成（正しい位置に挿入）
+            $table = $this.word_document.Tables.Add($range, $rows, $cols)
 
             # データを設定
             for ($i = 0; $i -lt $rows; $i++)
@@ -322,13 +710,31 @@ class WordDriver
             }
 
             # テーブルの後に段落を追加
-            $this.word_document.Content.InsertAfter("`r`n")
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            $range.InsertParagraphAfter()
 
             Write-Host "テーブルを追加しました: $rows 行 x $cols 列"
         }
         catch
         {
-            $global:Common.HandleError("4008", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4008", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "テーブルの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "テーブルの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -353,14 +759,39 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            $this.word_document.InlineShapes.AddPicture($image_path)
-            $this.word_document.Content.InsertAfter("`r`n")
+            # ドキュメントの最後に画像を挿入するためのRangeを作成
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            
+            # 画像を挿入（正しい位置に挿入）
+            $this.word_document.InlineShapes.AddPicture($image_path, $false, $true, $range)
+            
+            # 画像の後に段落を追加
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            $range.InsertParagraphAfter()
             
             Write-Host "画像を追加しました: $image_path"
         }
         catch
         {
-            $global:Common.HandleError("4009", "画像追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4009", "画像追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "画像の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "画像の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -375,13 +806,31 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
-            $this.word_document.Content.InsertBreak([Microsoft.Office.Interop.Word.WdBreakType]::wdPageBreak)
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            $range.InsertBreak([Microsoft.Office.Interop.Word.WdBreakType]::wdPageBreak)
             
             Write-Host "ページ区切りを追加しました。"
         }
         catch
         {
-            $global:Common.HandleError("4010", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4010", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ページ区切りの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ページ区切りの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -424,7 +873,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4011", "目次追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4011", "目次追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "目次の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "目次の追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -461,7 +926,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4015", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4015", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "フォントの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "フォントの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -503,7 +984,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4017", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4017", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ページ向きの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ページ向きの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -542,7 +1039,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4012", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4012", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ドキュメントの保存に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ドキュメントの保存に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -569,7 +1082,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4013", "目次更新エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4013", "目次更新エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "目次の更新に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "目次の更新に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -607,7 +1136,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4014", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4014", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ドキュメントを開くのに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ドキュメントを開くのに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -669,7 +1214,24 @@ class WordDriver
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4019", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 
@@ -731,7 +1293,23 @@ class WordDriver
         }
         catch
         {
-            $global:Common.HandleError("4016", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4016", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }

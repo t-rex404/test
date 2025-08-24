@@ -41,8 +41,27 @@ class ExcelDriver
         }
         catch
         {
+            # 初期化失敗時のクリーンアップ
+            Write-Host "ExcelDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("5001", "ExcelDriver初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5001", "ExcelDriver初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ExcelDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ExcelDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -65,7 +84,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -83,7 +118,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5003", "Excelアプリケーション初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5003", "Excelアプリケーション初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Excelアプリケーションの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "Excelアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -131,7 +182,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5005", "セル値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5005", "セル値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セル値の設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "セル値の設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -157,7 +224,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5006", "セル値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5006", "セル値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セル値の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "セル値の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -182,7 +265,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5007", "範囲値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5007", "範囲値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "範囲値の設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "範囲値の設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -208,7 +307,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5008", "範囲値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5008", "範囲値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "範囲値の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "範囲値の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -240,7 +355,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5009", "フォント設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5009", "フォント設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "フォントの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "フォントの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -265,8 +396,24 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5010", "太字設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
-            throw "太字設定に失敗しました: $($_.Exception.Message)"
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5010", "太字設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "太字の設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "太字の設定に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -290,7 +437,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5011", "背景色設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5011", "背景色設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "背景色の設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "背景色の設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -320,7 +483,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5012", "ワークシート追加エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5012", "ワークシート追加エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ワークシートの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ワークシートの追加に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -345,7 +524,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5013", "ワークシート選択エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5013", "ワークシート選択エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ワークシートの選択に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ワークシートの選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -375,7 +570,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5014", "ワークブック保存エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5014", "ワークブック保存エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ワークブックの保存に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ワークブックの保存に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -407,7 +618,23 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5015", "ワークブック開くエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5015", "ワークブック開くエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ワークブックを開くのに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ワークブックを開くのに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -444,7 +671,24 @@ class ExcelDriver
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5016", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 
@@ -488,8 +732,24 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5016", "ExcelDriver Disposeエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
-            Write-Host "リソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("5017", "ExcelDriver Disposeエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ExcelDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "ExcelDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 } 

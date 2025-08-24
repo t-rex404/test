@@ -86,8 +86,26 @@ class ChromeDriver : WebDriver
         catch
         {
             # 初期化に失敗した場合のクリーンアップ
+            Write-Host "ChromeDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("3001", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+            
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("3001", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ChromeDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ChromeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -146,7 +164,23 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3002", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("3002", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Chrome実行ファイルのパス取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "Chrome実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -194,7 +228,23 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("3003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -220,7 +270,23 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3004", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("3004", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "デバッグモードの有効化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -285,7 +351,24 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("3005", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 
@@ -312,12 +395,24 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("3005", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
-            Write-Host "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("3006", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 }
-
-
-
-

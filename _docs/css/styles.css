@@ -282,7 +282,7 @@ body.dark-mode .theme-text {
     box-shadow: var(--shadow-medium);
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
 }
@@ -296,6 +296,7 @@ body.dark-mode .theme-text {
     height: 4px;
     background: var(--gradient-1);
     transition: height 0.3s ease;
+    z-index: 1;
 }
 
 /* ========================================
@@ -384,6 +385,9 @@ body.dark-mode .theme-text {
     font-weight: bold;
     transition: all 0.3s ease;
     box-shadow: var(--shadow-medium);
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
 }
 
 .game-link:hover {
@@ -393,7 +397,8 @@ body.dark-mode .theme-text {
 
 .class-card:hover::before {
     height: 100%;
-    opacity: 0.1;
+    opacity: 0.05;
+    z-index: 1;
 }
 
 .class-card:hover {
@@ -454,6 +459,9 @@ body.dark-mode .theme-text {
     text-decoration: none;
     font-weight: bold;
     transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
 }
 
 .card-link:hover {

@@ -86,9 +86,26 @@ class EdgeDriver : WebDriver
         catch
         {
             # 初期化に失敗した場合のクリーンアップ
-            Write-Host "EdgeDriver初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "EdgeDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
-            $global:Common.HandleError("2001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("2001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -143,7 +160,23 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2002", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("2002", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
             throw "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -191,7 +224,23 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("2003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -217,7 +266,23 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2004", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("2004", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "デバッグモードの有効化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -282,7 +347,24 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("2005", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 
@@ -309,12 +391,24 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            $global:Common.HandleError("2005", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
-            Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("2006", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
 }
-
-
-
-
