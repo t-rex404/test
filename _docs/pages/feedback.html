@@ -734,7 +734,7 @@
         }
 
         // フォーム送信処理
-        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+        document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitButton = document.getElementById('submitButton');
@@ -763,9 +763,17 @@
                                String(now.getSeconds()).padStart(2, '0') +
                                String(now.getMilliseconds()).padStart(3, '0');
                 
-                // 端末情報を取得
-                const computerName = 'Unknown'; // ブラウザでは取得できないため
-                const userName = 'Unknown'; // ブラウザでは取得できないため
+                // IPアドレスを取得
+                let ipAddress = 'Unknown';
+                try {
+                    // 外部APIを使用してIPアドレスを取得
+                    const response = await fetch('https://api.ipify.org?format=json');
+                    const data = await response.json();
+                    ipAddress = data.ip;
+                } catch (error) {
+                    console.log('IPアドレスの取得に失敗しました:', error);
+                    ipAddress = 'Unknown';
+                }
                 
                 // ファイルパスを文字列化
                 const filePaths = files.map(file => file.name).join('; ');
@@ -776,12 +784,11 @@
                     method,
                     improvementContent,
                     filePaths,
-                    computerName,
-                    userName,
+                    ipAddress,
                     timestamp
                 ].map(field => `"${field}"`).join(',');
                 
-                const csvContent = '修正してほしい機能,修正してほしいメソッド,修正または改善してほしい内容,参考ファイルパス,作成端末名,端末ユーザ名,作成時間\n' + csvData;
+                const csvContent = '修正してほしい機能,修正してほしいメソッド,修正または改善してほしい内容,参考ファイルパス,IPアドレス,作成時間\n' + csvData;
                 
                 // 出力先パスを取得
                 const outputPath = document.getElementById('outputPath').value.trim();
@@ -790,7 +797,7 @@
                 }
                 
                 // ファイル名を生成
-                const fileName = `${timestamp}_${computerName}_${userName}.csv`;
+                const fileName = `${timestamp}.csv`;
                 
                 // CSVファイルをダウンロード
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
