@@ -117,7 +117,7 @@ catch {
 	# Commonオブジェクトが利用可能な場合はエラーログに記録
 	if ($global:Common) {
 		try {
-			$global:Common.HandleError("9999", "サンプルレポート生成エラー: $($_.Exception.Message)", "generate_SampleReport", ".\SampleReport_Error.log")
+			$global:Common.HandleError("9999", "サンプルレポート生成エラー: $($_.Exception.Message)", "Common", ".\SampleReport_Error.log")
 		} catch {
 			Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
 		}

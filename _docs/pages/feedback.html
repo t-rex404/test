@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>改善案フォーム - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .feedback-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .feedback-form {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .form-required {
+            color: #e74c3c;
+            margin-left: 5px;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-item:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-color);
+        }
+        
+        .radio-item input[type="radio"] {
+            margin: 0;
+        }
+        
+        .radio-item label {
+            cursor: pointer;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .file-input-button {
+            display: inline-block;
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .file-input-button:hover {
+            background: var(--primary-hover);
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .selected-files {
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-name {
+            flex: 1;
+            margin-right: 10px;
+            word-break: break-all;
+        }
+        
+        .remove-file {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .remove-file:hover {
+            background: #c0392b;
+        }
+        
+        .submit-button {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-button:hover {
+            background: var(--success-hover);
+        }
+        
+        .submit-button:disabled {
+            background: var(--disabled-color);
+            cursor: not-allowed;
+        }
+        
+        .back-button {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .back-button:hover {
+            background: var(--secondary-hover);
+        }
+        
+        .output-settings {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .output-settings h3 {
+            margin-top: 0;
+            color: var(--text-color);
+        }
+        
+        .output-path {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-family: monospace;
+        }
+        
+        .success-message {
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .error-message {
+            background: var(--error-bg);
+            color: var(--error-text);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        /* メソッド選択のスタイル */
+        .method-container {
+            margin-top: 15px;
+        }
+
+        .method-group {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .method-group h4 {
+            margin: 0 0 15px 0;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .method-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .method-item:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .method-item input[type="radio"] {
+            margin: 0 0 8px 0;
+        }
+
+        .method-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+
+        .method-desc {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .method-item:has(input[type="radio"]:checked) {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .method-item:has(input[type="radio"]:checked) .method-name,
+        .method-item:has(input[type="radio"]:checked) .method-desc {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">📝</span>
+                改善案フォーム
+                <span class="emoji">📝</span>
+            </h1>
+            <p class="subtitle">PowerShell Driver Classesの改善にご協力ください！</p>
+        </header>
+
+        <!-- Back Button -->
+        <a href="../index.html" class="back-button">← メインページに戻る</a>
+
+        <!-- Output Settings (Hidden) -->
+        <div class="output-settings" style="display: none;">
+            <h3>📁 CSV出力先の設定</h3>
+            <p>CSVファイルの出力先フォルダを指定してください：</p>
+            <input type="text" id="outputPath" class="output-path" 
+                   placeholder="例: C:\Users\YourName\Desktop\feedback" 
+                   value="C:\Users\YourName\Desktop\feedback">
+            <p class="note">※ フォルダが存在しない場合は自動で作成されます</p>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="feedback-container">
+            <form class="feedback-form" id="feedbackForm">
+                <!-- Driver Selection -->
+                <div class="form-group">
+                    <label class="form-label">
+                        修正してほしい、機能（Driverファイル）
+                        <span class="form-required">*</span>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="webdriver" name="driver" value="WebDriver" required>
+                            <label for="webdriver">WebDriver（ブラウザ操作の基底クラス）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="chromedriver" name="driver" value="ChromeDriver" required>
+                            <label for="chromedriver">ChromeDriver（Chromeブラウザ操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="edgedriver" name="driver" value="EdgeDriver" required>
+                            <label for="edgedriver">EdgeDriver（Edgeブラウザ操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="worddriver" name="driver" value="WordDriver" required>
+                            <label for="worddriver">WordDriver（Word操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="exceldriver" name="driver" value="ExcelDriver" required>
+                            <label for="exceldriver">ExcelDriver（Excel操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="powerpointdriver" name="driver" value="PowerPointDriver" required>
+                            <label for="powerpointdriver">PowerPointDriver（PowerPoint操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="oracledriver" name="driver" value="OracleDriver" required>
+                            <label for="oracledriver">OracleDriver（Oracle DB操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="common" name="driver" value="Common" required>
+                            <label for="common">Common（共通機能）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="other" name="driver" value="その他" required>
+                            <label for="other">その他</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method Selection -->
+                <div class="form-group" id="methodSelection" style="display: none;">
+                    <label class="form-label">
+                        修正してほしい、メソッド
+                        <span class="form-required">*</span>
+                    </label>
+                    <div class="method-container">
+                        <!-- WebDriver Methods -->
+                        <div class="method-group" id="webdriver-methods" style="display: none;">
+                            <h4>WebDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="NavigateTo" required>
+                                    <span class="method-name">NavigateTo</span>
+                                    <span class="method-desc">指定したURLに移動</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindElement" required>
+                                    <span class="method-name">FindElement</span>
+                                    <span class="method-desc">要素を検索</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ClickElement" required>
+                                    <span class="method-name">ClickElement</span>
+                                    <span class="method-desc">要素をクリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendKeys" required>
+                                    <span class="method-name">SendKeys</span>
+                                    <span class="method-desc">テキストを入力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TakeScreenshot" required>
+                                    <span class="method-name">TakeScreenshot</span>
+                                    <span class="method-desc">スクリーンショット取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetCookies" required>
+                                    <span class="method-name">GetCookies</span>
+                                    <span class="method-desc">Cookie取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- ChromeDriver Methods -->
+                        <div class="method-group" id="chromedriver-methods" style="display: none;">
+                            <h4>ChromeDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetChromeOptions" required>
+                                    <span class="method-name">SetChromeOptions</span>
+                                    <span class="method-desc">Chromeオプション設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetHeadlessMode" required>
+                                    <span class="method-name">SetHeadlessMode</span>
+                                    <span class="method-desc">ヘッドレスモード設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetUserAgent" required>
+                                    <span class="method-name">SetUserAgent</span>
+                                    <span class="method-desc">ユーザーエージェント設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- EdgeDriver Methods -->
+                        <div class="method-group" id="edgedriver-methods" style="display: none;">
+                            <h4>EdgeDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetEdgeOptions" required>
+                                    <span class="method-name">SetEdgeOptions</span>
+                                    <span class="method-desc">Edgeオプション設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetEnterpriseMode" required>
+                                    <span class="method-name">SetEnterpriseMode</span>
+                                    <span class="method-desc">エンタープライズモード設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- WordDriver Methods -->
+                        <div class="method-group" id="worddriver-methods" style="display: none;">
+                            <h4>WordDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateDocument" required>
+                                    <span class="method-name">CreateDocument</span>
+                                    <span class="method-desc">文書作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InsertText" required>
+                                    <span class="method-name">InsertText</span>
+                                    <span class="method-desc">テキスト挿入</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InsertTable" required>
+                                    <span class="method-name">InsertTable</span>
+                                    <span class="method-desc">表挿入</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InsertImage" required>
+                                    <span class="method-name">InsertImage</span>
+                                    <span class="method-desc">画像挿入</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- ExcelDriver Methods -->
+                        <div class="method-group" id="exceldriver-methods" style="display: none;">
+                            <h4>ExcelDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateWorkbook" required>
+                                    <span class="method-name">CreateWorkbook</span>
+                                    <span class="method-desc">ワークブック作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetCellValue" required>
+                                    <span class="method-name">SetCellValue</span>
+                                    <span class="method-desc">セル値設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FormatCell" required>
+                                    <span class="method-name">FormatCell</span>
+                                    <span class="method-desc">セル書式設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- PowerPointDriver Methods -->
+                        <div class="method-group" id="powerpointdriver-methods" style="display: none;">
+                            <h4>PowerPointDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreatePresentation" required>
+                                    <span class="method-name">CreatePresentation</span>
+                                    <span class="method-desc">プレゼンテーション作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="AddSlide" required>
+                                    <span class="method-name">AddSlide</span>
+                                    <span class="method-desc">スライド追加</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InsertShape" required>
+                                    <span class="method-name">InsertShape</span>
+                                    <span class="method-desc">図形挿入</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- OracleDriver Methods -->
+                        <div class="method-group" id="oracledriver-methods" style="display: none;">
+                            <h4>OracleDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Connect" required>
+                                    <span class="method-name">Connect</span>
+                                    <span class="method-desc">データベース接続</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ExecuteQuery" required>
+                                    <span class="method-name">ExecuteQuery</span>
+                                    <span class="method-desc">クエリ実行</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ExecuteNonQuery" required>
+                                    <span class="method-name">ExecuteNonQuery</span>
+                                    <span class="method-desc">非クエリ実行</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Common Methods -->
+                        <div class="method-group" id="common-methods" style="display: none;">
+                            <h4>Common メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="WriteLog" required>
+                                    <span class="method-name">WriteLog</span>
+                                    <span class="method-desc">ログ出力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="HandleError" required>
+                                    <span class="method-name">HandleError</span>
+                                    <span class="method-desc">エラーハンドリング</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Other Methods -->
+                        <div class="method-group" id="other-methods" style="display: none;">
+                            <h4>その他の機能</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="新機能提案" required>
+                                    <span class="method-name">新機能提案</span>
+                                    <span class="method-desc">新しい機能の提案</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ドキュメント改善" required>
+                                    <span class="method-name">ドキュメント改善</span>
+                                    <span class="method-desc">ドキュメントの改善提案</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外の内容</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Improvement Content -->
+                <div class="form-group">
+                    <label class="form-label" for="improvementContent">
+                        修正または、改善してほしい内容（問題点など）できるだけ詳しく書いてください。
+                        <span class="form-required">*</span>
+                    </label>
+                    <textarea 
+                        id="improvementContent" 
+                        name="improvementContent" 
+                        class="form-textarea" 
+                        placeholder="具体的な問題点や改善案を詳しく記入してください。例：エラーメッセージ、期待する動作、現在の動作など..."
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- Reference Files -->
+                <div class="form-group">
+                    <label class="form-label">
+                        参考ファイル（実行したソースコードやログファイル、画面のハードコピーなど）
+                    </label>
+                    <div class="file-input-container">
+                        <input type="file" id="referenceFiles" class="file-input" multiple accept="*.*">
+                        <div class="file-input-button">📁 ファイルを選択</div>
+                    </div>
+                    <div class="selected-files" id="selectedFiles" style="display: none;">
+                        <p><strong>選択されたファイル：</strong></p>
+                        <div id="fileList"></div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-button" id="submitButton">
+                    📤 フィードバックを送信
+                </button>
+            </form>
+
+            <!-- Success/Error Messages -->
+            <div class="success-message" id="successMessage">
+                ✅ フィードバックが正常に送信されました！CSVファイルが作成されています。
+            </div>
+            <div class="error-message" id="errorMessage">
+                ❌ エラーが発生しました。もう一度お試しください。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ファイル選択処理
+        document.getElementById('referenceFiles').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const fileList = document.getElementById('fileList');
+            const selectedFiles = document.getElementById('selectedFiles');
+            
+            if (files.length > 0) {
+                selectedFiles.style.display = 'block';
+                fileList.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <span class="file-name">${file.name}</span>
+                        <button type="button" class="remove-file" onclick="removeFile(${index})">削除</button>
+                    `;
+                    fileList.appendChild(fileItem);
+                });
+            } else {
+                selectedFiles.style.display = 'none';
+            }
+        });
+
+        // ファイル削除処理
+        function removeFile(index) {
+            const input = document.getElementById('referenceFiles');
+            const dt = new DataTransfer();
+            const files = Array.from(input.files);
+            
+            files.splice(index, 1);
+            files.forEach(file => dt.items.add(file));
+            input.files = dt.files;
+            
+            // 表示を更新
+            const event = new Event('change');
+            input.dispatchEvent(event);
+        }
+
+        // フォーム送信処理
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitButton = document.getElementById('submitButton');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // ボタンを無効化
+            submitButton.disabled = true;
+            submitButton.textContent = '📤 送信中...';
+            
+            try {
+                // フォームデータを取得
+                const formData = new FormData(e.target);
+                const driver = formData.get('driver');
+                const method = formData.get('method') || '未選択';
+                const improvementContent = formData.get('improvementContent');
+                const files = Array.from(document.getElementById('referenceFiles').files);
+                
+                // 現在時刻を取得（ミリ秒まで）
+                const now = new Date();
+                const timestamp = now.getFullYear().toString() +
+                               String(now.getMonth() + 1).padStart(2, '0') +
+                               String(now.getDate()).padStart(2, '0') +
+                               String(now.getHours()).padStart(2, '0') +
+                               String(now.getMinutes()).padStart(2, '0') +
+                               String(now.getSeconds()).padStart(2, '0') +
+                               String(now.getMilliseconds()).padStart(3, '0');
+                
+                // 端末情報を取得
+                const computerName = 'Unknown'; // ブラウザでは取得できないため
+                const userName = 'Unknown'; // ブラウザでは取得できないため
+                
+                // ファイルパスを文字列化
+                const filePaths = files.map(file => file.name).join('; ');
+                
+                // CSVデータを作成
+                const csvData = [
+                    driver,
+                    method,
+                    improvementContent,
+                    filePaths,
+                    computerName,
+                    userName,
+                    timestamp
+                ].map(field => `"${field}"`).join(',');
+                
+                const csvContent = '修正してほしい機能,修正してほしいメソッド,修正または改善してほしい内容,参考ファイルパス,作成端末名,端末ユーザ名,作成時間\n' + csvData;
+                
+                // 出力先パスを取得
+                const outputPath = document.getElementById('outputPath').value.trim();
+                if (!outputPath) {
+                    throw new Error('出力先パスが指定されていません');
+                }
+                
+                // ファイル名を生成
+                const fileName = `${timestamp}_${computerName}_${userName}.csv`;
+                
+                // CSVファイルをダウンロード
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', fileName);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 成功メッセージを表示
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+                
+                // フォームをリセット
+                e.target.reset();
+                document.getElementById('selectedFiles').style.display = 'none';
+                
+            } catch (error) {
+                console.error('エラーが発生しました:', error);
+                errorMessage.textContent = `❌ エラーが発生しました: ${error.message}`;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            } finally {
+                // ボタンを有効化
+                submitButton.disabled = false;
+                submitButton.textContent = '📤 フィードバックを送信';
+            }
+        });
+
+        // Driver選択時のメソッド表示処理
+        document.querySelectorAll('input[name="driver"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                const methodSelection = document.getElementById('methodSelection');
+                const selectedDriver = this.value;
+                
+                // すべてのメソッドグループを非表示
+                document.querySelectorAll('.method-group').forEach(function(group) {
+                    group.style.display = 'none';
+                });
+                
+                // 選択されたDriverのメソッドグループを表示
+                if (selectedDriver !== 'その他') {
+                    const methodGroupId = selectedDriver.toLowerCase() + '-methods';
+                    const methodGroup = document.getElementById(methodGroupId);
+                    if (methodGroup) {
+                        methodGroup.style.display = 'block';
+                    }
+                } else {
+                    // その他の場合は「その他の機能」を表示
+                    const otherMethods = document.getElementById('other-methods');
+                    if (otherMethods) {
+                        otherMethods.style.display = 'block';
+                    }
+                }
+                
+                // メソッド選択セクションを表示
+                methodSelection.style.display = 'block';
+                
+                // 既存のメソッド選択をクリア
+                document.querySelectorAll('input[name="method"]').forEach(function(methodRadio) {
+                    methodRadio.checked = false;
+                });
+            });
+        });
+
+        // ページ読み込み時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            // ダークモードの状態を復元
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -92,23 +92,6 @@
                     <a href="pages/edgedriver.html" class="card-link">詳細を見る →</a>
                 </div>
 
-                <!-- ExcelDriver -->
-                <div class="class-card" data-searchable="ExcelDriver エクセルドライバー Excel操作">
-                    <div class="card-header">
-                        <span class="card-icon">📊</span>
-                        <h3>ExcelDriver</h3>
-                    </div>
-                    <p class="card-description">
-                        Microsoft Excelを操作するためのドライバークラス。セル操作、書式設定、ワークシート管理などが可能。
-                    </p>
-                    <div class="card-features">
-                        <span class="feature-tag">📈 データ処理</span>
-                        <span class="feature-tag">🎨 書式設定</span>
-                        <span class="feature-tag">📑 シート管理</span>
-                    </div>
-                    <a href="pages/exceldriver.html" class="card-link">詳細を見る →</a>
-                </div>
-
                 <!-- WordDriver -->
                 <div class="class-card" data-searchable="WordDriver ワードドライバー Word操作 文書作成">
                     <div class="card-header">
@@ -124,6 +107,23 @@
                         <span class="feature-tag">🖼️ 画像挿入</span>
                     </div>
                     <a href="pages/worddriver.html" class="card-link">詳細を見る →</a>
+                </div>
+                
+                <!-- ExcelDriver -->
+                <div class="class-card" data-searchable="ExcelDriver エクセルドライバー Excel操作">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <h3>ExcelDriver</h3>
+                    </div>
+                    <p class="card-description">
+                        Microsoft Excelを操作するためのドライバークラス。セル操作、書式設定、ワークシート管理などが可能。
+                    </p>
+                    <div class="card-features">
+                        <span class="feature-tag">📈 データ処理</span>
+                        <span class="feature-tag">🎨 書式設定</span>
+                        <span class="feature-tag">📑 シート管理</span>
+                    </div>
+                    <a href="pages/exceldriver.html" class="card-link">詳細を見る →</a>
                 </div>
 
                 <!-- PowerPointDriver -->
@@ -267,7 +267,8 @@
                     <h3>✅ ベストプラクティス</h3>
                     <ul>
                         <li>使用後は必ずDispose()メソッドでリソースを解放</li>
-                        <li>エラー処理を適切に実装してください</li>
+                        <li>Commonクラスの統一されたエラー処理システムを活用</li>
+                        <li>エラーコードを適切に使用して問題の特定を効率化</li>
                         <li>ログを活用してデバッグを効率化</li>
                     </ul>
                 </div>
@@ -316,6 +317,10 @@
                             <td class="range">7000番台</td>
                             <td class="class-name">OracleDriver関連</td>
                         </tr>
+                        <tr>
+                            <td class="range">9000番台</td>
+                            <td class="class-name">Common関連（カスタムスクリプト用）</td>
+                        </tr>
                     </table>
                 </div>
 
@@ -327,6 +332,44 @@
                         <li>必要に応じて再試行ロジックを実装</li>
                         <li>リソースの解放を確実に実行</li>
                     </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section class="feedback-section">
+            <h2 class="section-title">
+                <span class="icon">💬</span> フィードバック・改善案
+            </h2>
+            
+            <div class="feedback-content">
+                <p>PowerShell Driver Classesをより良くするために、あなたのご意見をお聞かせください！</p>
+                <p>バグの報告、機能の改善案、使いにくい点など、どんなことでも構いません。</p>
+                
+                <div class="feedback-actions">
+                    <a href="pages/feedback.html" class="feedback-button">
+                        <span class="button-icon">📝</span>
+                        <span class="button-text">改善案フォームを開く</span>
+                    </a>
+                </div>
+                
+                <div class="feedback-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <span class="feature-text">具体的な問題点を報告</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💡</span>
+                        <span class="feature-text">新しい機能の提案</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📁</span>
+                        <span class="feature-text">ファイル添付で詳細説明</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span class="feature-text">CSV形式でデータ出力</span>
+                    </div>
                 </div>
             </div>
         </section>

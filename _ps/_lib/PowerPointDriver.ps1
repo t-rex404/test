@@ -692,7 +692,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6016", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("6017", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

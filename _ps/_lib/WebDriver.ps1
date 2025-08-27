@@ -1152,7 +1152,7 @@ class WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("1086", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("1088", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {

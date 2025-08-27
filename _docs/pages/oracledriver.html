@@ -404,6 +404,60 @@ finally {
             </div>
         </section>
 
+        <!-- エラーハンドリング -->
+        <section class="method-section" data-searchable="エラー処理 クリーンアップ">
+            <h2 class="section-title">
+                <span class="icon">⚠️</span> エラーハンドリング・クリーンアップ
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">統一されたエラー処理</div>
+                <p>OracleDriverは、Commonクラスの統一されたエラー処理システムを使用して、エラーの詳細な記録と適切なクリーンアップを行います。</p>
+                
+                <div class="code-example">
+                    <pre><code># エラー処理の例
+try {
+    $driver = [OracleDriver]::new()
+    # 処理を実行
+}
+catch {
+    # Commonクラスのエラー処理を使用
+    if ($global:Common) {
+        $global:Common.HandleError(
+            "7001", 
+            "OracleDriver初期化エラー: $($_.Exception.Message)", 
+            "OracleDriver",
+            ".\AllDrivers_Error.log"
+        )
+    }
+    throw
+}
+finally {
+    if ($driver) {
+        $driver.Disconnect()
+        $driver.Dispose()
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">自動クリーンアップ機能</div>
+                <p>初期化に失敗した場合、OracleDriverは自動的にクリーンアップを実行し、リソースの適切な解放を試みます。</p>
+                
+                <div class="code-example">
+                    <pre><code># 初期化失敗時の自動クリーンアップ
+try {
+    $driver = [OracleDriver]::new()
+}
+catch {
+    # CleanupOnInitializationFailure()が自動的に呼び出される
+    Write-Host "初期化に失敗しました。クリーンアップが実行されました。" -ForegroundColor Yellow
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
         <!-- エラーコード一覧 -->
         <section class="method-section">
             <h2 class="section-title">

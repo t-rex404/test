@@ -1336,7 +1336,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("7600", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("7003", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

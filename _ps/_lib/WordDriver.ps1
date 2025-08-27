@@ -836,6 +836,350 @@ class WordDriver
     }
 
     # ========================================
+    # セクション管理関連
+    # ========================================
+
+    # 新しいセクションを追加
+    [void] AddSection()
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            # ドキュメントの最後にセクション区切りを挿入
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
+            $range.InsertBreak([Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakNextPage)
+            
+            Write-Host "新しいセクションを追加しました。"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4020", "セクション追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セクションの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "セクションの追加に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 指定した位置にセクション区切りを挿入
+    [void] InsertSectionBreak([int]$position, [string]$break_type = "NextPage")
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            if ($position -lt 0)
+            {
+                throw "位置は0以上の値である必要があります。"
+            }
+
+            # ブレークタイプを正規化
+            $normalized_break_type = $break_type.Trim().ToLower()
+            $wd_break_type = [Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakNextPage
+            
+            switch ($normalized_break_type)
+            {
+                'nextpage' { $wd_break_type = [Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakNextPage }
+                'continuous' { $wd_break_type = [Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakContinuous }
+                'evenpage' { $wd_break_type = [Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakEvenPage }
+                'oddpage' { $wd_break_type = [Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakOddPage }
+                default { throw "サポートされていないセクション区切りタイプです: $break_type" }
+            }
+
+            # 指定した位置にセクション区切りを挿入
+            $range = $this.word_document.Content
+            $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseStart)
+            $range.Move([Microsoft.Office.Interop.Word.WdUnits]::wdCharacter, $position)
+            $range.InsertBreak($wd_break_type)
+            
+            Write-Host "指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4021", "セクション区切り挿入エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セクション区切りの挿入に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "セクション区切りの挿入に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # セクション数を取得
+    [int] GetSectionCount()
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            $section_count = $this.word_document.Sections.Count
+            Write-Host "セクション数: $section_count"
+            return $section_count
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4022", "セクション数取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セクション数の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "セクション数の取得に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 現在のセクションインデックスを取得
+    [int] GetCurrentSectionIndex()
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            # 現在のカーソル位置のセクションを取得
+            $current_range = $this.word_document.Application.Selection.Range
+            $current_section = $current_range.Sections.Item(1)
+            
+            # セクションインデックスを取得
+            for ($i = 1; $i -le $this.word_document.Sections.Count; $i++)
+            {
+                if ($this.word_document.Sections.Item($i) -eq $current_section)
+                {
+                    Write-Host "現在のセクションインデックス: $i"
+                    return $i
+                }
+            }
+            
+            # 見つからない場合は1を返す
+            Write-Host "現在のセクションインデックス: 1 (デフォルト)"
+            return 1
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4023", "現在のセクションインデックス取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "現在のセクションインデックスの取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "現在のセクションインデックスの取得に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 指定したセクションのページ設定を変更
+    [void] SetSectionPageSetup([int]$section_index, [hashtable]$page_settings)
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            if ($section_index -lt 1 -or $section_index -gt $this.word_document.Sections.Count)
+            {
+                throw "無効なセクションインデックスです: $section_index"
+            }
+
+            if (-not $page_settings)
+            {
+                throw "ページ設定が指定されていません。"
+            }
+
+            # 指定したセクションを取得
+            $section = $this.word_document.Sections.Item($section_index)
+            if ($section -eq $null)
+            {
+                throw "セクション $section_index の取得に失敗しました。"
+            }
+
+            # ページ設定を適用
+            if ($page_settings.ContainsKey('Orientation'))
+            {
+                $orientation = $page_settings['Orientation'].ToString().ToLower()
+                $wd_orientation = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientPortrait
+                
+                switch ($orientation)
+                {
+                    'portrait' { $wd_orientation = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientPortrait }
+                    'landscape' { $wd_orientation = [Microsoft.Office.Interop.Word.WdOrientation]::wdOrientLandscape }
+                    default { throw "サポートされていないページ向きです: $orientation" }
+                }
+                
+                $section.PageSetup.Orientation = $wd_orientation
+                Write-Host "セクション $section_index のページ向きを設定しました: $orientation"
+            }
+
+            if ($page_settings.ContainsKey('TopMargin'))
+            {
+                $section.PageSetup.TopMargin = $page_settings['TopMargin']
+                Write-Host "セクション $section_index の上マージンを設定しました: $($page_settings['TopMargin'])"
+            }
+
+            if ($page_settings.ContainsKey('BottomMargin'))
+            {
+                $section.PageSetup.BottomMargin = $page_settings['BottomMargin']
+                Write-Host "セクション $section_index の下マージンを設定しました: $($page_settings['BottomMargin'])"
+            }
+
+            if ($page_settings.ContainsKey('LeftMargin'))
+            {
+                $section.PageSetup.LeftMargin = $page_settings['LeftMargin']
+                Write-Host "セクション $section_index の左マージンを設定しました: $($page_settings['LeftMargin'])"
+            }
+
+            if ($page_settings.ContainsKey('RightMargin'))
+            {
+                $section.PageSetup.RightMargin = $page_settings['RightMargin']
+                Write-Host "セクション $section_index の右マージンを設定しました: $($page_settings['RightMargin'])"
+            }
+
+            if ($page_settings.ContainsKey('PageWidth'))
+            {
+                $section.PageSetup.PageWidth = $page_settings['PageWidth']
+                Write-Host "セクション $section_index のページ幅を設定しました: $($page_settings['PageWidth'])"
+            }
+
+            if ($page_settings.ContainsKey('PageHeight'))
+            {
+                $section.PageSetup.PageHeight = $page_settings['PageHeight']
+                Write-Host "セクション $section_index のページ高さを設定しました: $($page_settings['PageHeight'])"
+            }
+
+            Write-Host "セクション $section_index のページ設定を完了しました。"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4024", "セクションページ設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セクションのページ設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "セクションのページ設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 指定したセクションに移動
+    [void] GoToSection([int]$section_index)
+    {
+        try
+        {
+            if (-not $this.is_initialized)
+            {
+                throw "WordDriverが初期化されていません。"
+            }
+
+            if ($section_index -lt 1 -or $section_index -gt $this.word_document.Sections.Count)
+            {
+                throw "無効なセクションインデックスです: $section_index"
+            }
+
+            # 指定したセクションの開始位置に移動
+            $section = $this.word_document.Sections.Item($section_index)
+            if ($section -eq $null)
+            {
+                throw "セクション $section_index の取得に失敗しました。"
+            }
+
+            $section.Range.Select()
+            Write-Host "セクション $section_index に移動しました。"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("4025", "セクション移動エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "セクションへの移動に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "セクションへの移動に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # ========================================
     # 目次・スタイル関連
     # ========================================
 
