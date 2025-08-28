@@ -75,9 +75,16 @@ class WordDriver
     {
         try
         {
-            $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-            #$temp_dir = Join-Path $env:TEMP "WordDriver_$timestamp"
-            $temp_dir = Join-Path "C:\temp" "WordDriver"
+            $base_dirs = @(
+                "C:\temp",
+                "$($env:TEMP)"
+            )
+            $base_dir = $base_dirs[0]
+            if (-not (Test-Path $base_dir))
+            {
+                $base_dir = $base_dirs[1]
+            }
+            $temp_dir = Join-Path $base_dir "WordDriver"
             if (-not (Test-Path $temp_dir))
             {
                 New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null

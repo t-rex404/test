@@ -187,10 +187,14 @@ class EdgeDriver : WebDriver
         try
         {
             # ユーザーデータディレクトリのパスを生成
-            $base_dir = "C:\temp"
+            $base_dirs = @(
+                "C:\temp",
+                "$($env:TEMP)"
+            )
+            $base_dir = $base_dirs[0]
             if (-not (Test-Path $base_dir))
             {
-                $base_dir = "C:\temp"
+                $base_dir = $base_dirs[1]
             }
             
             $user_data_dir = Join-Path $base_dir "EdgeDriver_UserData"

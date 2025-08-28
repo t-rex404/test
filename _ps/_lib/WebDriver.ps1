@@ -24,9 +24,6 @@ class WebDriver
         }
         catch
         {
-            # 初期化に失敗した場合のクリーンアップ
-            Write-Host "WebDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
-            $this.CleanupOnInitializationFailure()
             # Commonオブジェクトが利用可能な場合はエラーログに記録
             # 初期化・接続関連エラー (1001)
             if ($global:Common)
@@ -830,11 +827,11 @@ class WebDriver
                     $cancellationTokenSource.CancelAfter([TimeSpan]::FromSeconds(5))
                     
                     $this.web_socket.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, 'Closing', $cancellationTokenSource.Token).Wait()
-                    Write-Host "WebSocket接続を正常に閉じました。"
+                    Write-Host "WebSocket接続を正常に閉じました。" -ForegroundColor Green
                 }
                 catch
                 {
-                    Write-Host "WebSocket接続を閉じる際にエラーが発生しました: $($_.Exception.Message)"
+                    Write-Host "WebSocket接続を閉じることが出来ませんでした: $($_.Exception.Message)"
                 }
                 finally
                 {

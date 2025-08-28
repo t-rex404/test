@@ -71,9 +71,16 @@ class ExcelDriver
     {
         try
         {
-            $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-            #$temp_dir = Join-Path $env:TEMP "ExcelDriver_$timestamp"
-            $temp_dir = Join-Path "C:\temp" "ExcelDriver"
+            $base_dirs = @(
+                "C:\temp",
+                "$($env:TEMP)"
+            )
+            $base_dir = $base_dirs[0]
+            if (-not (Test-Path $base_dir))
+            {
+                $base_dir = $base_dirs[1]
+            }
+            $temp_dir = Join-Path $base_dir "ExcelDriver"
             if (-not (Test-Path $temp_dir))
             {
                 New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null
