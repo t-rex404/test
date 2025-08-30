@@ -384,3 +384,196 @@ window.PowerShellDocs = {
     },
     showAll: showAllCards
 };
+
+// ========================================
+// チャットボット機能
+// ========================================
+const floatingActionButton = document.getElementById('floatingActionButton');
+const chatbotModal = document.getElementById('chatbotModal');
+const closeChatbot = document.getElementById('closeChatbot');
+const chatbotInput = document.getElementById('chatbotInput');
+const sendMessage = document.getElementById('sendMessage');
+const chatbotMessages = document.getElementById('chatbotMessages');
+
+// PS1ファイルの情報データベース
+const ps1FileDatabase = {
+    'WebDriver': {
+        description: 'ブラウザ操作の基底クラス',
+        methods: ['Navigate', 'FindElement', 'Click', 'SendKeys', 'Screenshot', 'GetCookies'],
+        usage: 'ChromeDriverやEdgeDriverの親クラスとして使用',
+        example: 'WebDriverを継承してカスタムドライバーを作成できます'
+    },
+    'ChromeDriver': {
+        description: 'Google Chromeブラウザを自動操作',
+        methods: ['StartChrome', 'SetWindowSize', 'ExecuteScript', 'WaitForElement'],
+        usage: 'Chromeブラウザの自動化に使用',
+        example: 'ChromeDriverをインスタンス化してブラウザを起動し、Webサイトを操作できます'
+    },
+    'EdgeDriver': {
+        description: 'Microsoft Edgeブラウザを自動操作',
+        methods: ['StartEdge', 'SetWindowSize', 'ExecuteScript', 'WaitForElement'],
+        usage: 'Edgeブラウザの自動化に使用',
+        example: 'EdgeDriverをインスタンス化してブラウザを起動し、Webサイトを操作できます'
+    },
+    'WordDriver': {
+        description: 'Microsoft Wordを自動操作',
+        methods: ['CreateDocument', 'AddText', 'SetFont', 'InsertTable', 'SaveDocument'],
+        usage: 'Word文書の自動作成・編集に使用',
+        example: 'WordDriverで文書を作成し、テキストや表を挿入して保存できます'
+    },
+    'ExcelDriver': {
+        description: 'Microsoft Excelを自動操作',
+        methods: ['OpenWorkbook', 'SetCellValue', 'FormatCell', 'CreateChart', 'SaveWorkbook'],
+        usage: 'Excelファイルの自動作成・編集に使用',
+        example: 'ExcelDriverでワークブックを開き、セルに値を設定して保存できます'
+    },
+    'PowerPointDriver': {
+        description: 'Microsoft PowerPointを自動操作',
+        methods: ['CreatePresentation', 'AddSlide', 'InsertShape', 'SetText', 'SavePresentation'],
+        usage: 'PowerPointプレゼンテーションの自動作成に使用',
+        example: 'PowerPointDriverでプレゼンテーションを作成し、スライドや図形を追加できます'
+    },
+    'OracleDriver': {
+        description: 'Oracleデータベースを操作',
+        methods: ['Connect', 'ExecuteQuery', 'ExecuteNonQuery', 'BeginTransaction', 'Commit'],
+        usage: 'Oracleデータベースへの接続・操作に使用',
+        example: 'OracleDriverでデータベースに接続し、SQLクエリを実行できます'
+    },
+    'Common': {
+        description: '共通機能を提供するユーティリティクラス',
+        methods: ['WriteLog', 'HandleError', 'GetErrorCode', 'FormatMessage'],
+        usage: '全ドライバークラスで使用する共通機能',
+        example: 'Commonクラスのログ出力やエラー処理機能を活用できます'
+    }
+};
+
+// フローティングアクションボタンのクリックイベント
+floatingActionButton?.addEventListener('click', () => {
+    chatbotModal.classList.add('show');
+    chatbotInput.focus();
+});
+
+// チャットボットを閉じる
+closeChatbot?.addEventListener('click', () => {
+    chatbotModal.classList.remove('show');
+});
+
+// モーダル外クリックで閉じる
+chatbotModal?.addEventListener('click', (e) => {
+    if (e.target === chatbotModal) {
+        chatbotModal.classList.remove('show');
+    }
+});
+
+// Enterキーでメッセージ送信
+chatbotInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendUserMessage();
+    }
+});
+
+// 送信ボタンのクリックイベント
+sendMessage?.addEventListener('click', sendUserMessage);
+
+// ユーザーメッセージを送信
+function sendUserMessage() {
+    const message = chatbotInput.value.trim();
+    if (!message) return;
+    
+    // ユーザーメッセージを表示
+    addMessage(message, 'user');
+    chatbotInput.value = '';
+    
+    // ボットの応答を生成
+    setTimeout(() => {
+        const response = generateBotResponse(message);
+        addMessage(response, 'bot');
+    }, 500);
+}
+
+// メッセージをチャットに追加
+function addMessage(content, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    
+    if (typeof content === 'string') {
+        messageContent.innerHTML = `<p>${content}</p>`;
+    } else {
+        messageContent.innerHTML = content;
+    }
+    
+    messageDiv.appendChild(messageContent);
+    chatbotMessages.appendChild(messageDiv);
+    
+    // スクロールを最下部に
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+// ボットの応答を生成
+function generateBotResponse(userMessage) {
+    const message = userMessage.toLowerCase();
+    
+    // 特定のキーワードに対する応答
+    if (message.includes('こんにちは') || message.includes('hello')) {
+        return 'こんにちは！PowerShell Driver Classesについて何でもお聞きください。';
+    }
+    
+    if (message.includes('使い方') || message.includes('how to use')) {
+        return 'どのクラスの使い方を知りたいですか？例えば「ChromeDriverの使い方を教えて」のように質問してください。';
+    }
+    
+    if (message.includes('メソッド') || message.includes('method')) {
+        return 'どのクラスのメソッドについて知りたいですか？具体的なクラス名を教えてください。';
+    }
+    
+    // 各ドライバークラスに関する質問
+    for (const [className, info] of Object.entries(ps1FileDatabase)) {
+        if (message.includes(className.toLowerCase()) || message.includes(className.replace('Driver', '').toLowerCase())) {
+            return generateClassInfo(className, info);
+        }
+    }
+    
+    // 一般的な質問に対する応答
+    if (message.includes('エラー') || message.includes('error')) {
+        return 'エラーが発生した場合は、CommonクラスのWriteLogメソッドでログを確認し、GetErrorCodeでエラーコードを取得してください。';
+    }
+    
+    if (message.includes('ログ') || message.includes('log')) {
+        return 'ログ出力にはCommonクラスのWriteLogメソッドを使用します。詳細なログでデバッグを効率化できます。';
+    }
+    
+    if (message.includes('インストール') || message.includes('install')) {
+        return 'PowerShell 5.1以上が必要です。各ドライバークラスを使用するには、対応するアプリケーション（Chrome、Office等）のインストールが必要です。';
+    }
+    
+    // デフォルト応答
+    return '申し訳ございません。もう少し具体的に質問していただけますか？例えば「ChromeDriverの使い方」「WordDriverで文書を作成する方法」など。';
+}
+
+// クラス情報を生成
+function generateClassInfo(className, info) {
+    return `
+        <h4>${className}について</h4>
+        <p><strong>説明:</strong> ${info.description}</p>
+        <p><strong>主なメソッド:</strong></p>
+        <ul>
+            ${info.methods.map(method => `<li>${method}</li>`).join('')}
+        </ul>
+        <p><strong>使用例:</strong> ${info.example}</p>
+        <p><strong>詳細:</strong> <a href="pages/${className.toLowerCase()}.html" target="_blank">${className}の詳細ページ</a>をご確認ください。</p>
+    `;
+}
+
+// ページ読み込み完了時の初期化
+document.addEventListener('DOMContentLoaded', () => {
+    // 既存の初期化処理はそのまま
+    initLinkDebug();
+    
+    // チャットボットの初期化
+    if (floatingActionButton && chatbotModal) {
+        console.log('チャットボットが初期化されました');
+    }
+});

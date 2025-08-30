@@ -381,6 +381,34 @@
                 <p class="version">Version 1.0.0 | Last Updated: 2024</p>
             </div>
         </footer>
+
+        <!-- フローティングアクションボタン -->
+        <div class="floating-action-button" id="floatingActionButton">
+            <span class="fab-icon">💬</span>
+            <span class="fab-tooltip">PS1ファイルの使い方を質問</span>
+        </div>
+
+        <!-- チャットボットモーダル -->
+        <div class="chatbot-modal" id="chatbotModal">
+            <div class="chatbot-container">
+                <div class="chatbot-header">
+                    <h3>🤖 PowerShell Driver Classes アシスタント</h3>
+                    <button class="close-button" id="closeChatbot">×</button>
+                </div>
+                <div class="chatbot-messages" id="chatbotMessages">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <p>こんにちは！PowerShell Driver Classesの使い方について何でもお聞きください。</p>
+                            <p>例：「ChromeDriverの使い方を教えて」「WordDriverで文書を作成する方法は？」など</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chatbot-input">
+                    <input type="text" id="chatbotInput" placeholder="質問を入力してください..." />
+                    <button id="sendMessage">送信</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/script.js"></script>
