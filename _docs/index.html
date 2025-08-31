@@ -275,6 +275,86 @@
             </div>
         </section>
 
+        <!-- ポータブルOllama Section -->
+        <!--
+        <section class="portable-ollama-section">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> ポータブルOllama（完全オフライン）
+            </h2>
+            
+            <div class="portable-content">
+                <div class="portable-description">
+                    <p>このドキュメントには、<strong>インストール作業不要</strong>のポータブルOllamaが含まれています。インターネット接続なしで、AIチャットボットをお楽しみいただけます！</p>
+                </div>
+                
+                <div class="portable-features">
+                    <div class="feature-card">
+                        <span class="feature-icon">📦</span>
+                        <h4>ポータブル</h4>
+                        <p>インストール不要、USBメモリなどで持ち運び可能</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">🔒</span>
+                        <h4>プライバシー保護</h4>
+                        <p>質問内容が外部に送信されることは一切ありません</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h4>高速レスポンス</h4>
+                        <p>ネットワーク遅延なしで即座に回答</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">🌐</span>
+                        <h4>完全オフライン</h4>
+                        <p>インターネット接続不要で動作</p>
+                    </div>
+                </div>
+                
+                <div class="portable-usage">
+                    <h3>🎯 使用方法（3ステップ）</h3>
+                    <div class="usage-steps">
+                        <div class="usage-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>起動スクリプト実行</h4>
+                                <p><code>start_ollama.bat</code> をダブルクリック</p>
+                            </div>
+                        </div>
+                        
+                        <div class="usage-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Ollamaサービス起動</h4>
+                                <p>コマンドプロンプトでOllamaが起動</p>
+                            </div>
+                        </div>
+                        
+                        <div class="usage-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>チャットボット使用</h4>
+                                <p>画面右下の💬ボタンで質問開始！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portable-actions">
+                    <a href="start_ollama.bat" class="primary-action">
+                        <span class="action-icon">🚀</span>
+                        <span class="action-text">Ollama起動スクリプト</span>
+                    </a>
+                    <a href="README_OLLAMA.md" target="_blank" class="secondary-action">
+                        <span class="action-icon">📖</span>
+                        <span class="action-text">詳細セットアップガイド</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        -->
         <!-- Error Codes Section -->
         <section class="error-codes">
             <h2 class="section-title">
@@ -393,7 +473,10 @@
             <div class="chatbot-container">
                 <div class="chatbot-header">
                     <h3>🤖 PowerShell Driver Classes アシスタント</h3>
-                    <button class="close-button" id="closeChatbot">×</button>
+                    <div class="header-actions">
+                        <button class="settings-button" id="openChatbotSettings" title="設定">⚙️</button>
+                        <button class="close-button" id="closeChatbot">×</button>
+                    </div>
                 </div>
                 <div class="chatbot-messages" id="chatbotMessages">
                     <div class="message bot-message">
@@ -406,6 +489,58 @@
                 <div class="chatbot-input">
                     <input type="text" id="chatbotInput" placeholder="質問を入力してください..." />
                     <button id="sendMessage">送信</button>
+                </div>
+                
+                <!-- 設定パネル -->
+                <div class="chatbot-settings" id="chatbotSettingsPanel">
+                    <div class="settings-header">
+                        <h4>🔧 ローカルLLM設定</h4>
+                        <button class="close-settings" id="closeSettings">×</button>
+                    </div>
+                    <div class="settings-content">
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="enableLocalLLM" />
+                                ローカルLLMを有効にする
+                            </label>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="llmType">LLMタイプ:</label>
+                            <select id="llmType">
+                                <option value="ollama">Ollama</option>
+                                <!--<option value="lmstudio">LM Studio</option>-->
+                                <!--<option value="llamacpp">llama.cpp</option>-->
+                            </select>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="llmEndpoint">エンドポイント:</label>
+                            <input type="text" id="llmEndpoint" placeholder="http://localhost:11434" />
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="llmModel">モデル:</label>
+                            <input type="text" id="llmModel" placeholder="gpt-oss:20b" />
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="fallbackToLocal" checked />
+                                ローカルLLM失敗時にフォールバック
+                            </label>
+                        </div>
+                        
+                        <div class="setting-actions">
+                            <button id="testConnection" class="test-btn">接続テスト</button>
+                            <button id="saveSettings" class="save-btn">設定保存</button>
+                        </div>
+                        
+                        <div class="connection-status" id="connectionStatus">
+                            <span class="status-indicator" id="statusIndicator">●</span>
+                            <span class="status-text" id="statusText">未接続</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

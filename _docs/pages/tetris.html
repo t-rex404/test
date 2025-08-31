@@ -249,6 +249,9 @@
         
         // キー入力
         let keys = {};
+        let lastKeyTime = {};
+        let keyRepeatDelay = 150; // キーリピート開始までの遅延（ミリ秒）
+        let keyRepeatInterval = 100; // キーリピート間隔（ミリ秒）
         
         // ゲーム開始
         function startGame() {
@@ -288,6 +291,10 @@
             // キーイベント設定
             document.addEventListener('keydown', handleKeyDown);
             document.addEventListener('keyup', handleKeyUp);
+            
+            // キー状態初期化
+            keys = {};
+            lastKeyTime = {};
         }
         
         // ランダムピース生成
@@ -381,16 +388,43 @@
         
         // キー押下処理
         function handleKeyDown(e) {
-            keys[e.key] = true;
+            const now = Date.now();
+            const key = e.key;
             
-            if (e.key === 'p' || e.key === 'P') {
+            // 既に押されているキーの場合は、リピート遅延をチェック
+            if (keys[key] && (now - lastKeyTime[key]) < keyRepeatDelay) {
+                return;
+            }
+            
+            keys[key] = true;
+            lastKeyTime[key] = now;
+            
+            if (key === 'p' || key === 'P') {
                 togglePause();
+            }
+            
+            // キーリピートを防ぐため、preventDefaultを呼び出し
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(key)) {
+                e.preventDefault();
             }
         }
         
         // キー離上処理
         function handleKeyUp(e) {
             keys[e.key] = false;
+            
+            // 回転とハードドロップの処理フラグをリセット
+            if (e.key === 'ArrowUp') {
+                keys['ArrowUpProcessed'] = false;
+            }
+            if (e.key === ' ') {
+                keys['SpaceProcessed'] = false;
+            }
+            
+            // キー離上時にリピート処理をリセット
+            if (lastKeyTime[e.key]) {
+                delete lastKeyTime[e.key];
+            }
         }
         
         // 一時停止切り替え
@@ -412,21 +446,30 @@
         
         // ゲーム更新
         function updateGame() {
-            // ピース移動
-            if (keys['ArrowLeft']) {
+            const now = Date.now();
+            
+            // ピース移動（キーリピート制御付き）
+            if (keys['ArrowLeft'] && (now - lastKeyTime['ArrowLeft']) >= keyRepeatInterval) {
                 movePiece(-1, 0);
+                lastKeyTime['ArrowLeft'] = now;
             }
-            if (keys['ArrowRight']) {
+            if (keys['ArrowRight'] && (now - lastKeyTime['ArrowRight']) >= keyRepeatInterval) {
                 movePiece(1, 0);
+                lastKeyTime['ArrowRight'] = now;
             }
-            if (keys['ArrowDown']) {
+            if (keys['ArrowDown'] && (now - lastKeyTime['ArrowDown']) >= keyRepeatInterval) {
                 movePiece(0, 1);
+                lastKeyTime['ArrowDown'] = now;
             }
-            if (keys['ArrowUp']) {
+            
+            // 回転とハードドロップは単発処理
+            if (keys['ArrowUp'] && !keys['ArrowUpProcessed']) {
                 rotatePiece();
+                keys['ArrowUpProcessed'] = true;
             }
-            if (keys[' ']) {
+            if (keys[' '] && !keys['SpaceProcessed']) {
                 hardDrop();
+                keys['SpaceProcessed'] = true;
             }
             
             // 自動落下
