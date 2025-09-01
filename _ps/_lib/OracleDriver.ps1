@@ -45,7 +45,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -76,7 +76,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7002", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0002", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -118,7 +118,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7010", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0004", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -195,7 +195,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7020", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0007", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -264,7 +264,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7021", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0008", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -329,7 +329,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7022", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0009", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -375,7 +375,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7011", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0005", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -416,7 +416,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7012", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0006", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -469,7 +469,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7100", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0010", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -516,7 +516,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7110", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0011", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -563,7 +563,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7120", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0012", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -610,7 +610,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7130", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0013", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -657,7 +657,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7140", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0014", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -700,7 +700,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7200", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0015", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -739,7 +739,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7201", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0016", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -779,7 +779,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7202", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0017", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -818,7 +818,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7210", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0018", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -857,7 +857,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7220", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0019", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -896,7 +896,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7230", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0020", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -939,7 +939,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7300", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0021", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -978,7 +978,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7301", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0022", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1027,7 +1027,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7400", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0023", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1068,7 +1068,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7401", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0024", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1109,7 +1109,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7402", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0025", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1149,7 +1149,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7410", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0026", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1189,7 +1189,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("7411", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0027", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1240,7 +1240,7 @@ ORDER BY TABLE_NAME
             {
                 try
                 {
-                    $global:Common.HandleError("7500", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0028", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1288,7 +1288,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("7501", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0029", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1336,7 +1336,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("7003", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0003", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

@@ -50,7 +50,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -96,7 +96,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -130,7 +130,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6003", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0003", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -165,7 +165,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6004", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0004", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -206,7 +206,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6005", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0005", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -247,7 +247,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6006", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0006", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -292,7 +292,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6007", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0007", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -334,7 +334,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6008", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0008", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -376,7 +376,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6009", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0009", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -416,7 +416,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6010", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0010", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -462,7 +462,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6011", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0011", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -516,7 +516,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6012", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0012", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -552,7 +552,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6013", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0013", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -598,7 +598,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6014", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0014", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -646,7 +646,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6015", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0015", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -699,7 +699,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6017", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0017", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -728,7 +728,8 @@ class PowerPointDriver
             if ($this.powerpoint_presentation -ne $null)
             {
                 # 既に保存済みでも再保存は行わない（読み取り専用エラー回避）
-                $this.powerpoint_presentation.Close()
+                #$this.powerpoint_presentation.Close()
+                $this.SavePresentation($this.temp_directory + "\PowerPointDriver_AutoSave.pptx")
                 $this.powerpoint_presentation = $null
             }
 
@@ -754,7 +755,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("6016", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointError_0016", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

@@ -50,7 +50,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5001", "ExcelDriver初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0001", "ExcelDriver初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -96,7 +96,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -130,7 +130,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5003", "Excelアプリケーション初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0003", "Excelアプリケーション初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -160,7 +160,7 @@ class ExcelDriver
         }
         catch
         {
-            $global:Common.HandleError("5004", "新規ワークブック作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("ExcelError_0004", "新規ワークブック作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
             throw "新規ワークブックの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -194,7 +194,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5005", "セル値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0005", "セル値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -236,7 +236,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5006", "セル値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0006", "セル値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -277,7 +277,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5007", "範囲値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0007", "範囲値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -319,7 +319,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5008", "範囲値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0008", "範囲値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -367,7 +367,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5009", "フォント設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0009", "フォント設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -408,7 +408,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5010", "太字設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0010", "太字設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -449,7 +449,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5011", "背景色設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0011", "背景色設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -495,7 +495,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5012", "ワークシート追加エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0012", "ワークシート追加エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -536,7 +536,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5013", "ワークシート選択エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0013", "ワークシート選択エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -582,7 +582,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5014", "ワークブック保存エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0014", "ワークブック保存エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -630,7 +630,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5015", "ワークブック開くエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0015", "ワークブック開くエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -683,7 +683,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5016", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0016", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -713,11 +713,13 @@ class ExcelDriver
             {
                 if (-not $this.is_saved)
                 {
-                    $this.excel_workbook.Close($false)
+                    #$this.excel_workbook.Close($false)
+                    $this.SaveWorkbook($this.temp_directory + "\ExcelDriver_AutoSave.xlsx")
                 }
                 else
                 {
-                    $this.excel_workbook.Close($true)
+                    #$this.excel_workbook.Close($true)
+                    $this.SaveWorkbook($this.temp_directory + "\ExcelDriver_AutoSave.xlsx")
                 }
                 $this.excel_workbook = $null
             }
@@ -744,7 +746,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("5017", "ExcelDriver Disposeエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelError_0017", "ExcelDriver Disposeエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

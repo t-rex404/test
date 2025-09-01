@@ -406,7 +406,7 @@ catch {
     # Commonクラスのエラー処理を使用
     if ($global:Common) {
         $global:Common.HandleError(
-            "6001", 
+            "PowerPointError_0001", 
             "PowerPointDriver初期化エラー: $($_.Exception.Message)", 
             "PowerPointDriver",
             ".\AllDrivers_Error.log"
@@ -446,24 +446,46 @@ catch {
             </h2>
             
             <div class="error-range-card">
+                <p>PowerPointDriverクラスでは、PowerPointError_0001からPowerPointError_0017までのエラーコードが使用されます。</p>
                 <table class="error-table">
                     <tr>
-                        <td class="range">6001</td>
+                        <td class="range">PowerPointError_0001</td>
                         <td>PowerPointDriver初期化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">6002</td>
+                        <td class="range">PowerPointError_0002</td>
                         <td>一時ディレクトリ作成エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">6003</td>
+                        <td class="range">PowerPointError_0003</td>
                         <td>PowerPointアプリケーション初期化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">6004-6016</td>
-                        <td>各種操作エラー</td>
+                        <td class="range">PowerPointError_0004</td>
+                        <td>新規プレゼンテーション作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">PowerPointError_0005</td>
+                        <td>スライド追加エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">PowerPointError_0006</td>
+                        <td>スライド選択エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">PowerPointError_0007</td>
+                        <td>タイトル設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">PowerPointError_0008</td>
+                        <td>テキストボックス追加エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">...</td>
+                        <td>その他のエラーコード（PowerPointError_0009～PowerPointError_0017）</td>
                     </tr>
                 </table>
+                <p class="note">※ 全17個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 

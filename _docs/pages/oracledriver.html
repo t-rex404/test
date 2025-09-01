@@ -404,6 +404,60 @@ finally {
             </div>
         </section>
 
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> OracleDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>OracleDriverクラスでは、OracleError_0001からOracleError_0029までのエラーコードが使用されます。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">OracleError_0001</td>
+                        <td>OracleDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0002</td>
+                        <td>SQLPLUSパス設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0003</td>
+                        <td>OracleDriver破棄エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0004</td>
+                        <td>接続パラメータ設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0005</td>
+                        <td>データベース接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0006</td>
+                        <td>接続切断エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0007</td>
+                        <td>SQLPLUS接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0008</td>
+                        <td>SQLPLUS接続文字列接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0009</td>
+                        <td>SQLPLUS実行エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">...</td>
+                        <td>その他のエラーコード（OracleError_0010～OracleError_0029）</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全29個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
         <!-- エラーハンドリング -->
         <section class="method-section" data-searchable="エラー処理 クリーンアップ">
             <h2 class="section-title">
@@ -424,7 +478,7 @@ catch {
     # Commonクラスのエラー処理を使用
     if ($global:Common) {
         $global:Common.HandleError(
-            "7001", 
+            "OracleError_0001", 
             "OracleDriver初期化エラー: $($_.Exception.Message)", 
             "OracleDriver",
             ".\AllDrivers_Error.log"

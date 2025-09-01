@@ -254,6 +254,24 @@ function Start-MyProcess {
             </div>
         </section>
 
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> Common固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>Commonクラスでは、CommonError_0001のエラーコードが使用されます。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">CommonError_0001</td>
+                        <td>サンプルレポート生成エラー</td>
+                    </tr>
+                </table>
+                <p class="note">※ Commonクラスは主に共通機能を提供するため、エラーコードは限定的です。各ドライバークラス固有のエラーコードは、それぞれのクラスページを参照してください。</p>
+            </div>
+        </section>
+
         <!-- ベストプラクティス -->
         <section class="method-section">
             <h2 class="section-title">
@@ -273,9 +291,10 @@ function Start-MyProcess {
                     </li>
                     <li><strong>エラーコードの体系的な管理</strong>
                         <ul>
-                            <li>モジュールごとに番号帯を分ける</li>
+                            <li>クラス名_Error_4桁番号の形式で統一</li>
                             <li>意味のあるエラータイトルを付ける</li>
                             <li>JSONファイルで一元管理</li>
+                            <li>例：WebError_0001、ChromeError_0001、WordError_0001</li>
                         </ul>
                     </li>
                 </ul>

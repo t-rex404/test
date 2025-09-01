@@ -437,6 +437,56 @@ finally {
             </div>
         </section>
 
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> WordDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>WordDriverクラスでは、WordError_0001からWordError_0025までのエラーコードが使用されます。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">WordError_0001</td>
+                        <td>WordDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0002</td>
+                        <td>一時ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0003</td>
+                        <td>Wordアプリケーション初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0004</td>
+                        <td>新規ドキュメント作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0005</td>
+                        <td>テキスト追加エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0006</td>
+                        <td>見出し追加エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0007</td>
+                        <td>段落追加エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WordError_0008</td>
+                        <td>表追加エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">...</td>
+                        <td>その他のエラーコード（WordError_0009～WordError_0025）</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全25個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
         <!-- エラーハンドリング -->
         <section class="method-section" data-searchable="エラー処理 クリーンアップ">
             <h2 class="section-title">
