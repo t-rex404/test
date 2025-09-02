@@ -84,6 +84,9 @@ try {
 	# 画像
 	if (Test-Path $ImgPath) {
 		Invoke-TestStep -Name 'AddImage(sample_word_image.png)' -ScriptBlock { $driver.AddImage($ImgPath) }
+		Invoke-TestStep -Name 'AddImage(sample_word_image.png, width=150)' -ScriptBlock { $driver.AddImage($ImgPath, 150, 0) }
+		Invoke-TestStep -Name 'AddImage(sample_word_image.png, height=80)' -ScriptBlock { $driver.AddImage($ImgPath, 0, 80) }
+		Invoke-TestStep -Name 'AddImage(sample_word_image.png, width=120, height=60)' -ScriptBlock { $driver.AddImage($ImgPath, 120, 60) }
 	}
 
 	Invoke-TestStep -Name 'AddPageBreak()' -ScriptBlock { $driver.AddPageBreak() }
