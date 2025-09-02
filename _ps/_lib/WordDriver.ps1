@@ -1,4 +1,4 @@
-﻿# Wordファイル操作クラス
+# Wordファイル操作クラス
 # 必要なアセンブリを読み込み
 Add-Type -AssemblyName Microsoft.Office.Interop.Word
 
@@ -733,7 +733,7 @@ class WordDriver
     }
 
     # 画像を追加
-    [void] AddImage([string]$image_path)
+    [void] AddImage([string]$image_path, [double]$width = 0, [double]$height = 0)
     {
         try
         {
@@ -752,19 +752,66 @@ class WordDriver
                 throw "WordDriverが初期化されていません。"
             }
 
+            # 画像サイズの検証
+            if ($width -lt 0)
+            {
+                throw "画像の幅は0以上の値である必要があります。"
+            }
+
+            if ($height -lt 0)
+            {
+                throw "画像の高さは0以上の値である必要があります。"
+            }
+
             # ドキュメントの最後に画像を挿入するためのRangeを作成
             $range = $this.word_document.Content
             $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
             
             # 画像を挿入（正しい位置に挿入）
-            $this.word_document.InlineShapes.AddPicture($image_path, $false, $true, $range)
+            $inline_shape = $this.word_document.InlineShapes.AddPicture($image_path, $false, $true, $range)
+            
+            # 画像サイズが指定されている場合はリサイズ
+            if ($width -gt 0 -or $height -gt 0)
+            {
+                # アスペクト比を保持するかどうかを決定
+                $lock_aspect_ratio = $true
+                
+                if ($width -gt 0 -and $height -gt 0)
+                {
+                    # 両方のサイズが指定されている場合はアスペクト比を無視
+                    $lock_aspect_ratio = $false
+                }
+                
+                # 画像をリサイズ
+                if ($width -gt 0)
+                {
+                    $inline_shape.Width = $width
+                }
+                
+                if ($height -gt 0)
+                {
+                    $inline_shape.Height = $height
+                }
+                
+                # アスペクト比の設定
+                $inline_shape.LockAspectRatio = $lock_aspect_ratio
+                
+                Write-Host "画像をリサイズしました: 幅=$width, 高さ=$height, アスペクト比保持=$lock_aspect_ratio"
+            }
             
             # 画像の後に段落を追加
             $range = $this.word_document.Content
             $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
             $range.InsertParagraphAfter()
             
-            Write-Host "画像を追加しました: $image_path"
+            if ($width -gt 0 -or $height -gt 0)
+            {
+                Write-Host "画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)"
+            }
+            else
+            {
+                Write-Host "画像を追加しました: $image_path (元のサイズ)"
+            }
         }
         catch
         {
