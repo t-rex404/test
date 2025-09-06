@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIAutomationDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>UIAutomationDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🎯</span>
+                UIAutomationDriver クラス
+                <span class="emoji">🎯</span>
+            </h1>
+            <p class="subtitle">UI Automationを使用した高度なGUIアプリケーション自動化 🚀</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>UIAutomationDriverクラスは、Windows UI Automationを使用してGUIアプリケーションの自動操作を行うためのPowerShellクラスです。UI Automationは、アクセシビリティ機能を活用して、より高精度で安定したGUI操作を実現します。要素の検索、操作、テキスト取得など、複雑なアプリケーションの自動化に最適です。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>高度なGUIアプリケーションの自動化</li>
+                    <li>要素ベースの精密な操作</li>
+                    <li>複雑なUIアプリケーションの制御</li>
+                    <li>アクセシビリティ機能を活用した操作</li>
+                </ul>
+            </div>
+
+            <div class="note-card success">
+                <h3>✨ 対応アプリケーション</h3>
+                <p>WinForms、WPF、Webアプリケーションなど、様々なタイプのアプリケーションに対応しています。</p>
+            </div>
+        </section>
+
+        <!-- 初期化・アプリケーション起動関連 -->
+        <section class="method-section" data-searchable="初期化 起動 アプリケーション">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・アプリケーション起動関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">UIAutomationDriver() - コンストラクタ</div>
+                <p>UIAutomationDriverインスタンスを作成し、UI Automationアセンブリを読み込みます。初期化に失敗した場合は、適切なエラーハンドリングが実行されます。</p>
+                
+                <div class="code-example">
+                    <pre><code># UIAutomationDriverのインスタンスを作成
+$uiAuto = [UIAutomationDriver]::new()
+
+# 自動的に以下が実行されます：
+# - UIAutomationClientアセンブリの読み込み
+# - UIAutomationTypesアセンブリの読み込み
+# - 初期設定の実行
+# - エラー発生時の適切なハンドリング</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">エラーハンドリング機能</div>
+                <p>コンストラクタでは、初期化に失敗した場合の包括的なエラーハンドリングが実装されています。</p>
+                
+                <div class="code-example">
+                    <pre><code># エラーハンドリングの例
+try {
+    $uiAuto = [UIAutomationDriver]::new()
+    Write-Host "UIAutomationDriverの初期化が成功しました" -ForegroundColor Green
+}
+catch {
+    # コンストラクタ内でエラーログが自動的に記録されます
+    # UIAError_0001がエラーログに記録される
+    Write-Host "UIAutomationDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Commonオブジェクトが利用可能な場合：
+# - エラーログファイル（AllDrivers_Error.log）に記録
+# - エラーコード（UIAError_0001）で識別可能
+# - 詳細なエラー情報が保存される</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">StartApplication([string]$app_path, [string]$arguments) - アプリケーション起動</div>
+                <p>指定したアプリケーションを起動します。</p>
+                
+                <div class="code-example">
+                    <pre><code># アプリケーションを起動
+$uiAuto.StartApplication("notepad.exe")
+
+# 引数付きで起動
+$uiAuto.StartApplication("chrome.exe", "https://www.google.com")
+
+# 特定のファイルを開く
+$uiAuto.StartApplication("notepad.exe", "C:\test\file.txt")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindWindow([string]$window_title) - ウィンドウ検索</div>
+                <p>指定したタイトルのウィンドウを検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ウィンドウを検索
+$uiAuto.FindWindow("メモ帳")
+
+# 部分一致で検索
+$uiAuto.FindWindow("Chrome")
+
+# 検索後、ウィンドウをアクティブ化
+$uiAuto.ActivateWindow()</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 要素検索関連 -->
+        <section class="method-section" data-searchable="要素 検索 名前 コントロールタイプ">
+            <h2 class="section-title">
+                <span class="icon">🔍</span> 要素検索関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">FindElementByName([string]$name) - 名前で要素検索</div>
+                <p>指定した名前の要素を検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 要素を名前で検索
+$textBox = $uiAuto.FindElementByName("テキスト エディター")
+
+# ボタンを検索
+$button = $uiAuto.FindElementByName("OK")
+
+# 検索した要素をクリック
+$uiAuto.ClickElement($button)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindElementByControlType([ControlType]$controlType) - コントロールタイプで要素検索</div>
+                <p>指定したコントロールタイプの要素を検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ボタンを検索
+$button = $uiAuto.FindElementByControlType([System.Windows.Automation.ControlType]::Button)
+
+# テキストボックスを検索
+$textBox = $uiAuto.FindElementByControlType([System.Windows.Automation.ControlType]::Edit)
+
+# 検索した要素を操作
+$uiAuto.ClickElement($button)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindElement([hashtable]$conditions) - 複合条件で要素検索</div>
+                <p>複数の条件を組み合わせて要素を検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 複合条件でボタンを検索
+$buttonConditions = @{
+    [System.Windows.Automation.AutomationElement]::ControlTypeProperty = [System.Windows.Automation.ControlType]::Button
+    [System.Windows.Automation.AutomationElement]::NameProperty = "設定"
+}
+$settingsButton = $uiAuto.FindElement($buttonConditions)
+
+# 検索した要素をクリック
+$uiAuto.ClickElement($settingsButton)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 要素操作関連 -->
+        <section class="method-section" data-searchable="要素 操作 クリック テキスト">
+            <h2 class="section-title">
+                <span class="icon">🎯</span> 要素操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">ClickElement([AutomationElement]$element) - 要素クリック</div>
+                <p>指定した要素をクリックします。</p>
+                
+                <div class="code-example">
+                    <pre><code># 要素をクリック
+$uiAuto.ClickElement($button)
+
+# 検索とクリックを組み合わせ
+$button = $uiAuto.FindElementByName("OK")
+$uiAuto.ClickElement($button)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetElementText([AutomationElement]$element, [string]$text) - 要素にテキスト設定</div>
+                <p>指定した要素にテキストを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 要素にテキストを設定
+$uiAuto.SetElementText($textBox, "Hello, UIAutomation!")
+
+# 検索とテキスト設定を組み合わせ
+$textBox = $uiAuto.FindElementByControlType([System.Windows.Automation.ControlType]::Edit)
+$uiAuto.SetElementText($textBox, "設定値")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetElementText([AutomationElement]$element) - 要素のテキスト取得</div>
+                <p>指定した要素のテキストを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 要素のテキストを取得
+$currentText = $uiAuto.GetElementText($textBox)
+Write-Host "現在のテキスト: $currentText"
+
+# 検索とテキスト取得を組み合わせ
+$textBox = $uiAuto.FindElementByName("テキスト エディター")
+$text = $uiAuto.GetElementText($textBox)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- マウス・キーボード操作関連 -->
+        <section class="method-section" data-searchable="マウス キーボード 入力">
+            <h2 class="section-title">
+                <span class="icon">🖱️</span> マウス・キーボード操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">ClickMouse([int]$x, [int]$y, [string]$button) - マウスクリック</div>
+                <p>指定した座標でマウスクリックを実行します。</p>
+                
+                <div class="code-example">
+                    <pre><code># マウスクリック
+$uiAuto.ClickMouse(100, 200, "Left")
+$uiAuto.ClickMouse(150, 250, "Right")
+
+# ダブルクリック
+$uiAuto.DoubleClickMouse(200, 300)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">TypeText([string]$text) - テキスト入力</div>
+                <p>テキストを入力します。</p>
+                
+                <div class="code-example">
+                    <pre><code># テキストを入力
+$uiAuto.TypeText("PowerShell UIAutomation テスト")
+
+# 特殊キーと組み合わせ
+$uiAuto.TypeText("Line 1")
+$uiAuto.SendSpecialKey("Enter")
+$uiAuto.TypeText("Line 2")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SendSpecialKey([string]$key) - 特殊キー送信</div>
+                <p>特殊キーを送信します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 特殊キーを送信
+$uiAuto.SendSpecialKey("Enter")
+$uiAuto.SendSpecialKey("Tab")
+$uiAuto.SendSpecialKey("Escape")
+
+# ファンクションキー
+$uiAuto.SendSpecialKey("F5")  # 更新</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SendKeyCombination([string[]]$keys) - キー組み合わせ送信</div>
+                <p>複数のキーを同時に押す組み合わせを送信します。</p>
+                
+                <div class="code-example">
+                    <pre><code># キー組み合わせを送信
+$uiAuto.SendKeyCombination(@("Ctrl", "C"))  # Ctrl+C
+$uiAuto.SendKeyCombination(@("Alt", "F4"))  # Alt+F4
+$uiAuto.SendKeyCombination(@("Ctrl", "Shift", "S"))  # Ctrl+Shift+S</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- スクリーンショット関連 -->
+        <section class="method-section" data-searchable="スクリーンショット 画像 キャプチャ">
+            <h2 class="section-title">
+                <span class="icon">📸</span> スクリーンショット関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">TakeScreenshot([string]$file_path) - スクリーンショット取得</div>
+                <p>画面全体のスクリーンショットを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># スクリーンショットを取得
+$uiAuto.TakeScreenshot("C:\screenshots\fullscreen.png")
+
+# タイムスタンプ付きで保存
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$uiAuto.TakeScreenshot("C:\screenshots\screenshot_$timestamp.png")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">TakeWindowScreenshot([string]$file_path) - ウィンドウスクリーンショット取得</div>
+                <p>現在のウィンドウのスクリーンショットを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ウィンドウのスクリーンショットを取得
+$uiAuto.TakeWindowScreenshot("C:\screenshots\window.png")
+
+# 操作前後の比較用
+$uiAuto.TakeWindowScreenshot("C:\screenshots\before.png")
+# 何らかの操作
+$uiAuto.TakeWindowScreenshot("C:\screenshots\after.png")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: Webブラウザでの自動操作</div>
+                
+                <div class="code-example">
+                    <pre><code># Webブラウザでの自動操作
+$uiAuto = [UIAutomationDriver]::new()
+
+try {
+    # Chromeを起動
+    $uiAuto.StartApplication("chrome.exe")
+    $uiAuto.FindWindow("Google Chrome")
+    $uiAuto.ActivateWindow()
+    Start-Sleep -Milliseconds 3000
+    
+    # アドレスバーを検索してURLを入力
+    $addressBar = $uiAuto.FindElementByControlType([System.Windows.Automation.ControlType]::Edit)
+    $uiAuto.SetElementText($addressBar, "https://www.google.com")
+    $uiAuto.SendSpecialKey("Enter")
+    Start-Sleep -Milliseconds 5000
+    
+    # 検索ボックスを検索してキーワードを入力
+    $searchBox = $uiAuto.FindElementByName("検索")
+    $uiAuto.SetElementText($searchBox, "PowerShell UIAutomation")
+    $uiAuto.SendSpecialKey("Enter")
+    Start-Sleep -Milliseconds 3000
+    
+    # 結果ページのスクリーンショットを取得
+    $uiAuto.TakeWindowScreenshot("C:\screenshots\google_search_results.png")
+    
+    $uiAuto.CloseApplication()
+}
+finally {
+    $uiAuto.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: Excelでの自動データ入力</div>
+                
+                <div class="code-example">
+                    <pre><code># Excelでの自動データ入力
+$uiAuto = [UIAutomationDriver]::new()
+
+try {
+    # Excelを起動
+    $uiAuto.StartApplication("excel.exe")
+    $uiAuto.FindWindow("Microsoft Excel")
+    $uiAuto.ActivateWindow()
+    Start-Sleep -Milliseconds 5000
+    
+    # セルA1をクリック
+    $cellA1 = $uiAuto.FindElementByName("A1")
+    $uiAuto.ClickElement($cellA1)
+    
+    # データを入力
+    $uiAuto.TypeText("商品名")
+    $uiAuto.SendSpecialKey("Tab")
+    $uiAuto.TypeText("価格")
+    $uiAuto.SendSpecialKey("Tab")
+    $uiAuto.TypeText("在庫数")
+    $uiAuto.SendSpecialKey("Enter")
+    
+    # 次の行に移動してデータを入力
+    $uiAuto.TypeText("ノートパソコン")
+    $uiAuto.SendSpecialKey("Tab")
+    $uiAuto.TypeText("150000")
+    $uiAuto.SendSpecialKey("Tab")
+    $uiAuto.TypeText("10")
+    $uiAuto.SendSpecialKey("Enter")
+    
+    # ファイルを保存
+    $uiAuto.SendKeyCombination(@("Ctrl", "S"))
+    Start-Sleep -Milliseconds 2000
+    $uiAuto.TypeText("C:\data\automated_data.xlsx")
+    $uiAuto.SendSpecialKey("Enter")
+    
+    $uiAuto.CloseApplication()
+}
+finally {
+    $uiAuto.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> UIAutomationDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>UIAutomationDriverクラスでは、UIAError_0001からUIAError_0025までのエラーコードが使用されます（25個）。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">UIAError_0001</td>
+                        <td>UIAutomationDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0002</td>
+                        <td>アプリケーション起動エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0003</td>
+                        <td>ウィンドウ検索エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0004</td>
+                        <td>ウィンドウアクティブ化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0005</td>
+                        <td>要素検索エラー（名前）</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0006</td>
+                        <td>要素検索エラー（コントロールタイプ）</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0007</td>
+                        <td>要素検索エラー（複合条件）</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0008</td>
+                        <td>要素クリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0009</td>
+                        <td>要素テキスト設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0010</td>
+                        <td>要素テキスト取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0011</td>
+                        <td>マウスクリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0012</td>
+                        <td>マウスダブルクリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0013</td>
+                        <td>マウス右クリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0014</td>
+                        <td>マウス移動エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0015</td>
+                        <td>キーボード入力エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0016</td>
+                        <td>特殊キー送信エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0017</td>
+                        <td>キー組み合わせ送信エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0018</td>
+                        <td>テキスト入力エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0019</td>
+                        <td>スクリーンショット取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0020</td>
+                        <td>ウィンドウスクリーンショット取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0021</td>
+                        <td>プロセス終了エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0022</td>
+                        <td>プロセス強制終了エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0023</td>
+                        <td>プロセス状態確認エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0024</td>
+                        <td>UIAutomationDriver破棄エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0025</td>
+                        <td>タイムアウトエラー</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全25個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">UIAutomationDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

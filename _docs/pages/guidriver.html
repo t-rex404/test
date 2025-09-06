@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUIDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>GUIDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🖱️</span>
+                GUIDriver クラス
+                <span class="emoji">🖱️</span>
+            </h1>
+            <p class="subtitle">GUIアプリケーションの自動操作とマウス・キーボード制御 🚀</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>GUIDriverクラスは、Windows GUIアプリケーションの自動操作を行うためのPowerShellクラスです。マウス操作、キーボード入力、ウィンドウ制御、スクリーンショット取得などの機能を提供し、様々なデスクトップアプリケーションの自動化を可能にします。Windows FormsとSystem.Drawingを活用して、高精度なGUI操作を実現します。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>デスクトップアプリケーションの自動化</li>
+                    <li>マウス・キーボード操作の自動化</li>
+                    <li>ウィンドウ制御の自動化</li>
+                    <li>スクリーンショット取得の自動化</li>
+                </ul>
+            </div>
+
+            <div class="note-card success">
+                <h3>✨ 対応機能</h3>
+                <p>マウス操作、キーボード制御、ウィンドウ管理、スクリーンショット取得など、包括的なGUI自動化機能を提供します。</p>
+            </div>
+        </section>
+
+        <!-- 初期化・アプリケーション起動関連 -->
+        <section class="method-section" data-searchable="初期化 起動 アプリケーション">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・アプリケーション起動関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">GUIDriver() - コンストラクタ</div>
+                <p>GUIDriverインスタンスを作成し、必要なアセンブリを読み込みます。初期化に失敗した場合は、適切なエラーハンドリングが実行されます。</p>
+                
+                <div class="code-example">
+                    <pre><code># GUIDriverのインスタンスを作成
+$gui = [GUIDriver]::new()
+
+# 自動的に以下が実行されます：
+# - System.Windows.Formsアセンブリの読み込み
+# - System.Drawingアセンブリの読み込み
+# - 初期設定の実行
+# - エラー発生時の適切なハンドリング</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">エラーハンドリング機能</div>
+                <p>コンストラクタでは、初期化に失敗した場合の包括的なエラーハンドリングが実装されています。</p>
+                
+                <div class="code-example">
+                    <pre><code># エラーハンドリングの例
+try {
+    $gui = [GUIDriver]::new()
+    Write-Host "GUIDriverの初期化が成功しました" -ForegroundColor Green
+}
+catch {
+    # コンストラクタ内でエラーログが自動的に記録されます
+    # GUIError_0001がエラーログに記録される
+    Write-Host "GUIDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Commonオブジェクトが利用可能な場合：
+# - エラーログファイル（AllDrivers_Error.log）に記録
+# - エラーコード（GUIError_0001）で識別可能
+# - 詳細なエラー情報が保存される</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">StartApplication([string]$app_path, [string]$arguments) - アプリケーション起動</div>
+                <p>指定したアプリケーションを起動します。</p>
+                
+                <div class="code-example">
+                    <pre><code># アプリケーションを起動
+$gui.StartApplication("notepad.exe")
+
+# 引数付きで起動
+$gui.StartApplication("chrome.exe", "https://www.google.com")
+
+# 特定のファイルを開く
+$gui.StartApplication("notepad.exe", "C:\test\file.txt")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindWindow([string]$window_title) - ウィンドウ検索</div>
+                <p>指定したタイトルのウィンドウを検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ウィンドウを検索
+$gui.FindWindow("メモ帳")
+
+# 部分一致で検索
+$gui.FindWindow("Chrome")
+
+# 検索後、ウィンドウをアクティブ化
+$gui.ActivateWindow()</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- マウス操作関連 -->
+        <section class="method-section" data-searchable="マウス クリック 移動">
+            <h2 class="section-title">
+                <span class="icon">🖱️</span> マウス操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">ClickMouse([int]$x, [int]$y, [string]$button) - マウスクリック</div>
+                <p>指定した座標でマウスクリックを実行します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 左クリック
+$gui.ClickMouse(100, 200, "Left")
+
+# 右クリック
+$gui.ClickMouse(150, 250, "Right")
+
+# 中央クリック
+$gui.ClickMouse(200, 300, "Middle")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DoubleClickMouse([int]$x, [int]$y) - ダブルクリック</div>
+                <p>指定した座標でマウスダブルクリックを実行します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ダブルクリック
+$gui.DoubleClickMouse(150, 250)
+
+# ファイルアイコンをダブルクリック
+$gui.DoubleClickMouse(300, 200)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">RightClickMouse([int]$x, [int]$y) - 右クリック</div>
+                <p>指定した座標でマウス右クリックを実行します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 右クリック
+$gui.RightClickMouse(200, 300)
+
+# コンテキストメニューを表示
+$gui.RightClickMouse(400, 500)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">MoveMouse([int]$x, [int]$y) - マウス移動</div>
+                <p>マウスカーソルを指定した座標に移動します。</p>
+                
+                <div class="code-example">
+                    <pre><code># マウスを移動
+$gui.MoveMouse(300, 400)
+
+# 段階的に移動
+$gui.MoveMouse(100, 100)
+Start-Sleep -Milliseconds 500
+$gui.MoveMouse(200, 200)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- キーボード操作関連 -->
+        <section class="method-section" data-searchable="キーボード 入力 特殊キー">
+            <h2 class="section-title">
+                <span class="icon">⌨️</span> キーボード操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">TypeText([string]$text) - テキスト入力</div>
+                <p>指定したテキストを入力します。</p>
+                
+                <div class="code-example">
+                    <pre><code># テキストを入力
+$gui.TypeText("Hello, World!")
+
+# 複数行のテキスト入力
+$gui.TypeText("Line 1")
+$gui.SendSpecialKey("Enter")
+$gui.TypeText("Line 2")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SendSpecialKey([string]$key) - 特殊キー送信</div>
+                <p>特殊キー（Enter、Tab、Escape等）を送信します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 特殊キーを送信
+$gui.SendSpecialKey("Enter")
+$gui.SendSpecialKey("Tab")
+$gui.SendSpecialKey("Escape")
+
+# ファンクションキー
+$gui.SendSpecialKey("F5")  # 更新
+$gui.SendSpecialKey("F1")  # ヘルプ</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SendKeyCombination([string[]]$keys) - キー組み合わせ送信</div>
+                <p>複数のキーを同時に押す組み合わせを送信します。</p>
+                
+                <div class="code-example">
+                    <pre><code># キー組み合わせを送信
+$gui.SendKeyCombination(@("Ctrl", "C"))  # Ctrl+C
+$gui.SendKeyCombination(@("Alt", "F4"))  # Alt+F4
+$gui.SendKeyCombination(@("Ctrl", "Shift", "S"))  # Ctrl+Shift+S</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- スクリーンショット関連 -->
+        <section class="method-section" data-searchable="スクリーンショット 画像 キャプチャ">
+            <h2 class="section-title">
+                <span class="icon">📸</span> スクリーンショット関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">TakeScreenshot([string]$file_path) - スクリーンショット取得</div>
+                <p>画面全体のスクリーンショットを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># スクリーンショットを取得
+$gui.TakeScreenshot("C:\screenshots\fullscreen.png")
+
+# タイムスタンプ付きで保存
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$gui.TakeScreenshot("C:\screenshots\screenshot_$timestamp.png")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">TakeWindowScreenshot([string]$file_path) - ウィンドウスクリーンショット取得</div>
+                <p>現在のウィンドウのスクリーンショットを取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ウィンドウのスクリーンショットを取得
+$gui.TakeWindowScreenshot("C:\screenshots\window.png")
+
+# 操作前後の比較用
+$gui.TakeWindowScreenshot("C:\screenshots\before.png")
+# 何らかの操作
+$gui.TakeWindowScreenshot("C:\screenshots\after.png")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: メモ帳での自動テキスト入力</div>
+                
+                <div class="code-example">
+                    <pre><code># メモ帳での自動操作
+$gui = [GUIDriver]::new()
+
+try {
+    # メモ帳を起動
+    $gui.StartApplication("notepad.exe")
+    
+    # ウィンドウを検索してアクティブ化
+    $gui.FindWindow("メモ帳")
+    $gui.ActivateWindow()
+    
+    # 少し待機してからテキスト入力
+    Start-Sleep -Milliseconds 1000
+    $gui.TypeText("PowerShell GUIDriver テスト")
+    $gui.SendSpecialKey("Enter")
+    $gui.TypeText("自動化されたテキスト入力です。")
+    
+    # スクリーンショットを取得
+    $gui.TakeWindowScreenshot("C:\screenshots\notepad_test.png")
+    
+    # ファイルを保存
+    $gui.SendKeyCombination(@("Ctrl", "S"))
+    Start-Sleep -Milliseconds 500
+    $gui.TypeText("C:\test\automated_text.txt")
+    $gui.SendSpecialKey("Enter")
+    
+    # アプリケーションを終了
+    $gui.CloseApplication()
+}
+finally {
+    $gui.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: 電卓アプリケーションの自動操作</div>
+                
+                <div class="code-example">
+                    <pre><code># 電卓での計算自動化
+$gui = [GUIDriver]::new()
+
+try {
+    # 電卓を起動
+    $gui.StartApplication("calc.exe")
+    $gui.FindWindow("電卓")
+    $gui.ActivateWindow()
+    Start-Sleep -Milliseconds 1000
+    
+    # 計算を実行: 123 + 456 = 579
+    $gui.TypeText("123")
+    $gui.SendKeys("+")
+    $gui.TypeText("456")
+    $gui.SendKeys("=")
+    
+    # 結果のスクリーンショットを取得
+    $gui.TakeWindowScreenshot("C:\screenshots\calculator_result.png")
+    
+    # クリアして次の計算
+    $gui.SendKeys("c")
+    $gui.TypeText("100")
+    $gui.SendKeys("*")
+    $gui.TypeText("5")
+    $gui.SendKeys("=")
+    
+    # 最終結果のスクリーンショット
+    $gui.TakeWindowScreenshot("C:\screenshots\calculator_final.png")
+    
+    $gui.CloseApplication()
+}
+finally {
+    $gui.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> GUIDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>GUIDriverクラスでは、GUIError_0001からGUIError_0019までのエラーコードが使用されます（19個）。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">GUIError_0001</td>
+                        <td>GUIDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0002</td>
+                        <td>アプリケーション起動エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0003</td>
+                        <td>ウィンドウ検索エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0004</td>
+                        <td>ウィンドウアクティブ化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0005</td>
+                        <td>マウスクリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0006</td>
+                        <td>マウス右クリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0007</td>
+                        <td>マウスダブルクリックエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0008</td>
+                        <td>マウス移動エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0009</td>
+                        <td>キーボード入力エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0010</td>
+                        <td>特殊キー送信エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0011</td>
+                        <td>キー組み合わせ送信エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0012</td>
+                        <td>テキスト入力エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0013</td>
+                        <td>スクリーンショット取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0014</td>
+                        <td>ウィンドウスクリーンショット取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0015</td>
+                        <td>プロセス終了エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0016</td>
+                        <td>プロセス強制終了エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0017</td>
+                        <td>プロセス状態確認エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0018</td>
+                        <td>GUIDriver破棄エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">GUIError_0019</td>
+                        <td>タイムアウトエラー</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全19個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">GUIDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -359,7 +359,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0008", "ファイルアップロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0007", "ファイルアップロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -407,7 +407,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0009", "ファイルダウンロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0008", "ファイルダウンロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -445,7 +445,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0010", "ファイル削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0009", "ファイル削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -483,7 +483,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0011", "ディレクトリ作成エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0010", "ディレクトリ作成エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -521,7 +521,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0012", "ディレクトリ削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0011", "ディレクトリ削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -577,7 +577,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0013", "ファイル一覧取得エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0012", "ファイル一覧取得エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -617,7 +617,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0014", "ファイル存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0013", "ファイル存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -657,7 +657,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0015", "ディレクトリ存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0014", "ディレクトリ存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -704,7 +704,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0020", "転送オプション設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0015", "転送オプション設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

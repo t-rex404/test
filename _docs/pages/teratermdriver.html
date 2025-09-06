@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeraTermDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>TeraTermDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🖥️</span>
+                TeraTermDriver クラス
+                <span class="emoji">🖥️</span>
+            </h1>
+            <p class="subtitle">TeraTermを使用したSSH/Telnet接続の自動化 🚀</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>TeraTermDriverクラスは、TeraTermのマクロ機能を使用してSSH/Telnet接続を自動化するためのPowerShellクラスです。リモートサーバーへの接続、コマンド実行、ファイル転送などを自動化できます。TeraTermの強力なマクロ機能を活用して、複雑なターミナル操作を簡単に実行できます。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>SSH/Telnet接続の自動化</li>
+                    <li>リモートサーバーでのコマンド実行</li>
+                    <li>ファイル転送の自動化</li>
+                    <li>サーバー管理の自動化</li>
+                </ul>
+            </div>
+
+            <div class="note-card success">
+                <h3>✨ 対応プロトコル</h3>
+                <p>SSH、Telnetプロトコルに対応し、TeraTermのマクロ機能を活用した高精度な自動化を実現します。</p>
+            </div>
+        </section>
+
+        <!-- 初期化・接続関連 -->
+        <section class="method-section" data-searchable="初期化 接続 サーバー">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">TeraTermDriver() - コンストラクタ</div>
+                <p>TeraTermDriverインスタンスを作成し、TeraTermの実行ファイルパスを検出します。</p>
+                
+                <div class="code-example">
+                    <pre><code># TeraTermDriverのインスタンスを作成
+$teraterm = [TeraTermDriver]::new()
+
+# 自動的に以下が実行されます：
+# - TeraTerm実行ファイルパスの検出
+# - 一時ディレクトリの作成
+# - 接続パラメータの初期化</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetConnectionParameters([string]$host, [string]$port, [string]$protocol, [string]$username, [string]$password) - 接続パラメータ設定</div>
+                <p>サーバー接続に必要なパラメータを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 接続パラメータを設定
+$teraterm.SetConnectionParameters(
+    -host "192.168.1.100"
+    -port "22"
+    -protocol "SSH"
+    -username "admin"
+    -password "password"
+)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Connect() - サーバー接続</div>
+                <p>設定されたパラメータでサーバーに接続します。</p>
+                
+                <div class="code-example">
+                    <pre><code># サーバーに接続
+$teraterm.Connect()
+
+# 接続状態を確認
+if ($teraterm.IsConnected()) {
+    Write-Host "接続成功！" -ForegroundColor Green
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- コマンド実行関連 -->
+        <section class="method-section" data-searchable="コマンド 実行 リモート">
+            <h2 class="section-title">
+                <span class="icon">📝</span> コマンド実行関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">ExecuteCommand([string]$command, [string]$expectedPrompt, [int]$timeoutSeconds) - コマンド実行</div>
+                <p>リモートサーバーでコマンドを実行し、結果を取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># コマンドを実行
+$result = $teraterm.ExecuteCommand("ls -la", "$", 30)
+Write-Host "コマンド結果: $result"
+
+# 複数のコマンドを実行
+$commands = @("pwd", "whoami", "date")
+foreach ($cmd in $commands) {
+    $result = $teraterm.ExecuteCommand($cmd, "$", 10)
+    Write-Host "$cmd : $result"
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">IsConnected() - 接続状態確認</div>
+                <p>現在の接続状態を確認します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 接続状態を確認
+if ($teraterm.IsConnected()) {
+    Write-Host "接続中です"
+} else {
+    Write-Host "接続されていません"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ファイル転送関連 -->
+        <section class="method-section" data-searchable="ファイル 転送 アップロード ダウンロード">
+            <h2 class="section-title">
+                <span class="icon">📁</span> ファイル転送関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">UploadFile([string]$localFilePath, [string]$remoteFilePath) - ファイルアップロード</div>
+                <p>SCPを使用してローカルファイルをリモートサーバーにアップロードします。</p>
+                
+                <div class="code-example">
+                    <pre><code># ファイルをアップロード
+$teraterm.UploadFile("C:\local\file.txt", "/remote/path/file.txt")
+
+# 複数ファイルのアップロード
+$localFiles = Get-ChildItem "C:\data\*" -File
+foreach ($file in $localFiles) {
+    $remotePath = "/uploads/$($file.Name)"
+    $teraterm.UploadFile($file.FullName, $remotePath)
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DownloadFile([string]$remoteFilePath, [string]$localFilePath) - ファイルダウンロード</div>
+                <p>SCPを使用してリモートサーバーからファイルをダウンロードします。</p>
+                
+                <div class="code-example">
+                    <pre><code># ファイルをダウンロード
+$teraterm.DownloadFile("/remote/path/file.txt", "C:\local\file.txt")
+
+# バックアップファイルをダウンロード
+$teraterm.DownloadFile("/backup/data.zip", "C:\backup\data_$(Get-Date -Format 'yyyyMMdd').zip")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: 基本的なサーバー管理</div>
+                
+                <div class="code-example">
+                    <pre><code># サーバー管理の自動化
+$teraterm = [TeraTermDriver]::new()
+
+try {
+    # 接続パラメータを設定
+    $teraterm.SetConnectionParameters(
+        -host "192.168.1.100"
+        -port "22"
+        -protocol "SSH"
+        -username "admin"
+        -password "adminpass"
+    )
+    
+    # サーバーに接続
+    $teraterm.Connect()
+    
+    # システム情報を取得
+    $hostname = $teraterm.ExecuteCommand("hostname", "$", 10)
+    $uptime = $teraterm.ExecuteCommand("uptime", "$", 10)
+    $disk = $teraterm.ExecuteCommand("df -h", "$", 10)
+    
+    Write-Host "ホスト名: $hostname"
+    Write-Host "稼働時間: $uptime"
+    Write-Host "ディスク使用量: $disk"
+    
+    # 接続を切断
+    $teraterm.Disconnect()
+}
+finally {
+    $teraterm.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: バッチファイル転送</div>
+                
+                <div class="code-example">
+                    <pre><code># 複数ファイルの一括転送
+$teraterm = [TeraTermDriver]::new()
+
+try {
+    $teraterm.SetConnectionParameters(
+        -host "backup.example.com"
+        -port "22"
+        -protocol "SSH"
+        -username "backup"
+        -password "backuppass"
+    )
+    
+    $teraterm.Connect()
+    
+    # ローカルファイルをリモートにアップロード
+    $localFiles = Get-ChildItem "C:\backup\*" -File
+    foreach ($file in $localFiles) {
+        $remotePath = "/backup/$($file.Name)"
+        $teraterm.UploadFile($file.FullName, $remotePath)
+        Write-Host "アップロード完了: $($file.Name)"
+    }
+    
+    # リモートファイルをローカルにダウンロード
+    $remoteFiles = @("config.txt", "log.txt", "data.csv")
+    foreach ($file in $remoteFiles) {
+        $localPath = "C:\download\$file"
+        $teraterm.DownloadFile("/remote/$file", $localPath)
+        Write-Host "ダウンロード完了: $file"
+    }
+    
+    $teraterm.Disconnect()
+}
+finally {
+    $teraterm.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> TeraTermDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>TeraTermDriverクラスでは、TeraTermError_0001からTeraTermError_0016までのエラーコードが使用されます。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">TeraTermError_0001</td>
+                        <td>TeraTermDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0002</td>
+                        <td>TeraTerm実行ファイルパス取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0003</td>
+                        <td>一時ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0004</td>
+                        <td>接続パラメータ設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0005</td>
+                        <td>サーバー接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0006</td>
+                        <td>接続マクロ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0007</td>
+                        <td>TeraTerm起動エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0008</td>
+                        <td>接続切断エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0009</td>
+                        <td>切断マクロ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0010</td>
+                        <td>マクロ実行エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0011</td>
+                        <td>コマンド実行エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0012</td>
+                        <td>コマンド実行マクロ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0013</td>
+                        <td>コマンド結果取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0014</td>
+                        <td>ファイルアップロードエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0015</td>
+                        <td>ファイルダウンロードエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0016</td>
+                        <td>TeraTermDriver破棄エラー</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全16個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">TeraTermDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

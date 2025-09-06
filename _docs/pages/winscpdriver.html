@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinSCPDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>WinSCPDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">📁</span>
+                WinSCPDriver クラス
+                <span class="emoji">📁</span>
+            </h1>
+            <p class="subtitle">WinSCPを使用したファイル転送とサーバー管理の自動化 🚀</p>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>WinSCPDriverクラスは、WinSCPライブラリを使用してSFTP、FTP、SCP、FTPSプロトコルでのファイル転送とサーバー管理を自動化するためのPowerShellクラスです。リモートサーバーへの接続、ファイルのアップロード・ダウンロード、ディレクトリ操作などを簡単に実行できます。</p>
+            
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>ファイル転送の自動化</li>
+                    <li>サーバー管理の自動化</li>
+                    <li>バックアップ処理の自動化</li>
+                    <li>データ同期の自動化</li>
+                </ul>
+            </div>
+
+            <div class="note-card success">
+                <h3>✨ 対応プロトコル</h3>
+                <p>SFTP、FTP、SCP、FTPSなど、セキュアなファイル転送プロトコルをサポートしています。</p>
+            </div>
+        </section>
+
+        <!-- 初期化・接続関連 -->
+        <section class="method-section" data-searchable="初期化 接続 サーバー">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">WinSCPDriver() - コンストラクタ</div>
+                <p>WinSCPDriverインスタンスを作成し、WinSCPライブラリを初期化します。</p>
+                
+                <div class="code-example">
+                    <pre><code># WinSCPDriverのインスタンスを作成
+$winSCP = [WinSCPDriver]::new()
+
+# 自動的に以下が実行されます：
+# - WinSCPアセンブリの読み込み
+# - 接続パラメータの初期化</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetConnectionParameters([string]$hostName, [string]$userName, [string]$password, [string]$protocol, [int]$port, [string]$hostKeyFingerprint) - 接続パラメータ設定</div>
+                <p>サーバー接続に必要なパラメータを設定します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 接続パラメータを設定
+$winSCP.SetConnectionParameters(
+    -hostName "example.com"
+    -userName "username"
+    -password "password"
+    -protocol "SFTP"
+    -port 22
+    -hostKeyFingerprint "ssh-rsa 2048 xx:xx:xx..."
+)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">Connect() - サーバー接続</div>
+                <p>設定されたパラメータでサーバーに接続します。</p>
+                
+                <div class="code-example">
+                    <pre><code># サーバーに接続
+$winSCP.Connect()
+
+# 接続状態を確認
+if ($winSCP.IsConnectedToServer()) {
+    Write-Host "接続成功！" -ForegroundColor Green
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ファイル操作関連 -->
+        <section class="method-section" data-searchable="ファイル アップロード ダウンロード">
+            <h2 class="section-title">
+                <span class="icon">📁</span> ファイル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">UploadFile([string]$localPath, [string]$remotePath) - ファイルアップロード</div>
+                <p>ローカルファイルをリモートサーバーにアップロードします。</p>
+                
+                <div class="code-example">
+                    <pre><code># ファイルをアップロード
+$winSCP.UploadFile("C:\local\file.txt", "/remote/path/file.txt")
+
+# 複数ファイルのアップロード
+$localFiles = Get-ChildItem "C:\data\*" -File
+foreach ($file in $localFiles) {
+    $remotePath = "/uploads/$($file.Name)"
+    $winSCP.UploadFile($file.FullName, $remotePath)
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DownloadFile([string]$remotePath, [string]$localPath) - ファイルダウンロード</div>
+                <p>リモートサーバーからファイルをダウンロードします。</p>
+                
+                <div class="code-example">
+                    <pre><code># ファイルをダウンロード
+$winSCP.DownloadFile("/remote/path/file.txt", "C:\local\file.txt")
+
+# バックアップファイルをダウンロード
+$winSCP.DownloadFile("/backup/data.zip", "C:\backup\data_$(Get-Date -Format 'yyyyMMdd').zip")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetFileList([string]$remotePath) - ファイル一覧取得</div>
+                <p>リモートディレクトリのファイル一覧を取得します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ファイル一覧を取得
+$files = $winSCP.GetFileList("/remote/path")
+foreach ($file in $files) {
+    Write-Host "ファイル: $($file.Name), サイズ: $($file.Size)"
+}
+
+# 特定の拡張子のファイルのみ取得
+$logFiles = $winSCP.GetFileList("/logs") | Where-Object { $_.Name -like "*.log" }</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ディレクトリ操作関連 -->
+        <section class="method-section" data-searchable="ディレクトリ フォルダ 作成 削除">
+            <h2 class="section-title">
+                <span class="icon">📂</span> ディレクトリ操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CreateDirectory([string]$remotePath) - ディレクトリ作成</div>
+                <p>リモートサーバーにディレクトリを作成します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ディレクトリを作成
+$winSCP.CreateDirectory("/remote/newfolder")
+
+# 階層ディレクトリを作成
+$winSCP.CreateDirectory("/remote/2024/01/data")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DirectoryExists([string]$remotePath) - ディレクトリ存在確認</div>
+                <p>指定したディレクトリが存在するか確認します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ディレクトリ存在確認
+if ($winSCP.DirectoryExists("/remote/newfolder")) {
+    Write-Host "ディレクトリが存在します"
+} else {
+    Write-Host "ディレクトリが存在しません"
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">RemoveDirectory([string]$remotePath) - ディレクトリ削除</div>
+                <p>リモートサーバーからディレクトリを削除します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ディレクトリを削除
+$winSCP.RemoveDirectory("/remote/oldfolder")
+
+# 安全な削除（存在確認後）
+if ($winSCP.DirectoryExists("/remote/temp")) {
+    $winSCP.RemoveDirectory("/remote/temp")
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: 基本的なファイル転送</div>
+                
+                <div class="code-example">
+                    <pre><code># WinSCPDriverを初期化
+$winSCP = [WinSCPDriver]::new()
+
+try {
+    # 接続パラメータを設定
+    $winSCP.SetConnectionParameters(
+        -hostName "ftp.example.com"
+        -userName "myuser"
+        -password "mypassword"
+        -protocol "FTP"
+        -port 21
+    )
+    
+    # サーバーに接続
+    $winSCP.Connect()
+    
+    # ファイルをアップロード
+    $winSCP.UploadFile("C:\data\report.pdf", "/uploads/report.pdf")
+    
+    # ファイル一覧を取得
+    $files = $winSCP.GetFileList("/uploads")
+    Write-Host "アップロードされたファイル数: $($files.Count)"
+    
+    # 接続を切断
+    $winSCP.Disconnect()
+}
+finally {
+    $winSCP.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: バッチファイル転送</div>
+                
+                <div class="code-example">
+                    <pre><code># 複数ファイルの一括アップロード
+$winSCP = [WinSCPDriver]::new()
+
+try {
+    $winSCP.SetConnectionParameters(
+        -hostName "sftp.example.com"
+        -userName "backup"
+        -password "securepass"
+        -protocol "SFTP"
+    )
+    
+    $winSCP.Connect()
+    
+    # ローカルディレクトリの全ファイルをアップロード
+    $localFiles = Get-ChildItem "C:\backup\*" -File
+    foreach ($file in $localFiles) {
+        $remotePath = "/backup/$($file.Name)"
+        $winSCP.UploadFile($file.FullName, $remotePath)
+        Write-Host "アップロード完了: $($file.Name)"
+    }
+    
+    $winSCP.Disconnect()
+}
+finally {
+    $winSCP.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> WinSCPDriver固有のエラーコード
+            </h2>
+            
+            <div class="error-range-card">
+                <p>WinSCPDriverクラスでは、WinSCPError_0001からWinSCPError_0015までのエラーコードが使用されます（15個）。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">WinSCPError_0001</td>
+                        <td>WinSCPDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0002</td>
+                        <td>WinSCPアセンブリ読み込みエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0003</td>
+                        <td>接続パラメータ設定エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0004</td>
+                        <td>サーバー接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0005</td>
+                        <td>接続切断エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0006</td>
+                        <td>WinSCPDriver破棄エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0007</td>
+                        <td>ファイルアップロードエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0008</td>
+                        <td>ファイルダウンロードエラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0009</td>
+                        <td>ファイル削除エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0010</td>
+                        <td>ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0011</td>
+                        <td>ディレクトリ削除エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0012</td>
+                        <td>ファイル一覧取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0013</td>
+                        <td>ファイル存在確認エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0014</td>
+                        <td>ディレクトリ存在確認エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0015</td>
+                        <td>転送オプション設定エラー</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全15個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">WinSCPDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

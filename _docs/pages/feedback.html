@@ -408,6 +408,22 @@
                             <label for="oracledriver">OracleDriver（Oracle DB操作）</label>
                         </div>
                         <div class="radio-item">
+                            <input type="radio" id="guidriver" name="driver" value="GUIDriver" required>
+                            <label for="guidriver">GUIDriver（GUIアプリケーション自動操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="uiautomationdriver" name="driver" value="UIAutomationDriver" required>
+                            <label for="uiautomationdriver">UIAutomationDriver（UI Automation自動操作）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="teratermdriver" name="driver" value="TeraTermDriver" required>
+                            <label for="teratermdriver">TeraTermDriver（TeraTerm SSH/Telnet接続）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="winscpdriver" name="driver" value="WinSCPDriver" required>
+                            <label for="winscpdriver">WinSCPDriver（WinSCP ファイル転送）</label>
+                        </div>
+                        <div class="radio-item">
                             <input type="radio" id="common" name="driver" value="Common" required>
                             <label for="common">Common（共通機能）</label>
                         </div>
@@ -1470,6 +1486,454 @@
                                     <input type="radio" name="method" value="Dispose" required>
                                     <span class="method-name">Dispose</span>
                                     <span class="method-desc">リソース解放</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- GUIDriver Methods -->
+                        <div class="method-group" id="guidriver-methods" style="display: none;">
+                            <h4>GUIDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="StartApplication" required>
+                                    <span class="method-name">StartApplication</span>
+                                    <span class="method-desc">アプリケーション起動</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindWindow" required>
+                                    <span class="method-name">FindWindow</span>
+                                    <span class="method-desc">ウィンドウ検索</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ActivateWindow" required>
+                                    <span class="method-name">ActivateWindow</span>
+                                    <span class="method-desc">ウィンドウアクティブ化</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ClickMouse" required>
+                                    <span class="method-name">ClickMouse</span>
+                                    <span class="method-desc">マウスクリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DoubleClickMouse" required>
+                                    <span class="method-name">DoubleClickMouse</span>
+                                    <span class="method-desc">マウスダブルクリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="RightClickMouse" required>
+                                    <span class="method-name">RightClickMouse</span>
+                                    <span class="method-desc">マウス右クリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="MoveMouse" required>
+                                    <span class="method-name">MoveMouse</span>
+                                    <span class="method-desc">マウス移動</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendKeys" required>
+                                    <span class="method-name">SendKeys</span>
+                                    <span class="method-desc">キーボード入力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendSpecialKey" required>
+                                    <span class="method-name">SendSpecialKey</span>
+                                    <span class="method-desc">特殊キー送信</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendKeyCombination" required>
+                                    <span class="method-name">SendKeyCombination</span>
+                                    <span class="method-desc">キー組み合わせ送信</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TypeText" required>
+                                    <span class="method-name">TypeText</span>
+                                    <span class="method-desc">テキスト入力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TakeScreenshot" required>
+                                    <span class="method-name">TakeScreenshot</span>
+                                    <span class="method-desc">スクリーンショット取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TakeWindowScreenshot" required>
+                                    <span class="method-name">TakeWindowScreenshot</span>
+                                    <span class="method-desc">ウィンドウスクリーンショット取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CloseApplication" required>
+                                    <span class="method-name">CloseApplication</span>
+                                    <span class="method-desc">プロセス終了</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="KillApplication" required>
+                                    <span class="method-name">KillApplication</span>
+                                    <span class="method-desc">プロセス強制終了</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="IsProcessRunning" required>
+                                    <span class="method-name">IsProcessRunning</span>
+                                    <span class="method-desc">プロセス状態確認</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Wait" required>
+                                    <span class="method-name">Wait</span>
+                                    <span class="method-desc">待機</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Dispose" required>
+                                    <span class="method-name">Dispose</span>
+                                    <span class="method-desc">リソース解放</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- UIAutomationDriver Methods -->
+                        <div class="method-group" id="uiautomationdriver-methods" style="display: none;">
+                            <h4>UIAutomationDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="StartApplication" required>
+                                    <span class="method-name">StartApplication</span>
+                                    <span class="method-desc">アプリケーション起動</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindWindow" required>
+                                    <span class="method-name">FindWindow</span>
+                                    <span class="method-desc">ウィンドウ検索</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ActivateWindow" required>
+                                    <span class="method-name">ActivateWindow</span>
+                                    <span class="method-desc">ウィンドウアクティブ化</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindElementByName" required>
+                                    <span class="method-name">FindElementByName</span>
+                                    <span class="method-desc">要素検索（名前で）</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindElementByControlType" required>
+                                    <span class="method-name">FindElementByControlType</span>
+                                    <span class="method-desc">要素検索（コントロールタイプで）</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindElement" required>
+                                    <span class="method-name">FindElement</span>
+                                    <span class="method-desc">要素検索（複合条件）</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ClickElement" required>
+                                    <span class="method-name">ClickElement</span>
+                                    <span class="method-desc">要素クリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetElementText" required>
+                                    <span class="method-name">SetElementText</span>
+                                    <span class="method-desc">要素にテキスト入力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetElementText" required>
+                                    <span class="method-name">GetElementText</span>
+                                    <span class="method-desc">要素のテキスト取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ClickMouse" required>
+                                    <span class="method-name">ClickMouse</span>
+                                    <span class="method-desc">マウスクリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DoubleClickMouse" required>
+                                    <span class="method-name">DoubleClickMouse</span>
+                                    <span class="method-desc">マウスダブルクリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="RightClickMouse" required>
+                                    <span class="method-name">RightClickMouse</span>
+                                    <span class="method-desc">マウス右クリック</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="MoveMouse" required>
+                                    <span class="method-name">MoveMouse</span>
+                                    <span class="method-desc">マウス移動</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendKeys" required>
+                                    <span class="method-name">SendKeys</span>
+                                    <span class="method-desc">キーボード入力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendSpecialKey" required>
+                                    <span class="method-name">SendSpecialKey</span>
+                                    <span class="method-desc">特殊キー送信</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SendKeyCombination" required>
+                                    <span class="method-name">SendKeyCombination</span>
+                                    <span class="method-desc">キー組み合わせ送信</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TypeText" required>
+                                    <span class="method-name">TypeText</span>
+                                    <span class="method-desc">テキスト入力</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TakeScreenshot" required>
+                                    <span class="method-name">TakeScreenshot</span>
+                                    <span class="method-desc">スクリーンショット取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="TakeWindowScreenshot" required>
+                                    <span class="method-name">TakeWindowScreenshot</span>
+                                    <span class="method-desc">ウィンドウスクリーンショット取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CloseApplication" required>
+                                    <span class="method-name">CloseApplication</span>
+                                    <span class="method-desc">プロセス終了</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="KillApplication" required>
+                                    <span class="method-name">KillApplication</span>
+                                    <span class="method-desc">プロセス強制終了</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="IsProcessRunning" required>
+                                    <span class="method-name">IsProcessRunning</span>
+                                    <span class="method-desc">プロセス状態確認</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Wait" required>
+                                    <span class="method-name">Wait</span>
+                                    <span class="method-desc">待機</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Dispose" required>
+                                    <span class="method-name">Dispose</span>
+                                    <span class="method-desc">リソース解放</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- TeraTermDriver Methods -->
+                        <div class="method-group" id="teratermdriver-methods" style="display: none;">
+                            <h4>TeraTermDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindTeraTermPath" required>
+                                    <span class="method-name">FindTeraTermPath</span>
+                                    <span class="method-desc">TeraTermの実行ファイルパスを検出</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateTempDirectories" required>
+                                    <span class="method-name">CreateTempDirectories</span>
+                                    <span class="method-desc">一時ディレクトリを作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetConnectionParameters" required>
+                                    <span class="method-name">SetConnectionParameters</span>
+                                    <span class="method-desc">接続パラメータを設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Connect" required>
+                                    <span class="method-name">Connect</span>
+                                    <span class="method-desc">サーバーに接続</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateConnectionMacro" required>
+                                    <span class="method-name">CreateConnectionMacro</span>
+                                    <span class="method-desc">接続用マクロファイルを作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="StartTeraTermWithMacro" required>
+                                    <span class="method-name">StartTeraTermWithMacro</span>
+                                    <span class="method-desc">TeraTermを起動してマクロを実行</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Disconnect" required>
+                                    <span class="method-name">Disconnect</span>
+                                    <span class="method-desc">接続を切断</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateDisconnectMacro" required>
+                                    <span class="method-name">CreateDisconnectMacro</span>
+                                    <span class="method-desc">切断用マクロファイルを作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ExecuteMacro" required>
+                                    <span class="method-name">ExecuteMacro</span>
+                                    <span class="method-desc">マクロを実行</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ExecuteCommand" required>
+                                    <span class="method-name">ExecuteCommand</span>
+                                    <span class="method-desc">コマンドを実行</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateCommandMacro" required>
+                                    <span class="method-name">CreateCommandMacro</span>
+                                    <span class="method-desc">コマンド実行用マクロファイルを作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetLastCommandResult" required>
+                                    <span class="method-name">GetLastCommandResult</span>
+                                    <span class="method-desc">最後のコマンド結果を取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="UploadFile" required>
+                                    <span class="method-name">UploadFile</span>
+                                    <span class="method-desc">ファイルをアップロード（SCP使用）</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DownloadFile" required>
+                                    <span class="method-name">DownloadFile</span>
+                                    <span class="method-desc">ファイルをダウンロード（SCP使用）</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="IsConnected" required>
+                                    <span class="method-name">IsConnected</span>
+                                    <span class="method-desc">接続状態を確認</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetConnectionInfo" required>
+                                    <span class="method-name">GetConnectionInfo</span>
+                                    <span class="method-desc">接続情報を取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetLogFiles" required>
+                                    <span class="method-name">GetLogFiles</span>
+                                    <span class="method-desc">ログファイル一覧を取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetMacroFiles" required>
+                                    <span class="method-name">GetMacroFiles</span>
+                                    <span class="method-desc">マクロファイル一覧を取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CleanupTempFiles" required>
+                                    <span class="method-name">CleanupTempFiles</span>
+                                    <span class="method-desc">一時ファイルをクリーンアップ</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CleanupOnInitializationFailure" required>
+                                    <span class="method-name">CleanupOnInitializationFailure</span>
+                                    <span class="method-desc">初期化失敗時のクリーンアップ</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Dispose" required>
+                                    <span class="method-name">Dispose</span>
+                                    <span class="method-desc">リソース解放</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- WinSCPDriver Methods -->
+                        <div class="method-group" id="winscpdriver-methods" style="display: none;">
+                            <h4>WinSCPDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InitializeWinSCP" required>
+                                    <span class="method-name">InitializeWinSCP</span>
+                                    <span class="method-desc">WinSCPの初期化</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindWinSCPPath" required>
+                                    <span class="method-name">FindWinSCPPath</span>
+                                    <span class="method-desc">WinSCPのインストールパスを検索</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetConnectionParameters" required>
+                                    <span class="method-name">SetConnectionParameters</span>
+                                    <span class="method-desc">接続パラメータを設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Connect" required>
+                                    <span class="method-name">Connect</span>
+                                    <span class="method-desc">サーバーに接続</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Disconnect" required>
+                                    <span class="method-name">Disconnect</span>
+                                    <span class="method-desc">接続を切断</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="UploadFile" required>
+                                    <span class="method-name">UploadFile</span>
+                                    <span class="method-desc">ファイルをアップロード</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DownloadFile" required>
+                                    <span class="method-name">DownloadFile</span>
+                                    <span class="method-desc">ファイルをダウンロード</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="RemoveFile" required>
+                                    <span class="method-name">RemoveFile</span>
+                                    <span class="method-desc">ファイルを削除</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateDirectory" required>
+                                    <span class="method-name">CreateDirectory</span>
+                                    <span class="method-desc">ディレクトリを作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="RemoveDirectory" required>
+                                    <span class="method-name">RemoveDirectory</span>
+                                    <span class="method-desc">ディレクトリを削除</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetFileList" required>
+                                    <span class="method-name">GetFileList</span>
+                                    <span class="method-desc">ファイル一覧を取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FileExists" required>
+                                    <span class="method-name">FileExists</span>
+                                    <span class="method-desc">ファイルの存在確認</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DirectoryExists" required>
+                                    <span class="method-name">DirectoryExists</span>
+                                    <span class="method-desc">ディレクトリの存在確認</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetTransferOptions" required>
+                                    <span class="method-name">SetTransferOptions</span>
+                                    <span class="method-desc">転送オプションを設定</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="IsConnectedToServer" required>
+                                    <span class="method-name">IsConnectedToServer</span>
+                                    <span class="method-desc">接続状態を取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CleanupOnInitializationFailure" required>
+                                    <span class="method-name">CleanupOnInitializationFailure</span>
+                                    <span class="method-desc">初期化失敗時のクリーンアップ</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Dispose" required>
+                                    <span class="method-name">Dispose</span>
+                                    <span class="method-desc">リソースの破棄</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="その他" required>
