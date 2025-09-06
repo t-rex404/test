@@ -1249,6 +1249,57 @@ class WebDriver
         }
     }
 
+    # ブラウザの表示倍率を変更
+    [void] SetZoomLevel([double]$zoom_level)
+    {
+        try
+        {
+            if ($zoom_level -le 0)
+            {
+                throw "ズームレベルは正の値である必要があります。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            # ズームレベルをパーセンテージに変換（例：1.0 = 100%, 1.5 = 150%）
+            $zoom_percentage = [math]::Round($zoom_level * 100, 2)
+            
+            # DevTools Protocolを使用してズームレベルを設定
+            $this.SendWebSocketMessage('Emulation.setPageScaleFactor', @{ pageScaleFactor = $zoom_level })
+            $response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            
+            if ($response.error)
+            {
+                throw "ズームレベル設定エラー: $($response.error.message)"
+            }
+
+            Write-Host "ブラウザの表示倍率を $zoom_percentage% に設定しました。" -ForegroundColor Green
+        }
+        catch
+        {
+            # ウィンドウ・タブ操作関連エラー (1072)
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("WebError_0089", "ブラウザ表示倍率変更エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ブラウザ表示倍率変更エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            throw "ブラウザの表示倍率変更に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ========================================
     # 要素検索関連
     # ========================================
@@ -2097,6 +2148,170 @@ class WebDriver
                 Write-Host "TagName要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
             }
             throw "TagNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 親オブジェクト内の子オブジェクト単数要素検索（CSSセレクタ）
+    [hashtable] FindChildElement([string]$parent_object_id, [string]$child_selector)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($parent_object_id))
+            {
+                throw "親オブジェクトIDが指定されていません。"
+            }
+
+            if ([string]::IsNullOrEmpty($child_selector))
+            {
+                throw "子要素のセレクタが指定されていません。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            # 親要素内で子要素を検索するJavaScriptを実行
+            $expression = "function(parentId, selector) { 
+                const parent = this; 
+                const child = parent.querySelector(selector); 
+                return child ? child : null; 
+            }"
+            
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
+                objectId = $parent_object_id; 
+                functionDeclaration = $expression; 
+                arguments = @(@{ value = $child_selector })
+            })
+            $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            
+            if ($response_json.error)
+            {
+                throw "子要素検索エラー: $($response_json.error.message)"
+            }
+            
+            if ($response_json.result.result.value -ne $null)
+            {
+                return @{ nodeId = $response_json.result.result.objectId; selector = $child_selector; parentId = $parent_object_id }
+            }
+            else
+            {
+                throw "親要素内で子要素を取得できません。セレクタ：$child_selector"
+            }
+        }
+        catch
+        {
+            # 要素検索関連エラー (1042)
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("WebError_0090", "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            throw "親オブジェクト内の子要素検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # 親オブジェクト内の子オブジェクト複数要素検索（CSSセレクタ）
+    [array] FindChildElements([string]$parent_object_id, [string]$child_selector)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($parent_object_id))
+            {
+                throw "親オブジェクトIDが指定されていません。"
+            }
+
+            if ([string]::IsNullOrEmpty($child_selector))
+            {
+                throw "子要素のセレクタが指定されていません。"
+            }
+
+            if (-not $this.is_initialized)
+            {
+                throw "WebDriverが初期化されていません。"
+            }
+
+            # 親要素内で子要素を複数検索するJavaScriptを実行
+            $expression = "function(parentId, selector) { 
+                const parent = this; 
+                const children = parent.querySelectorAll(selector); 
+                return Array.from(children); 
+            }"
+            
+            $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
+                objectId = $parent_object_id; 
+                functionDeclaration = $expression; 
+                arguments = @(@{ value = $child_selector })
+            })
+            $response_json = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+            
+            if ($response_json.error)
+            {
+                throw "子要素複数検索エラー: $($response_json.error.message)"
+            }
+            
+            if ($response_json.result.result.value -and $response_json.result.result.value.Count -gt 0)
+            {
+                $element_list = @()
+                for ($i = 0; $i -lt $response_json.result.result.value.Count; $i++)
+                {
+                    try
+                    {
+                        # 各子要素のobjectIdを取得
+                        $child_expression = "function(index) { return this[index]; }"
+                        $this.SendWebSocketMessage('Runtime.callFunctionOn', @{ 
+                            objectId = $response_json.result.result.objectId; 
+                            functionDeclaration = $child_expression; 
+                            arguments = @(@{ value = $i })
+                        })
+                        $child_response = $this.ReceiveWebSocketMessage() | ConvertFrom-Json
+                        
+                        if ($child_response.result.result.objectId)
+                        {
+                            $element_list += @{ nodeId = $child_response.result.result.objectId; selector = $child_selector; parentId = $parent_object_id; index = $i }
+                        }
+                    }
+                    catch
+                    {
+                        Write-Host "インデックス $i の子要素取得に失敗しましたが、処理を続行します: $($_.Exception.Message)"
+                    }
+                }
+                return $element_list
+            }
+            else
+            {
+                return @()
+            }
+        }
+        catch
+        {
+            # 要素検索関連エラー (1043)
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("WebError_0091", "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            throw "親オブジェクト内の子要素複数検索に失敗しました: $($_.Exception.Message)"
         }
     }
 
