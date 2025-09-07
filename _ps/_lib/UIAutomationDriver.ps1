@@ -67,16 +67,27 @@ class UIAutomationDriver
                 throw "アプリケーションパスが指定されていません。"
             }
 
+            # システムアプリケーションの場合はGet-Commandでパスを取得
+            $actual_path = $app_path
             if (-not (Test-Path $app_path))
             {
-                throw "指定されたアプリケーションファイルが見つかりません: $app_path"
+                try
+                {
+                    $command = Get-Command $app_path -ErrorAction Stop
+                    $actual_path = $command.Source
+                    Write-Host "システムアプリケーションのパスを取得しました: $actual_path" -ForegroundColor Yellow
+                }
+                catch
+                {
+                    throw "指定されたアプリケーションファイルが見つかりません: $app_path"
+                }
             }
 
-            $this.application_path = $app_path
+            $this.application_path = $actual_path
 
             # プロセス起動
             $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-            $processInfo.FileName = $app_path
+            $processInfo.FileName = $actual_path
             $processInfo.Arguments = $arguments
             $processInfo.UseShellExecute = $false
             $processInfo.CreateNoWindow = $false
@@ -133,14 +144,14 @@ class UIAutomationDriver
 
             # ウィンドウを検索する条件
             $condition = New-Object System.Windows.Automation.AndCondition(
-                [System.Windows.Automation.Automation]::PropertyCondition(
+                (New-Object System.Windows.Automation.PropertyCondition(
                     [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
                     [System.Windows.Automation.ControlType]::Window
-                ),
-                [System.Windows.Automation.Automation]::PropertyCondition(
+                )),
+                (New-Object System.Windows.Automation.PropertyCondition(
                     [System.Windows.Automation.AutomationElement]::NameProperty,
                     $window_title
-                )
+                ))
             )
 
             # タイムアウト付きでウィンドウ検索
@@ -155,10 +166,10 @@ class UIAutomationDriver
                 {
                     $processCondition = New-Object System.Windows.Automation.AndCondition(
                         $condition,
-                        [System.Windows.Automation.Automation]::PropertyCondition(
+                        (New-Object System.Windows.Automation.PropertyCondition(
                             [System.Windows.Automation.AutomationElement]::ProcessIdProperty,
                             $this.process.Id
-                        )
+                        ))
                     )
 
                     $window = $desktop.FindFirst([System.Windows.Automation.TreeScope]::Children, $processCondition)
@@ -271,7 +282,7 @@ class UIAutomationDriver
                 throw "ルート要素が設定されていません。"
             }
 
-            $condition = [System.Windows.Automation.Automation]::PropertyCondition(
+            $condition = New-Object System.Windows.Automation.PropertyCondition(
                 [System.Windows.Automation.AutomationElement]::NameProperty,
                 $name
             )
@@ -318,7 +329,7 @@ class UIAutomationDriver
                 throw "ルート要素が設定されていません。"
             }
 
-            $condition = [System.Windows.Automation.Automation]::PropertyCondition(
+            $condition = New-Object System.Windows.Automation.PropertyCondition(
                 [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
                 $controlType
             )
@@ -351,7 +362,7 @@ class UIAutomationDriver
                 Write-Host "要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
             }
             
-            throw "指定されたコントロールタイプの要素が見つかりませんでした: $($_.Exception.Message)"
+            throw "指定されたコントロールタイプの要素が見つかりませんでした: $controlType"
         }
     }
 
@@ -368,7 +379,7 @@ class UIAutomationDriver
             $conditionList = @()
             foreach ($key in $conditions.Keys)
             {
-                $conditionList += [System.Windows.Automation.Automation]::PropertyCondition($key, $conditions[$key])
+                $conditionList += New-Object System.Windows.Automation.PropertyCondition($key, $conditions[$key])
             }
 
             $andCondition = New-Object System.Windows.Automation.AndCondition($conditionList)
@@ -948,7 +959,7 @@ class UIAutomationDriver
             # スクリーンショット取得
             $bitmap = New-Object System.Drawing.Bitmap([int]$windowRect.Width, [int]$windowRect.Height)
             $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-            $graphics.CopyFromScreen([int]$windowRect.Left, [int]$windowRect.Top, 0, 0, [int]$windowRect.Size)
+            $graphics.CopyFromScreen([int]$windowRect.Left, [int]$windowRect.Top, 0, 0, [System.Drawing.Size]::new([int]$windowRect.Width, [int]$windowRect.Height))
             $graphics.Dispose()
 
             # ファイル保存
