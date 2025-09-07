@@ -200,6 +200,27 @@ $driver.Refresh()</code></pre>
             </div>
         </section>
 
+        <!-- ブラウザ操作関連 -->
+        <section class="method-section" data-searchable="ブラウザ ズーム 表示倍率">
+            <h2 class="section-title">
+                <span class="icon">🔍</span> ブラウザ操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SetZoomLevel([double]$zoom_level) - ブラウザの表示倍率変更</div>
+                <p>ブラウザの表示倍率を指定した値に変更します。</p>
+                
+                <div class="code-example">
+                    <pre><code># ブラウザの表示倍率を変更
+$driver.SetZoomLevel(1.0)    # 100%に設定
+$driver.SetZoomLevel(1.5)    # 150%に設定
+$driver.SetZoomLevel(0.75)   # 75%に設定
+
+# ズームレベルは0より大きい値である必要があります</code></pre>
+                </div>
+            </div>
+        </section>
+
         <!-- 要素操作関連 -->
         <section class="method-section" data-searchable="要素 検索 操作">
             <h2 class="section-title">
@@ -216,6 +237,41 @@ $searchBox = $driver.FindElement("input[name='q']")
 $button = $driver.FindElement("#submit-button")
 $element = $driver.FindElement(".container")
 $link = $driver.FindElement("a[href='/about']")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindChildElement([string]$parent_object_id, [string]$child_selector) - 親要素内の子要素検索（単数）</div>
+                <p>指定された親要素内で子要素を1つ検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 親要素を取得
+$parentElement = $driver.FindElement("#container")
+
+# 親要素内で子要素を検索
+$childElement = $driver.FindChildElement($parentElement.nodeId, ".child-item")
+$nestedButton = $driver.FindChildElement($parentElement.nodeId, "button[type='submit']")
+
+# 戻り値には nodeId, selector, parentId が含まれます</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindChildElements([string]$parent_object_id, [string]$child_selector) - 親要素内の子要素検索（複数）</div>
+                <p>指定された親要素内で子要素を複数検索します。</p>
+                
+                <div class="code-example">
+                    <pre><code># 親要素を取得
+$parentElement = $driver.FindElement("#list-container")
+
+# 親要素内で複数の子要素を検索
+$childElements = $driver.FindChildElements($parentElement.nodeId, ".list-item")
+$allButtons = $driver.FindChildElements($parentElement.nodeId, "button")
+
+# 各要素には nodeId, selector, parentId, index が含まれます
+foreach ($child in $childElements) {
+    Write-Host "子要素: $($child.selector), インデックス: $($child.index)"
+}</code></pre>
                 </div>
             </div>
 
@@ -418,7 +474,7 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>WebDriverクラスでは、WebError_0001からWebError_0088までのエラーコードが使用されます。</p>
+                <p>WebDriverクラスでは、WebError_0001からWebError_0091までのエラーコードが使用されます。</p>
                 <table class="error-table">
                     <tr>
                         <td class="range">WebError_0001</td>
@@ -453,11 +509,23 @@ finally {
                         <td>ページ遷移エラー</td>
                     </tr>
                     <tr>
+                        <td class="range">WebError_0089</td>
+                        <td>ブラウザ表示倍率変更エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WebError_0090</td>
+                        <td>親オブジェクト内子要素単数検索エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WebError_0091</td>
+                        <td>親オブジェクト内子要素複数検索エラー</td>
+                    </tr>
+                    <tr>
                         <td class="range">...</td>
                         <td>その他のエラーコード（WebError_0009～WebError_0088）</td>
                     </tr>
                 </table>
-                <p class="note">※ 全88個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+                <p class="note">※ 全91個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 
