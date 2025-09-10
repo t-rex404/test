@@ -12,9 +12,9 @@ REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_ExcelDriver_All
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_PowerPointDriver_AllMethods.ps1"
 REM powershell.exe -ExecutionPolicy Bypass -file %~dp0\_ps\hoge.ps1
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\generate_SampleReport.ps1"
-powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_UIAutomationDriver_Calculator_Notepad.ps1"
+REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_UIAutomationDriver_Calculator_Notepad.ps1"
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_GUIDriver_Calculator_Notepad.ps1"
-
+powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_UIAutomationDriver_AllMethods.ps1"
 
 POPD
 

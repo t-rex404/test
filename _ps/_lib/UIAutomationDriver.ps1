@@ -145,7 +145,7 @@ class UIAutomationDriver
 
             # デスクトップのルート要素を取得
             $desktop = [System.Windows.Automation.AutomationElement]::RootElement
-            if ($null -ne $desktop)
+            if ($null -eq $desktop)
             {
                 throw "デスクトップのルート要素を取得できませんでした。"
             }
@@ -422,12 +422,12 @@ class UIAutomationDriver
                 {
                     try
                     {
-                        $process = [System.Diagnostics.Process]::GetProcessById($window.Current.ProcessId)
-                        if ($process.ProcessName -like "*$process_name*")
+                        $windowProcess = [System.Diagnostics.Process]::GetProcessById($window.Current.ProcessId)
+                        if ($windowProcess.ProcessName -like "*$process_name*")
                         {
                             $this.root_element = $window
                             $this.window_title = $window.Current.Name
-                            Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($process.ProcessName))" -ForegroundColor Green
+                            Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))" -ForegroundColor Green
                             return $window
                         }
                     }
@@ -501,8 +501,8 @@ class UIAutomationDriver
                     
                     try
                     {
-                        $process = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
-                        $processName = $process.ProcessName
+                        $windowProcess = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
+                        $processName = $windowProcess.ProcessName
                         
                         $matchProcess = $false
                         $matchTitle = $false
@@ -685,8 +685,8 @@ class UIAutomationDriver
                         
                         try
                         {
-                            $process = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
-                            $processName = $process.ProcessName
+                            $windowProcess = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
+                            $processName = $windowProcess.ProcessName
                             
                             $matchProcess = $false
                             $matchTitle = $false
@@ -1137,14 +1137,21 @@ class UIAutomationDriver
             [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($x, $y)
             Start-Sleep -Milliseconds 100
 
-            # クリック実行
-            switch ($button.ToLower())
-            {
-                "left" { [System.Windows.Forms.Cursor]::Click() }
-                "right" { [System.Windows.Forms.Cursor]::Click([System.Windows.Forms.MouseButtons]::Right) }
-                "middle" { [System.Windows.Forms.Cursor]::Click([System.Windows.Forms.MouseButtons]::Middle) }
-                default { [System.Windows.Forms.Cursor]::Click() }
+            # クリック実行（Windows APIを使用）
+            $mouseEventCode = switch ($button.ToLower()) {
+                "left" { 0x0002 -bor 0x0004 }  # MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP
+                "right" { 0x0008 -bor 0x0010 } # MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP
+                "middle" { 0x0020 -bor 0x0040 } # MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP
+                default { 0x0002 -bor 0x0004 }
             }
+
+            # Windows APIを直接呼び出し
+            $user32 = Add-Type -MemberDefinition @"
+                [DllImport("user32.dll")]
+                public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, UIntPtr dwExtraInfo);
+"@ -Name "User32" -Namespace "Win32" -PassThru
+
+            $user32::mouse_event($mouseEventCode, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero)
 
             Write-Host "マウスクリックを実行しました: ($x, $y) $button" -ForegroundColor Green
         }
@@ -1180,10 +1187,16 @@ class UIAutomationDriver
             [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($x, $y)
             Start-Sleep -Milliseconds 100
 
-            # ダブルクリック実行
-            [System.Windows.Forms.Cursor]::Click()
+            # ダブルクリック実行（Windows APIを使用）
+            $user32 = Add-Type -MemberDefinition @"
+                [DllImport("user32.dll")]
+                public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, UIntPtr dwExtraInfo);
+"@ -Name "User32" -Namespace "Win32" -PassThru
+
+            # 左クリックを2回実行
+            $user32::mouse_event(0x0002 -bor 0x0004, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero) # 1回目
             Start-Sleep -Milliseconds 50
-            [System.Windows.Forms.Cursor]::Click()
+            $user32::mouse_event(0x0002 -bor 0x0004, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero) # 2回目
 
             Write-Host "マウスダブルクリックを実行しました: ($x, $y)" -ForegroundColor Green
         }
@@ -1219,8 +1232,13 @@ class UIAutomationDriver
             [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($x, $y)
             Start-Sleep -Milliseconds 100
 
-            # 右クリック実行
-            [System.Windows.Forms.Cursor]::Click([System.Windows.Forms.MouseButtons]::Right)
+            # 右クリック実行（Windows APIを使用）
+            $user32 = Add-Type -MemberDefinition @"
+                [DllImport("user32.dll")]
+                public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, UIntPtr dwExtraInfo);
+"@ -Name "User32" -Namespace "Win32" -PassThru
+
+            $user32::mouse_event(0x0008 -bor 0x0010, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero) # MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP
 
             Write-Host "マウス右クリックを実行しました: ($x, $y)" -ForegroundColor Green
         }
