@@ -2,10 +2,6 @@
 # 必要なアセンブリを読み込み
 Add-Type -AssemblyName Microsoft.Office.Interop.PowerPoint
 
-# 共通ライブラリをインポート
-#. "$PSScriptRoot\Common.ps1"
-#$Common = New-Object -TypeName 'Common'
-
 class PowerPointDriver
 {
     [Microsoft.Office.Interop.PowerPoint.Application]$powerpoint_app
@@ -671,13 +667,13 @@ class PowerPointDriver
     {
         try
         {
-            if ($this.powerpoint_presentation -ne $null)
+            if ($null -ne $this.powerpoint_presentation)
             {
                 $this.powerpoint_presentation.Close()
                 $this.powerpoint_presentation = $null
             }
 
-            if ($this.powerpoint_app -ne $null)
+            if ($null -ne $this.powerpoint_app)
             {
                 $this.powerpoint_app.Quit()
                 $this.powerpoint_app = $null
@@ -725,7 +721,7 @@ class PowerPointDriver
                 return
             }
 
-            if ($this.powerpoint_presentation -ne $null)
+            if ($null -ne $this.powerpoint_presentation)
             {
                 # 既に保存済みでも再保存は行わない（読み取り専用エラー回避）
                 #$this.powerpoint_presentation.Close()
@@ -733,7 +729,7 @@ class PowerPointDriver
                 $this.powerpoint_presentation = $null
             }
 
-            if ($this.powerpoint_app -ne $null)
+            if ($null -ne $this.powerpoint_app)
             {
                 $this.powerpoint_app.Quit()
                 $this.powerpoint_app = $null

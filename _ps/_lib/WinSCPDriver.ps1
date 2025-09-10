@@ -1,9 +1,5 @@
-# WinSCPDriver.ps1
 # WinSCPを操作するためのPowerShellクラス
 # ファイル転送、接続管理などの機能を提供
-
-# 共通ライブラリをインポート
-. "$PSScriptRoot\Common.ps1"
 
 class WinSCPDriver
 {
@@ -162,7 +158,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0002", "WinSCPパス検索エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0003", "WinSCPパス検索エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -183,7 +179,7 @@ class WinSCPDriver
     {
         try
         {
-            if ($this.SessionOptions -eq $null)
+            if ($null -eq $this.SessionOptions)
             {
                 throw "セッションオプションが初期化されていません。"
             }
@@ -227,7 +223,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0003", "接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0004", "接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -254,7 +250,7 @@ class WinSCPDriver
                 return
             }
 
-            if ($this.SessionOptions -eq $null)
+            if ($null -eq $this.SessionOptions)
             {
                 throw "接続パラメータが設定されていません。SetConnectionParameters()を先に呼び出してください。"
             }
@@ -272,7 +268,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0004", "サーバー接続エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0005", "サーバー接続エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -299,7 +295,7 @@ class WinSCPDriver
                 return
             }
 
-            if ($this.Session -ne $null)
+            if ($null -ne $this.Session)
             {
                 $this.Session.Close()
                 $this.IsConnected = $false
@@ -313,7 +309,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0005", "接続切断エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0006", "接続切断エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -678,7 +674,7 @@ class WinSCPDriver
     {
         try
         {
-            if ($this.TransferOptions -eq $null)
+            if ($null -eq $this.TransferOptions)
             {
                 $this.TransferOptions = New-Object WinSCP.TransferOptions
             }
@@ -736,7 +732,7 @@ class WinSCPDriver
                 $this.Disconnect()
             }
 
-            if ($this.Session -ne $null)
+            if ($null -ne $this.Session)
             {
                 $this.Session.Dispose()
                 $this.Session = $null
@@ -754,7 +750,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0006", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0007", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -774,7 +770,7 @@ class WinSCPDriver
         try
         {
             # セッションが存在する場合は破棄
-            if ($this.Session -ne $null)
+            if ($null -ne $this.Session)
             {
                 try
                 {

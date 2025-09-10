@@ -2,10 +2,6 @@
 # 必要なアセンブリを読み込み
 Add-Type -AssemblyName Microsoft.Office.Interop.Excel
 
-# 共通ライブラリをインポート
-#. "$PSScriptRoot\Common.ps1"
-#$Common = New-Object -TypeName 'Common'
-
 class ExcelDriver
 {
     [Microsoft.Office.Interop.Excel.Application]$excel_app
@@ -655,13 +651,13 @@ class ExcelDriver
     {
         try
         {
-            if ($this.excel_workbook -ne $null)
+            if ($null -ne $this.excel_workbook)
             {
                 $this.excel_workbook.Close($false)
                 $this.excel_workbook = $null
             }
 
-            if ($this.excel_app -ne $null)
+            if ($null -ne $this.excel_app)
             {
                 $this.excel_app.Quit()
                 $this.excel_app = $null
@@ -709,7 +705,7 @@ class ExcelDriver
                 return
             }
 
-            if ($this.excel_workbook -ne $null)
+            if ($null -ne $this.excel_workbook)
             {
                 if (-not $this.is_saved)
                 {
@@ -724,7 +720,7 @@ class ExcelDriver
                 $this.excel_workbook = $null
             }
 
-            if ($this.excel_app -ne $null)
+            if ($null -ne $this.excel_app)
             {
                 $this.excel_app.Quit()
                 $this.excel_app = $null

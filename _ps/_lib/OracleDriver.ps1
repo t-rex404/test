@@ -1,10 +1,6 @@
 # ORACLEデータベース操作クラス
 # Oracle.ManagedDataAccess.Clientを使用してORACLEデータベースに接続・操作
 
-# 共通ライブラリをインポート
-#. "$PSScriptRoot\Common.ps1"
-#$Common = New-Object -TypeName 'Common'
-
 Add-Type -AssemblyName "System.Data.OracleClient"
 
 class OracleDriver
@@ -118,7 +114,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0004", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0003", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -195,7 +191,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0007", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0004", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -264,7 +260,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0008", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0005", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -329,7 +325,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0009", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0006", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -375,7 +371,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0005", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0007", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -416,7 +412,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0006", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0008", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1336,7 +1332,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0003", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0009", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

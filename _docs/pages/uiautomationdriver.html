@@ -92,7 +92,7 @@
             <h2 class="section-title">
                 <span class="icon">📖</span> 概要
             </h2>
-            <p>UIAutomationDriverクラスは、Windows UI Automationを使用してGUIアプリケーションの自動操作を行うためのPowerShellクラスです。UI Automationは、アクセシビリティ機能を活用して、より高精度で安定したGUI操作を実現します。要素の検索、操作、テキスト取得など、複雑なアプリケーションの自動化に最適です。</p>
+            <p>UIAutomationDriverクラスは、Windows UI Automationを使用してGUIアプリケーションの自動操作を行うためのPowerShellクラスです。UI Automationは、アクセシビリティ機能を活用して、より高精度で安定したGUI操作を実現します。要素の検索、操作、テキスト取得など、複雑なアプリケーションの自動化に最適です。VS CodeのようなElectronアプリケーションにも対応した高度なウィンドウ検索機能を提供します。</p>
             
             <div class="note-card info">
                 <h3>🎯 主な用途</h3>
@@ -101,12 +101,14 @@
                     <li>要素ベースの精密な操作</li>
                     <li>複雑なUIアプリケーションの制御</li>
                     <li>アクセシビリティ機能を活用した操作</li>
+                    <li>Electronアプリケーション（VS Code等）の自動化</li>
+                    <li>柔軟なウィンドウ検索機能</li>
                 </ul>
             </div>
 
             <div class="note-card success">
                 <h3>✨ 対応アプリケーション</h3>
-                <p>WinForms、WPF、Webアプリケーションなど、様々なタイプのアプリケーションに対応しています。</p>
+                <p>WinForms、WPF、Webアプリケーション、Electronアプリケーション（VS Code、Discord等）など、様々なタイプのアプリケーションに対応しています。特にElectronアプリケーションでは、改善されたウィンドウ検索機能により確実に自動化できます。</p>
             </div>
         </section>
 
@@ -172,18 +174,105 @@ $uiAuto.StartApplication("notepad.exe", "C:\test\file.txt")</code></pre>
             </div>
 
             <div class="method-card">
-                <div class="method-name">FindWindow([string]$window_title) - ウィンドウ検索</div>
-                <p>指定したタイトルのウィンドウを検索します。</p>
+                <div class="method-name">FindWindow([string]$window_title) - ウィンドウ検索（改善版）</div>
+                <p>指定したタイトルのウィンドウを検索します。VS CodeのようなElectronアプリケーションにも対応した改善版です。</p>
                 
                 <div class="code-example">
-                    <pre><code># ウィンドウを検索
+                    <pre><code># ウィンドウを検索（完全一致）
 $uiAuto.FindWindow("メモ帳")
 
 # 部分一致で検索
 $uiAuto.FindWindow("Chrome")
 
+# VS Codeのようなアプリケーションも検索可能
+$uiAuto.FindWindow("Visual Studio Code")
+
 # 検索後、ウィンドウをアクティブ化
 $uiAuto.ActivateWindow()</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindWindowByPartialName([string]$partial_name) - 部分一致ウィンドウ検索</div>
+                <p>指定した部分文字列に一致するウィンドウを検索します。アプリケーション名の一部で検索する場合に便利です。</p>
+                
+                <div class="code-example">
+                    <pre><code># 部分一致でウィンドウを検索
+$uiAuto.FindWindowByPartialName("Code")  # "Visual Studio Code"を検索
+
+# ブラウザの検索
+$uiAuto.FindWindowByPartialName("Chrome")
+
+# メモ帳の検索
+$uiAuto.FindWindowByPartialName("メモ")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindWindowByProcessName([string]$process_name) - プロセス名でウィンドウ検索</div>
+                <p>指定したプロセス名のウィンドウを検索します。プロセス名が分かっている場合に確実に検索できます。</p>
+                
+                <div class="code-example">
+                    <pre><code># プロセス名でウィンドウを検索
+$uiAuto.FindWindowByProcessName("Code")  # VS Codeのプロセス名
+
+# ブラウザの検索
+$uiAuto.FindWindowByProcessName("chrome")
+
+# メモ帳の検索
+$uiAuto.FindWindowByProcessName("notepad")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindWindowByProcessAndTitle([string]$process_name, [string]$window_title) - プロセス名とウィンドウタイトルで検索</div>
+                <p>プロセス名とウィンドウタイトルの両方の条件でウィンドウを検索します。最も適切なウィンドウをスコアリングで選択します。</p>
+                
+                <div class="code-example">
+                    <pre><code># プロセス名とウィンドウタイトルの両方で検索
+$uiAuto.FindWindowByProcessAndTitle("Code", "Visual Studio Code")
+
+# プロセス名のみで検索（ウィンドウタイトルは任意）
+$uiAuto.FindWindowByProcessAndTitle("chrome", "")
+
+# ウィンドウタイトルのみで検索（プロセス名は任意）
+$uiAuto.FindWindowByProcessAndTitle("", "メモ帳")
+
+# 部分一致での検索
+$uiAuto.FindWindowByProcessAndTitle("Code", "Code")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">FindWindowFlexible([hashtable]$searchCriteria) - 柔軟なウィンドウ検索</div>
+                <p>複数の条件を指定して柔軟にウィンドウを検索します。完全一致・部分一致の選択、タイムアウト設定などが可能です。</p>
+                
+                <div class="code-example">
+                    <pre><code># 基本的な柔軟な検索
+$criteria = @{
+    ProcessName = "Code"
+    WindowTitle = "Visual Studio Code"
+    ExactMatch = $false
+    Timeout = 15000
+}
+$uiAuto.FindWindowFlexible($criteria)
+
+# 完全一致での検索
+$criteria = @{
+    ProcessName = "chrome"
+    WindowTitle = "Google Chrome"
+    ExactMatch = $true
+    Timeout = 10000
+}
+$uiAuto.FindWindowFlexible($criteria)
+
+# プロセス名のみで検索
+$criteria = @{
+    ProcessName = "notepad"
+    WindowTitle = ""
+    ExactMatch = $false
+}
+$uiAuto.FindWindowFlexible($criteria)</code></pre>
                 </div>
             </div>
         </section>
@@ -400,16 +489,79 @@ $uiAuto.TakeWindowScreenshot("C:\screenshots\after.png")</code></pre>
             </h2>
 
             <div class="method-card">
-                <div class="method-name">例1: Webブラウザでの自動操作</div>
+                <div class="method-name">例1: VS Codeでの自動操作（複合検索）</div>
                 
                 <div class="code-example">
-                    <pre><code># Webブラウザでの自動操作
+                    <pre><code># VS Codeでの自動操作（複合検索）
+$uiAuto = [UIAutomationDriver]::new()
+
+try {
+    # VS Codeを起動
+    $uiAuto.StartApplication("code")
+    
+    # プロセス名とウィンドウタイトルの両方で検索
+    try {
+        $uiAuto.FindWindowByProcessAndTitle("Code", "Visual Studio Code")
+    }
+    catch {
+        # 柔軟な検索でフォールバック
+        $criteria = @{
+            ProcessName = "Code"
+            WindowTitle = "Code"
+            ExactMatch = $false
+            Timeout = 15000
+        }
+        $uiAuto.FindWindowFlexible($criteria)
+    }
+    
+    $uiAuto.ActivateWindow()
+    Start-Sleep -Milliseconds 3000
+    
+    # 新しいファイルを作成
+    $uiAuto.SendKeyCombination(@("Ctrl", "N"))
+    Start-Sleep -Milliseconds 1000
+    
+    # コードを入力
+    $uiAuto.TypeText("// PowerShell UIAutomation テスト")
+    $uiAuto.SendSpecialKey("Enter")
+    $uiAuto.TypeText("Write-Host 'Hello, VS Code!' -ForegroundColor Green")
+    
+    # ファイルを保存
+    $uiAuto.SendKeyCombination(@("Ctrl", "S"))
+    Start-Sleep -Milliseconds 2000
+    $uiAuto.TypeText("C:\test\vscode_test.ps1")
+    $uiAuto.SendSpecialKey("Enter")
+    
+    # スクリーンショットを取得
+    $uiAuto.TakeWindowScreenshot("C:\screenshots\vscode_automation.png")
+    
+    $uiAuto.CloseApplication()
+}
+finally {
+    $uiAuto.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: Webブラウザでの自動操作（柔軟な検索）</div>
+                
+                <div class="code-example">
+                    <pre><code># Webブラウザでの自動操作（柔軟な検索）
 $uiAuto = [UIAutomationDriver]::new()
 
 try {
     # Chromeを起動
     $uiAuto.StartApplication("chrome.exe")
-    $uiAuto.FindWindow("Google Chrome")
+    
+    # 柔軟な検索でブラウザを特定
+    $criteria = @{
+        ProcessName = "chrome"
+        WindowTitle = "Chrome"
+        ExactMatch = $false
+        Timeout = 20000
+    }
+    $uiAuto.FindWindowFlexible($criteria)
     $uiAuto.ActivateWindow()
     Start-Sleep -Milliseconds 3000
     
@@ -437,7 +589,7 @@ finally {
             </div>
 
             <div class="method-card">
-                <div class="method-name">例2: Excelでの自動データ入力</div>
+                <div class="method-name">例3: Excelでの自動データ入力</div>
                 
                 <div class="code-example">
                     <pre><code># Excelでの自動データ入力
@@ -492,7 +644,7 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>UIAutomationDriverクラスでは、UIAError_0001からUIAError_0025までのエラーコードが使用されます（25個）。</p>
+                <p>UIAutomationDriverクラスでは、UIAError_0001からUIAError_0030までのエラーコードが使用されます（30個）。</p>
                 <table class="error-table">
                     <tr>
                         <td class="range">UIAError_0001</td>
@@ -512,90 +664,110 @@ finally {
                     </tr>
                     <tr>
                         <td class="range">UIAError_0005</td>
-                        <td>要素検索エラー（名前）</td>
+                        <td>部分一致ウィンドウ検索エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0006</td>
-                        <td>要素検索エラー（コントロールタイプ）</td>
+                        <td>プロセス名ウィンドウ検索エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0007</td>
-                        <td>要素検索エラー（複合条件）</td>
+                        <td>プロセス名とウィンドウタイトル検索エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0008</td>
-                        <td>要素クリックエラー</td>
+                        <td>柔軟なウィンドウ検索エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0009</td>
-                        <td>要素テキスト設定エラー</td>
+                        <td>ウィンドウアクティブ化エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0010</td>
-                        <td>要素テキスト取得エラー</td>
+                        <td>要素検索エラー（名前）</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0011</td>
-                        <td>マウスクリックエラー</td>
+                        <td>要素検索エラー（コントロールタイプ）</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0012</td>
-                        <td>マウスダブルクリックエラー</td>
+                        <td>要素検索エラー（複合条件）</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0013</td>
-                        <td>マウス右クリックエラー</td>
+                        <td>要素クリックエラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0014</td>
-                        <td>マウス移動エラー</td>
+                        <td>要素テキスト設定エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0015</td>
-                        <td>キーボード入力エラー</td>
+                        <td>要素テキスト取得エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0016</td>
-                        <td>特殊キー送信エラー</td>
+                        <td>マウスクリックエラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0017</td>
-                        <td>キー組み合わせ送信エラー</td>
+                        <td>マウスダブルクリックエラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0018</td>
-                        <td>テキスト入力エラー</td>
+                        <td>マウス右クリックエラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0019</td>
-                        <td>スクリーンショット取得エラー</td>
+                        <td>マウス移動エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0020</td>
-                        <td>ウィンドウスクリーンショット取得エラー</td>
+                        <td>キーボード入力エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0021</td>
-                        <td>プロセス終了エラー</td>
+                        <td>特殊キー送信エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0022</td>
-                        <td>プロセス強制終了エラー</td>
+                        <td>キー組み合わせ送信エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0023</td>
-                        <td>プロセス状態確認エラー</td>
+                        <td>テキスト入力エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0024</td>
-                        <td>UIAutomationDriver破棄エラー</td>
+                        <td>スクリーンショット取得エラー</td>
                     </tr>
                     <tr>
                         <td class="range">UIAError_0025</td>
+                        <td>ウィンドウスクリーンショット取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0026</td>
+                        <td>プロセス終了エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0027</td>
+                        <td>プロセス強制終了エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0028</td>
+                        <td>プロセス状態確認エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">UIAError_0029</td>
                         <td>タイムアウトエラー</td>
                     </tr>
+                    <tr>
+                        <td class="range">UIAError_0030</td>
+                        <td>UIAutomationDriver破棄エラー</td>
+                    </tr>
                 </table>
-                <p class="note">※ 全25個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+                <p class="note">※ 全30個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 

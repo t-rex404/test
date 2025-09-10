@@ -1,10 +1,6 @@
 # TeraTerm操作クラス
 # TeraTermのマクロ機能を使用してSSH/Telnet接続を自動化
 
-# 共通ライブラリをインポート
-#. "$PSScriptRoot\Common.ps1"
-#$Common = New-Object -TypeName 'Common'
-
 class TeraTermDriver
 {
     [string]$TeraTermPath
@@ -828,7 +824,7 @@ wait '$expectedPrompt' $timeoutSeconds
             Port = $this.current_port
             Protocol = $this.current_protocol
             IsConnected = $this.is_connected
-            ProcessId = if ($this.teraterm_process) { $this.teraterm_process.Id } else { $null }
+            ProcessId = if ($null -ne $this.teraterm_process) { $this.teraterm_process.Id } else { $null }
         }
     }
 

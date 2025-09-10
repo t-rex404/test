@@ -139,62 +139,167 @@ class UIAutomationDriver
 
             $this.window_title = $window_title
 
+            # アプリケーションの完全な初期化を待つ
+            Write-Host "アプリケーションの初期化を待機中..." -ForegroundColor Yellow
+            Start-Sleep -Milliseconds 3000
+
             # デスクトップのルート要素を取得
             $desktop = [System.Windows.Automation.AutomationElement]::RootElement
+            if ($null -ne $desktop)
+            {
+                throw "デスクトップのルート要素を取得できませんでした。"
+            }
 
-            # ウィンドウを検索する条件
-            $condition = New-Object System.Windows.Automation.AndCondition(
-                (New-Object System.Windows.Automation.PropertyCondition(
-                    [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
-                    [System.Windows.Automation.ControlType]::Window
-                )),
-                (New-Object System.Windows.Automation.PropertyCondition(
-                    [System.Windows.Automation.AutomationElement]::NameProperty,
-                    $window_title
-                ))
+            Write-Host "デスクトップのルート要素を取得しました。" -ForegroundColor Green
+
+            # ウィンドウ検索の条件（複数のパターンを試行）
+            $searchPatterns = @(
+                # 完全一致
+                $window_title,
+                # 部分一致（前方）
+                "*$window_title*",
+                # 部分一致（後方）
+                "*$window_title",
+                # 部分一致（前方）
+                "$window_title*"
             )
 
             # タイムアウト付きでウィンドウ検索
-            $timeout = 10000 # 10秒
+            $timeout = 30000 # 30秒に延長
             $elapsed = 0
-            $interval = 500 # 500ms間隔
+            $interval = 1000 # 1秒間隔に変更
+
+            Write-Host "ウィンドウ検索を開始します: $window_title" -ForegroundColor Yellow
 
             while ($elapsed -lt $timeout)
             {
-                # プロセスに関連するウィンドウを検索
-                if ($this.process -and -not $this.process.HasExited)
+                # 各検索パターンを試行
+                foreach ($pattern in $searchPatterns)
                 {
-                    $processCondition = New-Object System.Windows.Automation.AndCondition(
-                        $condition,
-                        (New-Object System.Windows.Automation.PropertyCondition(
-                            [System.Windows.Automation.AutomationElement]::ProcessIdProperty,
-                            $this.process.Id
-                        ))
-                    )
-
-                    $window = $desktop.FindFirst([System.Windows.Automation.TreeScope]::Children, $processCondition)
-                    if ($window -ne $null)
+                    try
                     {
-                        $this.root_element = $window
-                        Write-Host "ウィンドウを発見しました: $window_title" -ForegroundColor Green
-                        return $window
+                        # ウィンドウを検索する条件
+                        $condition = New-Object System.Windows.Automation.AndCondition(
+                            (New-Object System.Windows.Automation.PropertyCondition(
+                                [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                                [System.Windows.Automation.ControlType]::Window
+                            )),
+                            (New-Object System.Windows.Automation.PropertyCondition(
+                                [System.Windows.Automation.AutomationElement]::NameProperty,
+                                $pattern
+                            ))
+                        )
+
+                        # プロセスに関連するウィンドウを検索
+                        if ($this.process -and -not $this.process.HasExited)
+                        {
+                            try
+                            {
+                                $processCondition = New-Object System.Windows.Automation.AndCondition(
+                                    $condition,
+                                    (New-Object System.Windows.Automation.PropertyCondition(
+                                        [System.Windows.Automation.AutomationElement]::ProcessIdProperty,
+                                        $this.process.Id
+                                    ))
+                                )
+
+                                $window = $desktop.FindFirst([System.Windows.Automation.TreeScope]::Children, $processCondition)
+                                if ($null -ne $window -and $window.Current.IsEnabled)
+                                {
+                                    $this.root_element = $window
+                                    Write-Host "プロセスIDでウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
+                                    return $window
+                                }
+                            }
+                            catch
+                            {
+                                Write-Host "プロセスID検索でエラー: $($_.Exception.Message)" -ForegroundColor Yellow
+                            }
+                        }
+
+                        # プロセスIDに関係なくウィンドウを検索
+                        $window = $desktop.FindFirst([System.Windows.Automation.TreeScope]::Children, $condition)
+                        if ($null -ne $window -and $window.Current.IsEnabled)
+                        {
+                            $this.root_element = $window
+                            Write-Host "ウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
+                            return $window
+                        }
+                    }
+                    catch
+                    {
+                        Write-Host "パターン '$pattern' で検索中にエラー: $($_.Exception.Message)" -ForegroundColor Yellow
                     }
                 }
 
-                # プロセスIDに関係なくウィンドウを検索
-                $window = $desktop.FindFirst([System.Windows.Automation.TreeScope]::Children, $condition)
-                if ($window -ne $null)
+                # より広範囲な検索（すべてのウィンドウを列挙）
+                try
                 {
-                    $this.root_element = $window
-                    Write-Host "ウィンドウを発見しました: $window_title" -ForegroundColor Green
-                    return $window
+                    $allWindows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, 
+                        (New-Object System.Windows.Automation.PropertyCondition(
+                            [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                            [System.Windows.Automation.ControlType]::Window
+                        )))
+
+                    foreach ($window in $allWindows)
+                    {
+                        if ($null -ne $window -and $window.Current.IsEnabled)
+                        {
+                            $windowName = $window.Current.Name
+                            if ($windowName -like "*$window_title*" -or $window_title -like "*$windowName*")
+                            {
+                                $this.root_element = $window
+                                Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
+                                return $window
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    Write-Host "全ウィンドウ検索でエラー: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
 
+                Write-Host "検索中... (経過時間: $($elapsed/1000)秒)" -ForegroundColor Yellow
                 Start-Sleep -Milliseconds $interval
                 $elapsed += $interval
             }
 
-            throw "指定されたウィンドウが見つかりませんでした: $window_title"
+            # 最後の手段：プロセス名で検索
+            if ($this.process -and -not $this.process.HasExited)
+            {
+                try
+                {
+                    $processName = $this.process.ProcessName
+                    Write-Host "プロセス名 '$processName' でウィンドウを検索中..." -ForegroundColor Yellow
+                    
+                    $allWindows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, 
+                        (New-Object System.Windows.Automation.PropertyCondition(
+                            [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                            [System.Windows.Automation.ControlType]::Window
+                        )))
+
+                    foreach ($window in $allWindows)
+                    {
+                        if ($null -ne $window -and $window.Current.IsEnabled)
+                        {
+                            $windowProcessId = $window.Current.ProcessId
+                            if ($windowProcessId -eq $this.process.Id)
+                            {
+                                $this.root_element = $window
+                                Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
+                                return $window
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    Write-Host "プロセス名検索でエラー: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+
+            throw "指定されたウィンドウが見つかりませんでした: $window_title (タイムアウト: $($timeout/1000)秒)"
         }
         catch
         {
@@ -219,26 +324,486 @@ class UIAutomationDriver
         }
     }
 
+    # ウィンドウ検索（部分一致）
+    [System.Windows.Automation.AutomationElement] FindWindowByPartialName([string]$partial_name)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($partial_name))
+            {
+                throw "部分検索名が指定されていません。"
+            }
+
+            Write-Host "部分一致でウィンドウを検索中: $partial_name" -ForegroundColor Yellow
+
+            # デスクトップのルート要素を取得
+            $desktop = [System.Windows.Automation.AutomationElement]::RootElement
+            if ($null -eq $desktop)
+            {
+                throw "デスクトップのルート要素を取得できませんでした。"
+            }
+
+            # すべてのウィンドウを取得
+            $allWindows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, 
+                (New-Object System.Windows.Automation.PropertyCondition(
+                    [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                    [System.Windows.Automation.ControlType]::Window
+                )))
+
+            foreach ($window in $allWindows)
+            {
+                if ($null -ne $window -and $window.Current.IsEnabled)
+                {
+                    $windowName = $window.Current.Name
+                    if ($windowName -like "*$partial_name*")
+                    {
+                        $this.root_element = $window
+                        $this.window_title = $windowName
+                        Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
+                        return $window
+                    }
+                }
+            }
+
+            throw "部分一致するウィンドウが見つかりませんでした: $partial_name"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("UIAError_0005", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "部分一致ウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "部分一致するウィンドウが見つかりませんでした: $($_.Exception.Message)"
+        }
+    }
+
+    # ウィンドウ検索（プロセス名で）
+    [System.Windows.Automation.AutomationElement] FindWindowByProcessName([string]$process_name)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($process_name))
+            {
+                throw "プロセス名が指定されていません。"
+            }
+
+            Write-Host "プロセス名でウィンドウを検索中: $process_name" -ForegroundColor Yellow
+
+            # デスクトップのルート要素を取得
+            $desktop = [System.Windows.Automation.AutomationElement]::RootElement
+            if ($null -eq $desktop)
+            {
+                throw "デスクトップのルート要素を取得できませんでした。"
+            }
+
+            # すべてのウィンドウを取得
+            $allWindows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, 
+                (New-Object System.Windows.Automation.PropertyCondition(
+                    [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                    [System.Windows.Automation.ControlType]::Window
+                )))
+
+            foreach ($window in $allWindows)
+            {
+                if ($null -ne $window -and $window.Current.IsEnabled)
+                {
+                    try
+                    {
+                        $process = [System.Diagnostics.Process]::GetProcessById($window.Current.ProcessId)
+                        if ($process.ProcessName -like "*$process_name*")
+                        {
+                            $this.root_element = $window
+                            $this.window_title = $window.Current.Name
+                            Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($process.ProcessName))" -ForegroundColor Green
+                            return $window
+                        }
+                    }
+                    catch
+                    {
+                        # プロセスが存在しない場合はスキップ
+                        continue
+                    }
+                }
+            }
+
+            throw "指定されたプロセス名のウィンドウが見つかりませんでした: $process_name"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("UIAError_0006", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "指定されたプロセス名のウィンドウが見つかりませんでした: $($_.Exception.Message)"
+        }
+    }
+
+    # ウィンドウ検索（プロセス名とウィンドウタイトルの両方で）
+    [System.Windows.Automation.AutomationElement] FindWindowByProcessAndTitle([string]$process_name, [string]$window_title)
+    {
+        try
+        {
+            if ([string]::IsNullOrEmpty($process_name) -and [string]::IsNullOrEmpty($window_title))
+            {
+                throw "プロセス名またはウィンドウタイトルのいずれかが指定されている必要があります。"
+            }
+
+            Write-Host "プロセス名とウィンドウタイトルでウィンドウを検索中: プロセス='$process_name', タイトル='$window_title'" -ForegroundColor Yellow
+
+            # デスクトップのルート要素を取得
+            $desktop = [System.Windows.Automation.AutomationElement]::RootElement
+            if ($null -eq $desktop)
+            {
+                throw "デスクトップのルート要素を取得できませんでした。"
+            }
+
+            # すべてのウィンドウを取得
+            $allWindows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, 
+                (New-Object System.Windows.Automation.PropertyCondition(
+                    [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                    [System.Windows.Automation.ControlType]::Window
+                )))
+
+            $candidates = @()
+
+            foreach ($window in $allWindows)
+            {
+                if ($null -ne $window -and $window.Current.IsEnabled)
+                {
+                    $windowName = $window.Current.Name
+                    $windowProcessId = $window.Current.ProcessId
+                    
+                    try
+                    {
+                        $process = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
+                        $processName = $process.ProcessName
+                        
+                        $matchProcess = $false
+                        $matchTitle = $false
+                        
+                        # プロセス名のマッチング
+                        if ([string]::IsNullOrEmpty($process_name))
+                        {
+                            $matchProcess = $true
+                        }
+                        else
+                        {
+                            $matchProcess = $processName -like "*$process_name*"
+                        }
+                        
+                        # ウィンドウタイトルのマッチング
+                        if ([string]::IsNullOrEmpty($window_title))
+                        {
+                            $matchTitle = $true
+                        }
+                        else
+                        {
+                            $matchTitle = $windowName -like "*$window_title*"
+                        }
+                        
+                        # 両方の条件に一致する場合
+                        if ($matchProcess -and $matchTitle)
+                        {
+                            $candidates += @{
+                                Window = $window
+                                ProcessName = $processName
+                                WindowName = $windowName
+                                ProcessId = $windowProcessId
+                                Score = 0
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        # プロセスが存在しない場合はスキップ
+                        continue
+                    }
+                }
+            }
+
+            if ($candidates.Count -eq 0)
+            {
+                throw "指定された条件に一致するウィンドウが見つかりませんでした: プロセス='$process_name', タイトル='$window_title'"
+            }
+
+            # 最も適切なウィンドウを選択（スコアリング）
+            $bestMatch = $null
+            $highestScore = -1
+
+            foreach ($candidate in $candidates)
+            {
+                $score = 0
+                
+                # プロセス名の完全一致
+                if (-not [string]::IsNullOrEmpty($process_name) -and $candidate.ProcessName -eq $process_name)
+                {
+                    $score += 100
+                }
+                # プロセス名の部分一致
+                elseif (-not [string]::IsNullOrEmpty($process_name) -and $candidate.ProcessName -like "*$process_name*")
+                {
+                    $score += 50
+                }
+                
+                # ウィンドウタイトルの完全一致
+                if (-not [string]::IsNullOrEmpty($window_title) -and $candidate.WindowName -eq $window_title)
+                {
+                    $score += 100
+                }
+                # ウィンドウタイトルの部分一致
+                elseif (-not [string]::IsNullOrEmpty($window_title) -and $candidate.WindowName -like "*$window_title*")
+                {
+                    $score += 50
+                }
+                
+                # プロセスIDが一致する場合（起動したアプリケーションの場合）
+                if ($this.process -and $candidate.ProcessId -eq $this.process.Id)
+                {
+                    $score += 200
+                }
+                
+                if ($score > $highestScore)
+                {
+                    $highestScore = $score
+                    $bestMatch = $candidate
+                }
+            }
+
+            if ($null -ne $bestMatch)
+            {
+                $this.root_element = $bestMatch.Window
+                $this.window_title = $bestMatch.WindowName
+                Write-Host "プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)" -ForegroundColor Green
+                return $bestMatch.Window
+            }
+
+            throw "適切なウィンドウが見つかりませんでした: プロセス='$process_name', タイトル='$window_title'"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("UIAError_0007", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "プロセス名とウィンドウタイトルでウィンドウを検索できませんでした: $($_.Exception.Message)"
+        }
+    }
+
+    # ウィンドウ検索（複数条件での柔軟な検索）
+    [System.Windows.Automation.AutomationElement] FindWindowFlexible([hashtable]$searchCriteria)
+    {
+        try
+        {
+            if ($null -eq $searchCriteria -or $searchCriteria.Count -eq 0)
+            {
+                throw "検索条件が指定されていません。"
+            }
+
+            $processName = $searchCriteria["ProcessName"]
+            $windowTitle = $searchCriteria["WindowTitle"]
+            $exactMatch = $searchCriteria["ExactMatch"]
+            $timeout = $searchCriteria["Timeout"]
+
+            if ([string]::IsNullOrEmpty($timeout))
+            {
+                $timeout = 10000  # デフォルト10秒
+            }
+
+            if ([string]::IsNullOrEmpty($exactMatch))
+            {
+                $exactMatch = $false
+            }
+
+            Write-Host "柔軟なウィンドウ検索を開始: プロセス='$processName', タイトル='$windowTitle', 完全一致=$exactMatch" -ForegroundColor Yellow
+
+            # デスクトップのルート要素を取得
+            $desktop = [System.Windows.Automation.AutomationElement]::RootElement
+            if ($null -eq $desktop)
+            {
+                throw "デスクトップのルート要素を取得できませんでした。"
+            }
+
+            $elapsed = 0
+            $interval = 500
+
+            while ($elapsed -lt $timeout)
+            {
+                # すべてのウィンドウを取得
+                $allWindows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, 
+                    (New-Object System.Windows.Automation.PropertyCondition(
+                        [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                        [System.Windows.Automation.ControlType]::Window
+                    )))
+
+                $candidates = @()
+
+                foreach ($window in $allWindows)
+                {
+                    if ($null -ne $window -and $window.Current.IsEnabled)
+                    {
+                        $windowName = $window.Current.Name
+                        $windowProcessId = $window.Current.ProcessId
+                        
+                        try
+                        {
+                            $process = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
+                            $processName = $process.ProcessName
+                            
+                            $matchProcess = $false
+                            $matchTitle = $false
+                            
+                            # プロセス名のマッチング
+                            if ([string]::IsNullOrEmpty($processName))
+                            {
+                                $matchProcess = $true
+                            }
+                            else
+                            {
+                                if ($exactMatch)
+                                {
+                                    $matchProcess = $processName -eq $processName
+                                }
+                                else
+                                {
+                                    $matchProcess = $processName -like "*$processName*"
+                                }
+                            }
+                            
+                            # ウィンドウタイトルのマッチング
+                            if ([string]::IsNullOrEmpty($windowTitle))
+                            {
+                                $matchTitle = $true
+                            }
+                            else
+                            {
+                                if ($exactMatch)
+                                {
+                                    $matchTitle = $windowName -eq $windowTitle
+                                }
+                                else
+                                {
+                                    $matchTitle = $windowName -like "*$windowTitle*"
+                                }
+                            }
+                            
+                            # 両方の条件に一致する場合
+                            if ($matchProcess -and $matchTitle)
+                            {
+                                $candidates += @{
+                                    Window = $window
+                                    ProcessName = $processName
+                                    WindowName = $windowName
+                                    ProcessId = $windowProcessId
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            # プロセスが存在しない場合はスキップ
+                            continue
+                        }
+                    }
+                }
+
+                if ($candidates.Count -gt 0)
+                {
+                    # 最初に見つかったウィンドウを返す
+                    $bestMatch = $candidates[0]
+                    $this.root_element = $bestMatch.Window
+                    $this.window_title = $bestMatch.WindowName
+                    Write-Host "柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))" -ForegroundColor Green
+                    return $bestMatch.Window
+                }
+
+                Write-Host "検索中... (経過時間: $($elapsed/1000)秒)" -ForegroundColor Yellow
+                Start-Sleep -Milliseconds $interval
+                $elapsed += $interval
+            }
+
+            throw "指定された条件に一致するウィンドウが見つかりませんでした: プロセス='$processName', タイトル='$windowTitle' (タイムアウト: $($timeout/1000)秒)"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("UIAError_0008", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "柔軟なウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            throw "柔軟なウィンドウ検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ウィンドウアクティブ化
     [void] ActivateWindow()
     {
         try
         {
-            if ($this.root_element -eq $null)
+            if ($null -eq $this.root_element)
             {
                 throw "ウィンドウ要素が設定されていません。"
             }
 
             # ウィンドウパターンを取得してアクティブ化
             $windowPattern = $this.root_element.GetCurrentPattern([System.Windows.Automation.WindowPattern]::Pattern)
-            if ($windowPattern -ne $null)
+            if ($null -ne $windowPattern)
             {
                 $windowPattern.SetWindowVisualState([System.Windows.Automation.WindowVisualState]::Normal)
             }
 
             # ウィンドウを前面に表示
             $transformPattern = $this.root_element.GetCurrentPattern([System.Windows.Automation.TransformPattern]::Pattern)
-            if ($transformPattern -ne $null)
+            if ($null -ne $transformPattern)
             {
                 $transformPattern.Move(0, 0)
             }
@@ -252,7 +817,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0004", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0009", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -277,7 +842,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($this.root_element -eq $null)
+            if ($null -eq $this.root_element)
             {
                 throw "ルート要素が設定されていません。"
             }
@@ -288,7 +853,7 @@ class UIAutomationDriver
             )
 
             $element = $this.root_element.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-            if ($element -eq $null)
+            if ($null -eq $element)
             {
                 throw "指定された要素が見つかりませんでした: $name"
             }
@@ -303,7 +868,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0005", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0010", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -324,7 +889,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($this.root_element -eq $null)
+            if ($null -eq $this.root_element)
             {
                 throw "ルート要素が設定されていません。"
             }
@@ -335,7 +900,7 @@ class UIAutomationDriver
             )
 
             $element = $this.root_element.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-            if ($element -eq $null)
+            if ($null -eq $element)
             {
                 throw "指定されたコントロールタイプの要素が見つかりませんでした: $controlType"
             }
@@ -350,7 +915,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0006", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0011", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -371,7 +936,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($this.root_element -eq $null)
+            if ($null -eq $this.root_element)
             {
                 throw "ルート要素が設定されていません。"
             }
@@ -385,7 +950,7 @@ class UIAutomationDriver
             $andCondition = New-Object System.Windows.Automation.AndCondition($conditionList)
             $element = $this.root_element.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $andCondition)
             
-            if ($element -eq $null)
+            if ($null -eq $element)
             {
                 throw "指定された条件の要素が見つかりませんでした"
             }
@@ -400,7 +965,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0007", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0012", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -421,7 +986,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($element -eq $null)
+            if ($null -eq $element)
             {
                 throw "要素が指定されていません。"
             }
@@ -431,7 +996,7 @@ class UIAutomationDriver
 
             # InvokePatternを取得してクリック
             $invokePattern = $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-            if ($invokePattern -ne $null)
+            if ($null -ne $invokePattern)
             {
                 $invokePattern.Invoke()
             }
@@ -451,7 +1016,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0008", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0013", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -472,7 +1037,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($element -eq $null)
+            if ($null -eq $element)
             {
                 throw "要素が指定されていません。"
             }
@@ -482,7 +1047,7 @@ class UIAutomationDriver
 
             # ValuePatternを取得してテキスト設定
             $valuePattern = $element.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
-            if ($valuePattern -ne $null)
+            if ($null -ne $valuePattern)
             {
                 $valuePattern.SetValue($text)
             }
@@ -501,7 +1066,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0009", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0014", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -522,7 +1087,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($element -eq $null)
+            if ($null -eq $element)
             {
                 throw "要素が指定されていません。"
             }
@@ -543,7 +1108,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0010", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0015", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -590,7 +1155,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0011", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0016", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -629,7 +1194,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0012", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0017", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -666,7 +1231,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0013", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0018", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -699,7 +1264,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0014", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0019", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -736,7 +1301,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0015", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0020", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -805,7 +1370,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0016", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0021", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -839,7 +1404,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0017", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0022", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -872,7 +1437,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0018", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0023", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -922,7 +1487,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0019", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0024", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -943,7 +1508,7 @@ class UIAutomationDriver
     {
         try
         {
-            if ($this.root_element -eq $null)
+            if ($null -eq $this.root_element)
             {
                 throw "ウィンドウ要素が設定されていません。"
             }
@@ -975,7 +1540,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0020", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0025", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1023,7 +1588,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0021", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0026", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1059,7 +1624,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0022", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0027", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1093,7 +1658,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0023", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0028", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1124,7 +1689,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0025", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0029", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1167,7 +1732,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0024", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0030", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

@@ -335,7 +335,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0007", "マウスダブルクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0006", "マウスダブルクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -378,7 +378,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0006", "マウス右クリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0007", "マウス右クリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -869,7 +869,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0019", "タイムアウトエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0018", "タイムアウトエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -911,7 +911,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0018", "GUIDriver破棄エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0019", "GUIDriver破棄エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

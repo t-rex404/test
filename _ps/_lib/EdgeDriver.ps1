@@ -1,10 +1,3 @@
-# EdgeDriverエラー管理モジュールをインポート
-#import-module "$PSScriptRoot\EdgeDriverErrors.psm1"
-
-# 共通ライブラリをインポート
-#. "$PSScriptRoot\Common.ps1"
-#$Common = New-Object -TypeName 'Common'
-
 class EdgeDriver : WebDriver
 {
     [string]$browser_exe_path
