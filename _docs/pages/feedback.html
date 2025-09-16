@@ -2237,7 +2237,11 @@
 
             <!-- Success/Error Messages -->
             <div class="success-message" id="successMessage">
-                ✅ フィードバックを送信しました。順番に対応しますので、修正が完了までお待ちください。
+                <!--✅ フィードバックを送信しました。順番に対応しますので、修正が完了までお待ちください。-->
+                ✅ 修正依頼ファイルを作成しました。<br>
+                    以下のパスにファイルを置いてください。<br>
+                    「¥¥10.1.1.1¥_____」<br>
+                    順番に対応しますので、修正が完了までお待ちください。<br>
             </div>
             <div class="error-message" id="errorMessage">
                 ❌ エラーが発生しました。もう一度お試しください。
@@ -2343,6 +2347,7 @@
                 
                 // IPアドレスを取得
                 let ipAddress = 'Unknown';
+                /*
                 try {
                     // 外部APIを使用してIPアドレスを取得
                     const response = await fetch('https://api.ipify.org?format=json');
@@ -2352,20 +2357,21 @@
                     console.log('IPアドレスの取得に失敗しました:', error);
                     ipAddress = 'Unknown';
                 }
+                */
                 
-                                 // ファイルの詳細情報とフルパスを取得
-                 const fileDetails = files.map((file, index) => {
-                     const sizeKB = (file.size / 1024).toFixed(2);
-                     const type = file.type || '不明';
-                     const fullPath = document.getElementById(`filePath_${index}`)?.value || '';
-                     
-                     // フルパスが入力されていない場合はエラー
-                     if (!fullPath.trim()) {
-                         throw new Error(`ファイル「${file.name}」のフルパスが入力されていません。`);
-                     }
-                     
-                     return `${file.name} (${sizeKB}KB, ${type}) - パス: ${fullPath}`;
-                 }).join('; ');
+                // ファイルの詳細情報とフルパスを取得
+                const fileDetails = files.map((file, index) => {
+                    const sizeKB = (file.size / 1024).toFixed(2);
+                    const type = file.type || '不明';
+                    const fullPath = document.getElementById(`filePath_${index}`)?.value || '';
+                    
+                    // フルパスが入力されていない場合はエラー
+                    if (!fullPath.trim()) {
+                        throw new Error(`ファイル「${file.name}」のフルパスが入力されていません。`);
+                    }
+                
+                    return `${file.name} (${sizeKB}KB, ${type}) - パス: ${fullPath}`;
+                }).join('; ');
                 
                 // CSVデータを作成（ファイルの詳細情報とフルパスを含む）
                 const csvData = [

@@ -179,6 +179,7 @@ class UIAutomationDriver
                     try
                     {
                         # ウィンドウを検索する条件
+                        <#
                         $condition = New-Object System.Windows.Automation.AndCondition(
                             (New-Object System.Windows.Automation.PropertyCondition(
                                 [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
@@ -188,6 +189,10 @@ class UIAutomationDriver
                                 [System.Windows.Automation.AutomationElement]::NameProperty,
                                 $pattern
                             ))
+                        )
+                        #>
+                        $condition = new-object System.Windows.Automation.PropertyCondition(
+                            [System.Windows.Automation.AutomationElement]::NameProperty,$window_title
                         )
 
                         # プロセスに関連するウィンドウを検索

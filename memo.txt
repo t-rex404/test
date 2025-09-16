@@ -1,0 +1,336 @@
+● OracleDriver.ps1のExecuteSelectメソッドの使い
+  方とデータベース接続から切断までの流れを説明
+  します。
+
+  ExecuteSelectメソッドの詳細
+
+  メソッドシグネチャ 
+  (_ps/_lib/OracleDriver.ps1:788)
+
+  [System.Data.DataTable] 
+  ExecuteSelect([string]$sql,
+  [hashtable]$parameters = @{})
+
+  パラメータ
+
+  - $sql: 実行するSELECT文
+  - $parameters:
+  パラメータ化クエリ用のパラメータ（オプション
+  、デフォルトは空のハッシュテーブル）
+
+  戻り値
+
+  - System.Data.DataTable:
+  クエリ結果を含むDataTableオブジェクト
+
+  データベース接続から切断までの完全な流れ
+
+  1. 基本的な使用例（直接接続）
+
+  # OracleDriverのインスタンス化
+  $oracle = [OracleDriver]::new()
+
+  try {
+      # 接続パラメータを設定
+      $oracle.SetConnectionParameters(
+          "oracle-server.example.com",  # 
+  サーバー
+          "1521",                        # 
+  ポート
+          "ORCL",                        # 
+  サービス名
+          "username",                    # 
+  ユーザー名
+          "password"                     # 
+  パスワード
+      )
+
+      # データベースに接続
+      $oracle.Connect()
+
+      # SELECT文を実行
+      $sql = "SELECT * FROM employees WHERE 
+  department_id = :deptId"
+      $params = @{":deptId" = 100}
+      $result = $oracle.ExecuteSelect($sql,
+  $params)
+
+      # 結果を処理
+      foreach ($row in $result.Rows) {
+          Write-Host "Employee: 
+  $($row["FIRST_NAME"]) $($row["LAST_NAME"])"
+      }
+  }
+  finally {
+      # 接続を切断
+      $oracle.Disconnect()
+  }
+
+  2. TNS接続を使用する場合
+
+  $oracle = [OracleDriver]::new()
+
+  try {
+      # TNS_ADMINパスを設定（必要な場合）
+      $oracle.SetTnsAdminPath("C:\oracle\networ    
+  k\admin")
+
+      # TNS接続
+      $oracle.ConnectTns("PROD_DB", "username",    
+   "password")
+
+      # SELECT文を実行（パラメータなし）
+      $sql = "SELECT COUNT(*) AS total FROM        
+  orders"
+      $result = $oracle.ExecuteSelect($sql)        
+
+      Write-Host "Total orders:
+  $($result.Rows[0]["total"])"
+  }
+  finally {
+      $oracle.Disconnect()
+  }
+
+  3. トランザクション内での実行
+
+  $oracle = [OracleDriver]::new()
+
+  try {
+      # 接続
+      $oracle.SetConnectionParameters("server",    
+   "1521", "ORCL", "user", "pass")
+      $oracle.Connect()
+
+      # トランザクション開始
+      $oracle.BeginTransaction()
+
+      try {
+          # SELECT文を実行
+          $checkSql = "SELECT COUNT(*) AS cnt      
+  FROM inventory WHERE product_id = :prodId"       
+          $checkParams = @{":prodId" = 12345}      
+          $checkResult =
+  $oracle.ExecuteSelect($checkSql,
+  $checkParams)
+
+          $count = $checkResult.Rows[0]["cnt"]     
+
+          if ($count -gt 0) {
+              # UPDATE文を実行
+              $updateSql = "UPDATE inventory       
+  SET quantity = quantity - 1 WHERE product_id     
+  = :prodId"
+              $oracle.ExecuteUpdate($updateSql,    
+   $checkParams)
+
+              # コミット
+              $oracle.CommitTransaction()
+          }
+          else {
+              # ロールバック
+              $oracle.RollbackTransaction()        
+          }
+      }
+      catch {
+          # エラー時はロールバック
+          $oracle.RollbackTransaction()
+          throw
+      }
+  }
+  finally {
+      $oracle.Disconnect()
+  }
+
+  重要なポイント
+
+  1. 接続前チェック: ExecuteSelectは接続確認を     
+  行い、未接続の場合は例外をスロー
+  (_ps/_lib/OracleDriver.ps1:792-795)
+  2. パラメータ化クエリ: SQLインジェクション防     
+  止のため、パラメータ化クエリを推奨
+  3. 自動クリーンアップ:
+  Disconnect()メソッドは自動的にアクティブなト     
+  ランザクションをロールバック
+  (_ps/_lib/OracleDriver.ps1:747-750)
+  4. エラーハンドリング:
+  全てのメソッドは$global:Commonオブジェクトが     
+  利用可能な場合、エラーログを自動記録
+  5. 接続状態確認:
+  IsConnected()メソッドで接続状態を確認可能        
+  (_ps/_lib/OracleDriver.ps1:1943-1946)
+
+
+
+--------------------------------------------------
+  ● tnsnames.oraを使用したOracle接続からExecuteSe
+  lectメソッドの実行、切断までの流れを説明しま
+  す。
+
+  tnsnames.ora使用時の接続フロー
+
+  1. TNS設定と接続
+
+  # OracleDriverのインスタンス化
+  $oracle = [OracleDriver]::new()
+
+  try {
+      # TNS_ADMINパスの設定（tnsnames.oraがある    
+  ディレクトリ）
+      $oracle.SetTnsAdminPath("C:\oracle\networ    
+  k\admin")
+
+      # TNSエイリアスを使用して接続
+      # tnsnames.ora内で定義されているエイリア     
+  ス名を指定
+      $oracle.ConnectTns(
+          "PROD_DB",      #
+  TNSエイリアス（tnsnames.ora内の定義名）
+          "scott",        # ユーザー名
+          "tiger"         # パスワード
+      )
+
+      # SELECT文の実行
+      $sql = "SELECT * FROM emp WHERE deptno =     
+  :dept"
+      $params = @{":dept" = 20}
+      $result = $oracle.ExecuteSelect($sql,        
+  $params)
+
+      # 結果の処理
+      foreach ($row in $result.Rows) {
+          Write-Host "$($row["EMPNO"]) -
+  $($row["ENAME"]) - $($row["JOB"])"
+      }
+  }
+  finally {
+      # 必ず切断処理を実行
+      $oracle.Disconnect()
+  }
+
+  2. tnsnames.oraの構成例
+
+  PROD_DB =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 
+  oracle-server.example.com)(PORT = 1521))
+      (CONNECT_DATA =
+        (SERVER = DEDICATED)
+        (SERVICE_NAME = ORCL)
+      )
+    )
+
+  3. メソッドチェーンの詳細
+
+  SetTnsAdminPath 
+  (_ps/_lib/OracleDriver.ps1:65-94)
+
+  - tnsnames.oraが格納されているディレクトリを     
+  指定
+  - 環境変数TNS_ADMINも自動設定
+
+  ConnectTns 
+  (_ps/_lib/OracleDriver.ps1:653-694)
+
+  - TNSエイリアス、ユーザー名、パスワードで接続    
+  - 内部でSetTnsConnectionParametersを呼び出し     
+  - 接続文字列: Data Source=TNSエイリアス;User     
+  Id=username;Password=password;
+
+  ExecuteSelect 
+  (_ps/_lib/OracleDriver.ps1:788-834)
+
+  - 接続状態を確認
+  - SQLコマンドオブジェクトを作成
+  - パラメータをバインド
+  - DataAdapterで結果をDataTableに格納
+
+  4. 複数のクエリを実行する例
+
+  $oracle = [OracleDriver]::new()
+
+  try {
+      # TNS接続（スキーマも指定可能）
+      $oracle.SetTnsAdminPath($env:ORACLE_HOME     
+  + "\network\admin")
+      $oracle.ConnectTns("DEV_DB", "hr",
+  "password", "HR_SCHEMA")
+
+      # 1. 部門一覧を取得
+      $deptSql = "SELECT * FROM departments        
+  ORDER BY department_id"
+      $departments =
+  $oracle.ExecuteSelect($deptSql)
+
+      Write-Host "部門数:
+  $($departments.Rows.Count)"
+
+      # 2. 各部門の従業員数を取得
+      foreach ($dept in $departments.Rows) {       
+          $empSql = @"
+  SELECT COUNT(*) as emp_count
+  FROM employees
+  WHERE department_id = :deptId
+  "@
+          $empCount =
+  $oracle.ExecuteSelect($empSql, @{":deptId" =     
+  $dept["DEPARTMENT_ID"]})
+
+          Write-Host "部門
+  $($dept["DEPARTMENT_NAME"]):
+  $($empCount.Rows[0]["emp_count"])名"
+      }
+
+      # 3. ユーティリティメソッドも利用可能        
+      $tables = $oracle.GetTableList()  #
+  全テーブル一覧取得
+      $structure =
+  $oracle.GetTableStructure("EMPLOYEES")  #        
+  テーブル構造取得
+  }
+  catch {
+      Write-Host "エラーが発生しました: $_"        
+  -ForegroundColor Red
+
+      # 最後のエラーメッセージを確認
+      if ($oracle.GetLastErrorMessage()) {
+          Write-Host "詳細:
+  $($oracle.GetLastErrorMessage())"
+      }
+  }
+  finally {
+      # 接続を切断（アクティブなトランザクショ     
+  ンは自動ロールバック）
+      $oracle.Disconnect()
+  }
+
+  5. 環境変数を使用した簡略化
+
+  # 環境変数TNS_ADMINが既に設定されている場合      
+  $oracle = [OracleDriver]::new()
+
+  try {
+      # TNS_ADMINパス設定は省略可能（コンストラ    
+  クタで$env:TNS_ADMINを読み込み）
+      $oracle.ConnectTns("MYDB", "username",       
+  "password")
+
+      # クエリ実行
+      $data = $oracle.ExecuteSelect("SELECT        
+  SYSDATE FROM DUAL")
+      Write-Host "現在時刻:
+  $($data.Rows[0][0])"
+  }
+  finally {
+      $oracle.Disconnect()
+  }
+
+  重要なポイント
+
+  1. TNSエイリアスの利点:
+  サーバー情報をtnsnames.oraで一元管理
+  2. エラーハンドリング: 各メソッドはエラーコー    
+  ド（OracleError_XXXX）で管理
+  3. 自動クリーンアップ: Disconnect()はトランザ    
+  クションを自動ロールバック
+  4. 接続プーリング:
+  System.Data.OracleClientが内部で管理

@@ -129,20 +129,20 @@
 $driver = [OracleDriver]::new()
 
 # 接続パラメータを設定
-$driver.SetConnectionString("localhost", "1521", "XE", "username", "password")</code></pre>
+$driver.SetConnectionParameters("localhost", "1521", "XE", "username", "password")</code></pre>
                 </div>
             </div>
 
             <div class="method-card">
-                <div class="method-name">SetConnectionString([string]$server, [string]$port, [string]$service, [string]$username, [string]$password) - 接続文字列設定</div>
+                <div class="method-name">SetConnectionParameters([string]$server, [string]$port, [string]$service_name, [string]$username, [string]$password, [string]$schema = "") - 接続パラメータ設定</div>
                 <p>Oracleデータベースへの接続パラメータを設定します。</p>
                 
                 <div class="code-example">
                     <pre><code># 基本的な接続設定
-$driver.SetConnectionString("localhost", "1521", "XE", "system", "password")
+$driver.SetConnectionParameters("localhost", "1521", "XE", "system", "password")
 
 # 本番環境への接続
-$driver.SetConnectionString("prod-db.company.com", "1521", "PROD", "app_user", "SecurePass123")</code></pre>
+$driver.SetConnectionParameters("prod-db.company.com", "1521", "PROD", "app_user", "SecurePass123")</code></pre>
                 </div>
             </div>
 
@@ -169,50 +169,52 @@ if ($driver.IsConnected) {
             </h2>
 
             <div class="method-card">
-                <div class="method-name">ExecuteQuery([string]$sql) - SELECT文実行</div>
+                <div class="method-name">ExecuteSelect([string]$sql, [hashtable]$parameters = @{}) - SELECT文実行</div>
                 <p>SELECT文を実行し、結果を返します。</p>
                 
                 <div class="code-example">
                     <pre><code># 基本的なSELECT文
-$result = $driver.ExecuteQuery("SELECT * FROM employees WHERE department = 'IT'")
+$result = $driver.ExecuteSelect("SELECT * FROM employees WHERE department = 'IT'")
 
 # 条件付きクエリ
-$result = $driver.ExecuteQuery("SELECT name, salary FROM employees WHERE salary > 50000")
+$result = $driver.ExecuteSelect("SELECT name, salary FROM employees WHERE salary > 50000")
 
 # 集計クエリ
-$result = $driver.ExecuteQuery("SELECT department, AVG(salary) FROM employees GROUP BY department")</code></pre>
+$result = $driver.ExecuteSelect("SELECT department, AVG(salary) FROM employees GROUP BY department")</code></pre>
                 </div>
             </div>
 
             <div class="method-card">
-                <div class="method-name">ExecuteNonQuery([string]$sql) - INSERT/UPDATE/DELETE文実行</div>
+                <div class="method-name">ExecuteInsert / ExecuteUpdate / ExecuteDelete([string]$sql, [hashtable]$parameters = @{}) - DML実行</div>
                 <p>データを変更するSQL文を実行し、影響を受けた行数を返します。</p>
                 
                 <div class="code-example">
                     <pre><code># INSERT文
-$affectedRows = $driver.ExecuteNonQuery("INSERT INTO employees (name, department, salary) VALUES ('田中太郎', '営業', 400000)")
+$affectedRows = $driver.ExecuteInsert("INSERT INTO employees (name, department, salary) VALUES ('田中太郎', '営業', 400000)")
 
 # UPDATE文
-$affectedRows = $driver.ExecuteNonQuery("UPDATE employees SET salary = 450000 WHERE name = '田中太郎'")
+$affectedRows = $driver.ExecuteUpdate("UPDATE employees SET salary = 450000 WHERE name = '田中太郎'")
 
 # DELETE文
-$affectedRows = $driver.ExecuteNonQuery("DELETE FROM employees WHERE department = '廃止部署'")</code></pre>
+$affectedRows = $driver.ExecuteDelete("DELETE FROM employees WHERE department = '廃止部署'")</code></pre>
                 </div>
             </div>
 
             <div class="method-card">
-                <div class="method-name">ExecuteScalar([string]$sql) - 単一値取得</div>
-                <p>クエリの結果から単一の値を取得します。</p>
+                <div class="method-name">ExecuteSelect([string]$sql) - 単一値取得例</div>
+                <p>ExecuteSelectの結果から単一の値を取得します。</p>
                 
                 <div class="code-example">
                     <pre><code># レコード数を取得
-$count = $driver.ExecuteScalar("SELECT COUNT(*) FROM employees")
+$result = $driver.ExecuteSelect("SELECT COUNT(*) AS CNT FROM employees")
+$count = [int]$result.Rows[0].CNT
 
 # 最大値を取得
-$maxSalary = $driver.ExecuteScalar("SELECT MAX(salary) FROM employees")
+$result = $driver.ExecuteSelect("SELECT MAX(salary) AS MAX_SAL FROM employees")
+$maxSalary = [decimal]$result.Rows[0].MAX_SAL
 
-# 存在確認
-$exists = $driver.ExecuteScalar("SELECT 1 FROM employees WHERE name = '田中太郎'")</code></pre>
+# 存在確認（1件以上あれば存在）
+$exists = $driver.ExecuteSelect("SELECT 1 AS VAL FROM employees WHERE name = '田中太郎'").Rows.Count -gt 0</code></pre>
                 </div>
             </div>
         </section>
@@ -282,37 +284,37 @@ $driver.DropTable("temp_employees")
 $driver.BeginTransaction()
 
 # 複数の操作を実行
-$driver.ExecuteNonQuery("INSERT INTO employees (name, department) VALUES ('山田花子', '開発')")
-$driver.ExecuteNonQuery("UPDATE departments SET employee_count = employee_count + 1 WHERE name = '開発'")
+$driver.ExecuteInsert("INSERT INTO employees (name, department) VALUES ('山田花子', '開発')")
+$driver.ExecuteUpdate("UPDATE departments SET employee_count = employee_count + 1 WHERE name = '開発'")
 
 # コミットまたはロールバック</code></pre>
                 </div>
             </div>
 
             <div class="method-card">
-                <div class="method-name">Commit() - トランザクションコミット</div>
+                <div class="method-name">CommitTransaction() - トランザクションコミット</div>
                 <p>現在のトランザクションをコミットします。</p>
                 
                 <div class="code-example">
                     <pre><code># トランザクションをコミット
-$driver.Commit()
+$driver.CommitTransaction()
 Write-Host "トランザクションがコミットされました"</code></pre>
                 </div>
             </div>
 
             <div class="method-card">
-                <div class="method-name">Rollback() - トランザクションロールバック</div>
+                <div class="method-name">RollbackTransaction() - トランザクションロールバック</div>
                 <p>現在のトランザクションをロールバックします。</p>
                 
                 <div class="code-example">
                     <pre><code># エラーが発生した場合のロールバック
 try {
     $driver.BeginTransaction()
-    $driver.ExecuteNonQuery("INSERT INTO employees (name, department) VALUES ('テスト', 'テスト')")
-    $driver.Commit()
+    $driver.ExecuteInsert("INSERT INTO employees (name, department) VALUES ('テスト', 'テスト')")
+    $driver.CommitTransaction()
 }
 catch {
-    $driver.Rollback()
+    $driver.RollbackTransaction()
     Write-Host "エラーが発生したため、ロールバックしました"
 }</code></pre>
                 </div>
@@ -334,7 +336,7 @@ $driver = [OracleDriver]::new()
 
 try {
     # 接続設定
-    $driver.SetConnectionString("localhost", "1521", "XE", "hr", "password")
+    $driver.SetConnectionParameters("localhost", "1521", "XE", "hr", "password")
     $driver.Connect()
     
     # トランザクション開始
@@ -342,18 +344,18 @@ try {
     
     # 給与の一括更新
     $updateSql = "UPDATE employees SET salary = salary * 1.1 WHERE department = 'IT'"
-    $affectedRows = $driver.ExecuteNonQuery($updateSql)
+    $affectedRows = $driver.ExecuteUpdate($updateSql)
     
     # 更新履歴を記録
     $logSql = "INSERT INTO salary_updates (department, update_date, affected_rows) VALUES ('IT', SYSDATE, $affectedRows)"
-    $driver.ExecuteNonQuery($logSql)
+    $driver.ExecuteInsert($logSql)
     
     # コミット
-    $driver.Commit()
+    $driver.CommitTransaction()
     Write-Host "IT部門の給与を10%増額しました。影響を受けた行数: $affectedRows"
 }
 catch {
-    $driver.Rollback()
+    $driver.RollbackTransaction()
     Write-Host "エラーが発生したため、ロールバックしました: $($_.Exception.Message)"
 }
 finally {
@@ -371,7 +373,7 @@ finally {
 $driver = [OracleDriver]::new()
 
 try {
-    $driver.SetConnectionString("localhost", "1521", "XE", "report_user", "password")
+    $driver.SetConnectionParameters("localhost", "1521", "XE", "report_user", "password")
     $driver.Connect()
     
     # 今月の売上データを抽出
@@ -388,7 +390,7 @@ try {
         ORDER BY total_sales DESC
 "@
     
-    $salesData = $driver.ExecuteQuery($salesQuery)
+    $salesData = $driver.ExecuteSelect($salesQuery)
     
     # 結果をCSVファイルに出力
     $csvPath = "C:\Reports\sales_report_$currentMonth.csv"
@@ -411,7 +413,7 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>OracleDriverクラスでは、OracleError_0001からOracleError_0029までのエラーコードが使用されます。</p>
+                <p>OracleDriverクラスでは、OracleError_0001からOracleError_0040までのエラーコードが使用されます。</p>
                 <table class="error-table">
                     <tr>
                         <td class="range">OracleError_0001</td>
@@ -423,38 +425,38 @@ finally {
                     </tr>
                     <tr>
                         <td class="range">OracleError_0003</td>
-                        <td>OracleDriver破棄エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">OracleError_0004</td>
                         <td>接続パラメータ設定エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0005</td>
-                        <td>データベース接続エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">OracleError_0006</td>
-                        <td>接続切断エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">OracleError_0007</td>
+                        <td class="range">OracleError_0004</td>
                         <td>SQLPLUS接続エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0008</td>
+                        <td class="range">OracleError_0005</td>
                         <td>SQLPLUS接続文字列接続エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0009</td>
+                        <td class="range">OracleError_0006</td>
                         <td>SQLPLUS実行エラー</td>
                     </tr>
                     <tr>
+                        <td class="range">OracleError_0007</td>
+                        <td>データベース接続エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0008</td>
+                        <td>接続切断エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">OracleError_0009</td>
+                        <td>OracleDriver破棄エラー</td>
+                    </tr>
+                    <tr>
                         <td class="range">...</td>
-                        <td>その他のエラーコード（OracleError_0010～OracleError_0029）</td>
+                        <td>その他のエラーコード（OracleError_0010～OracleError_0040）</td>
                     </tr>
                 </table>
-                <p class="note">※ 全29個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+                <p class="note">※ エラーコードの詳細はErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 
@@ -512,41 +514,7 @@ catch {
             </div>
         </section>
 
-        <!-- エラーコード一覧 -->
-        <section class="method-section">
-            <h2 class="section-title">
-                <span class="icon">🚨</span> OracleDriver固有のエラーコード
-            </h2>
-            
-            <div class="error-range-card">
-                <table class="error-table">
-                    <tr>
-                        <td class="range">7001</td>
-                        <td>OracleDriver初期化エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">7002</td>
-                        <td>接続文字列設定エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">7003</td>
-                        <td>データベース接続エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">7004</td>
-                        <td>SQL実行エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">7005</td>
-                        <td>トランザクション管理エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">7006</td>
-                        <td>接続切断エラー</td>
-                    </tr>
-                </table>
-            </div>
-        </section>
+        
 
         <!-- Footer -->
         <footer>

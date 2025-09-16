@@ -13,6 +13,8 @@ class OracleDriver
     [string]$last_error_message
     [hashtable]$connection_parameters
     [string]$sqlplus_path
+    [string]$tns_admin_path
+    [string]$tns_alias
 
     # ========================================
     # 初期化・接続関連
@@ -27,6 +29,8 @@ class OracleDriver
             $this.last_error_message = ""
             $this.connection_parameters = @{}
             $this.sqlplus_path = "sqlplus"
+            $this.tns_admin_path = $env:TNS_ADMIN
+            $this.tns_alias = ""
             
             Write-Host "OracleDriverの初期化が完了しました。"
         }
@@ -57,6 +61,38 @@ class OracleDriver
         }
     }
 
+    # TNS_ADMINパスを設定
+    [void] SetTnsAdminPath([string]$path)
+    {
+        try
+        {
+            $this.tns_admin_path = $path
+            $env:TNS_ADMIN = $path
+            Write-Host "TNS_ADMINパスを設定しました: $path"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0002", "TNS_ADMINパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "TNS_ADMINパスの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "TNS_ADMINパスの設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # SQLPLUSのパスを設定
     [void] SetSqlPlusPath([string]$path)
     {
@@ -72,7 +108,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0002", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0003", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -85,6 +121,47 @@ class OracleDriver
             }
             
             throw "SQLPLUSパスの設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # TNS接続用のパラメータを設定
+    [void] SetTnsConnectionParameters([string]$tnsAlias, [string]$username, [string]$password, [string]$schema = "")
+    {
+        try
+        {
+            $this.tns_alias = $tnsAlias
+            $this.connection_parameters = @{
+                TnsAlias = $tnsAlias
+                Username = $username
+                Password = $password
+                Schema = $schema
+            }
+
+            # TNS接続文字列を構築
+            $this.ConnectionString = "Data Source=$tnsAlias;User Id=$username;Password=$password;"
+
+            Write-Host "TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias"
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0004", "TNS接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "TNS接続パラメータの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "TNS接続パラメータの設定に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -114,7 +191,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0003", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0005", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -127,6 +204,84 @@ class OracleDriver
             }
             
             throw "接続パラメータの設定に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # TNSエイリアスを使用してSQLPLUSで接続
+    [void] ConnectWithSqlPlusTns([string]$username, [string]$password, [string]$tnsAlias)
+    {
+        try
+        {
+            if ($this.is_connected)
+            {
+                Write-Host "既に接続されています。" -ForegroundColor Yellow
+                return
+            }
+
+            # 接続パラメータを保存
+            $this.connection_parameters.Username = $username
+            $this.connection_parameters.Password = $password
+            $this.connection_parameters.TnsAlias = $tnsAlias
+            $this.tns_alias = $tnsAlias
+
+            # SQLPLUS接続文字列を構築（TNSエイリアス使用）
+            $connectionString = "$username/$password@$tnsAlias"
+
+            # SQLPLUSプロセスを開始
+            $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $processInfo.FileName = $this.sqlplus_path
+            $processInfo.Arguments = $connectionString
+            $processInfo.UseShellExecute = $false
+            $processInfo.RedirectStandardInput = $true
+            $processInfo.RedirectStandardOutput = $true
+            $processInfo.RedirectStandardError = $true
+            $processInfo.CreateNoWindow = $false
+
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $processInfo
+            $process.Start()
+
+            # 接続テスト用のSQLを実行
+            $process.StandardInput.WriteLine("SELECT 1 FROM DUAL;")
+            $process.StandardInput.WriteLine("EXIT;")
+
+            $output = $process.StandardOutput.ReadToEnd()
+            $error = $process.StandardError.ReadToEnd()
+
+            $process.WaitForExit()
+            $process.Close()
+
+            if ($process.ExitCode -eq 0 -and $output -match "1")
+            {
+                $this.is_connected = $true
+                Write-Host "SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias" -ForegroundColor Green
+            }
+            else
+            {
+                throw "SQLPLUS TNS接続に失敗しました。エラー: $error"
+            }
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0006", "SQLPLUS TNS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SQLPLUSでのTNS接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "SQLPLUSでのTNS接続に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -191,7 +346,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0004", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0007", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -260,7 +415,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0005", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0008", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -276,46 +431,93 @@ class OracleDriver
         }
     }
 
-    # SQLPLUSでSQLを実行
-    [string] ExecuteSqlPlus([string]$sql, [string]$username, [string]$password, [string]$service_name)
+    # TNSエイリアスを使用してSQLPLUSでSQLを実行
+    [string] ExecuteSqlPlusTns([string]$sql, [string]$username, [string]$password, [string]$tnsAlias)
     {
         try
         {
-            $connectionString = "$username/$password@$service_name"
-            
-            # SQLPLUSプロセスを開始
+            # SQLの末尾にセミコロンまたはスラッシュがない場合は追加
+            $trimmedSql = $sql.TrimEnd()
+            if (-not ($trimmedSql.EndsWith(";") -or $trimmedSql.EndsWith("/")))
+            {
+                # PL/SQLブロックやストアドプロシージャの場合はスラッシュ、それ以外はセミコロン
+                if ($trimmedSql -match "(?i)^\s*(CREATE|ALTER|DROP|BEGIN|DECLARE)" -or $trimmedSql -match "(?i)\bEND\s*$")
+                {
+                    $sql = $sql + "`n/"
+                }
+                else
+                {
+                    $sql = $sql + ";"
+                }
+            }
+
+            # TNS_ADMINが設定されていることを確認
+            if (-not [string]::IsNullOrEmpty($this.tns_admin_path))
+            {
+                $env:TNS_ADMIN = $this.tns_admin_path
+            }
+
+            # SQLPLUSプロセスを開始（-Sオプションでサイレントモード、TNSエイリアス使用）
             $processInfo = New-Object System.Diagnostics.ProcessStartInfo
             $processInfo.FileName = $this.sqlplus_path
-            $processInfo.Arguments = $connectionString
+            $processInfo.Arguments = "-S $username/$password@$tnsAlias"
             $processInfo.UseShellExecute = $false
             $processInfo.RedirectStandardInput = $true
             $processInfo.RedirectStandardOutput = $true
             $processInfo.RedirectStandardError = $true
-            $processInfo.CreateNoWindow = $false
+            $processInfo.CreateNoWindow = $true
+            $processInfo.WorkingDirectory = [System.IO.Directory]::GetCurrentDirectory()
 
             $process = New-Object System.Diagnostics.Process
             $process.StartInfo = $processInfo
-            $process.Start()
 
-            # SQLを実行
+            # プロセス開始のエラーチェック
+            if (-not $process.Start())
+            {
+                throw "SQLPLUSプロセスの開始に失敗しました。"
+            }
+
+            # SQLPLUSの設定とSQLを実行
+            $process.StandardInput.WriteLine("SET PAGESIZE 0")
+            $process.StandardInput.WriteLine("SET FEEDBACK OFF")
+            $process.StandardInput.WriteLine("SET HEADING OFF")
+            $process.StandardInput.WriteLine("SET LINESIZE 1000")
+            $process.StandardInput.WriteLine("SET TRIMSPOOL ON")
+            $process.StandardInput.WriteLine("SET ECHO OFF")
+            $process.StandardInput.WriteLine("WHENEVER SQLERROR EXIT SQL.SQLCODE")
             $process.StandardInput.WriteLine($sql)
             $process.StandardInput.WriteLine("EXIT;")
-            
+            $process.StandardInput.Close()
+
             $output = $process.StandardOutput.ReadToEnd()
             $error = $process.StandardError.ReadToEnd()
-            
-            $process.WaitForExit()
+
+            # タイムアウトを設定（30秒）
+            $timeout = 30000
+            if (-not $process.WaitForExit($timeout))
+            {
+                $process.Kill()
+                throw "SQLPLUSの実行がタイムアウトしました。"
+            }
+
+            $exitCode = $process.ExitCode
             $process.Close()
 
-            if ($process.ExitCode -eq 0)
+            # エラーチェック（終了コードとエラー出力の両方を確認）
+            if ($exitCode -ne 0 -or -not [string]::IsNullOrEmpty($error))
             {
-                Write-Host "SQLPLUSでSQLを実行しました。" -ForegroundColor Green
-                return $output
+                $errorMessage = if (-not [string]::IsNullOrEmpty($error)) { $error } else { "終了コード: $exitCode" }
+                throw "SQLPLUSでのSQL実行に失敗しました。エラー: $errorMessage"
             }
-            else
+
+            # ORA-エラーやSP2-エラーのチェック
+            if ($output -match "ORA-\d+" -or $output -match "SP2-\d+")
             {
-                throw "SQLPLUSでのSQL実行に失敗しました。エラー: $error"
+                throw "SQLPLUSでエラーが発生しました: $output"
             }
+
+            Write-Host "SQLPLUSでSQLを実行しました（TNS）。" -ForegroundColor Green
+            return $output.Trim()
         }
         catch
         {
@@ -325,7 +527,113 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0006", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0009", "SQLPLUS TNS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SQLPLUSでのSQL実行に失敗しました（TNS）: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "SQLPLUSでのSQL実行に失敗しました（TNS）: $($_.Exception.Message)"
+        }
+    }
+
+    # SQLPLUSでSQLを実行
+    [string] ExecuteSqlPlus([string]$sql, [string]$username, [string]$password, [string]$service_name)
+    {
+        try
+        {
+            # SQLの末尾にセミコロンまたはスラッシュがない場合は追加
+            $trimmedSql = $sql.TrimEnd()
+            if (-not ($trimmedSql.EndsWith(";") -or $trimmedSql.EndsWith("/")))
+            {
+                # PL/SQLブロックやストアドプロシージャの場合はスラッシュ、それ以外はセミコロン
+                if ($trimmedSql -match "(?i)^\s*(CREATE|ALTER|DROP|BEGIN|DECLARE)" -or $trimmedSql -match "(?i)\bEND\s*$")
+                {
+                    $sql = $sql + "`n/"
+                }
+                else
+                {
+                    $sql = $sql + ";"
+                }
+            }
+
+            # SQLPLUSプロセスを開始（-Sオプションでサイレントモード）
+            $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $processInfo.FileName = $this.sqlplus_path
+            $processInfo.Arguments = "-S $username/$password@$service_name"
+            $processInfo.UseShellExecute = $false
+            $processInfo.RedirectStandardInput = $true
+            $processInfo.RedirectStandardOutput = $true
+            $processInfo.RedirectStandardError = $true
+            $processInfo.CreateNoWindow = $true
+            $processInfo.WorkingDirectory = [System.IO.Directory]::GetCurrentDirectory()
+
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $processInfo
+
+            # プロセス開始のエラーチェック
+            if (-not $process.Start())
+            {
+                throw "SQLPLUSプロセスの開始に失敗しました。"
+            }
+
+            # SQLPLUSの設定とSQLを実行
+            $process.StandardInput.WriteLine("SET PAGESIZE 0")
+            $process.StandardInput.WriteLine("SET FEEDBACK OFF")
+            $process.StandardInput.WriteLine("SET HEADING OFF")
+            $process.StandardInput.WriteLine("SET LINESIZE 1000")
+            $process.StandardInput.WriteLine("SET TRIMSPOOL ON")
+            $process.StandardInput.WriteLine("SET ECHO OFF")
+            $process.StandardInput.WriteLine("WHENEVER SQLERROR EXIT SQL.SQLCODE")
+            $process.StandardInput.WriteLine($sql)
+            $process.StandardInput.WriteLine("EXIT;")
+            $process.StandardInput.Close()
+
+            $output = $process.StandardOutput.ReadToEnd()
+            $error = $process.StandardError.ReadToEnd()
+
+            # タイムアウトを設定（30秒）
+            $timeout = 30000
+            if (-not $process.WaitForExit($timeout))
+            {
+                $process.Kill()
+                throw "SQLPLUSの実行がタイムアウトしました。"
+            }
+
+            $exitCode = $process.ExitCode
+            $process.Close()
+
+            # エラーチェック（終了コードとエラー出力の両方を確認）
+            if ($exitCode -ne 0 -or -not [string]::IsNullOrEmpty($error))
+            {
+                $errorMessage = if (-not [string]::IsNullOrEmpty($error)) { $error } else { "終了コード: $exitCode" }
+                throw "SQLPLUSでのSQL実行に失敗しました。エラー: $errorMessage"
+            }
+
+            # ORA-エラーやSP2-エラーのチェック
+            if ($output -match "ORA-\d+" -or $output -match "SP2-\d+")
+            {
+                throw "SQLPLUSでエラーが発生しました: $output"
+            }
+
+            Write-Host "SQLPLUSでSQLを実行しました。" -ForegroundColor Green
+            return $output.Trim()
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0010", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -338,6 +646,50 @@ class OracleDriver
             }
             
             throw "SQLPLUSでのSQL実行に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # TNSエイリアスを使用してデータベースに接続
+    [void] ConnectTns([string]$tnsAlias, [string]$username, [string]$password, [string]$schema = "")
+    {
+        try
+        {
+            if ($this.is_connected)
+            {
+                Write-Host "既に接続されています。" -ForegroundColor Yellow
+                return
+            }
+
+            # TNS接続パラメータを設定
+            $this.SetTnsConnectionParameters($tnsAlias, $username, $password, $schema)
+
+            $this.Connection = New-Object System.Data.OracleClient.OracleConnection($this.ConnectionString)
+            $this.Connection.Open()
+            $this.is_connected = $true
+
+            Write-Host "ORACLEデータベースに接続しました（TNS: $tnsAlias）。" -ForegroundColor Green
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0011", "TNSデータベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "TNSを使用したデータベースへの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "TNSを使用したデータベースへの接続に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -371,7 +723,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0007", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0012", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -412,7 +764,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0008", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0013", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -465,7 +817,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0010", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0014", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -512,7 +864,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0011", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0015", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -559,7 +911,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0012", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0016", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -606,7 +958,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0013", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0017", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -653,7 +1005,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0014", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0018", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -669,8 +1021,168 @@ class OracleDriver
         }
     }
 
+    # CALL文を実行（ストアドプロシージャ呼び出し）
+    [void] ExecuteCall([string]$procedureName, [hashtable]$parameters = @{})
+    {
+        try
+        {
+            if (-not $this.is_connected)
+            {
+                throw "データベースに接続されていません。Connect()を先に実行してください。"
+            }
+
+            $command = New-Object System.Data.OracleClient.OracleCommand($procedureName, $this.Connection)
+            $command.CommandType = [System.Data.CommandType]::StoredProcedure
+
+            # パラメータを追加
+            foreach ($key in $parameters.Keys)
+            {
+                $param = $command.Parameters.Add($key, $parameters[$key])
+            }
+
+            $command.ExecuteNonQuery()
+
+            Write-Host "CALL文を実行しました。プロシージャ: $procedureName" -ForegroundColor Green
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0019", "CALL実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "CALL文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "CALL文の実行に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # EXPLAIN PLANを実行
+    [System.Data.DataTable] ExecuteExplainPlan([string]$sql, [string]$statementId = "PLAN_" + [System.Guid]::NewGuid().ToString())
+    {
+        try
+        {
+            if (-not $this.is_connected)
+            {
+                throw "データベースに接続されていません。Connect()を先に実行してください。"
+            }
+
+            # EXPLAIN PLANを実行
+            $explainSql = "EXPLAIN PLAN SET STATEMENT_ID = '$statementId' FOR $sql"
+            $command = New-Object System.Data.OracleClient.OracleCommand($explainSql, $this.Connection)
+            $command.ExecuteNonQuery()
+
+            # 実行計画を取得
+            $selectPlan = @"
+SELECT LPAD(' ', 2 * (LEVEL - 1)) || OPERATION || ' ' || OPTIONS AS OPERATION,
+       OBJECT_NAME,
+       COST,
+       CARDINALITY,
+       BYTES
+FROM PLAN_TABLE
+START WITH ID = 0 AND STATEMENT_ID = '$statementId'
+CONNECT BY PRIOR ID = PARENT_ID AND STATEMENT_ID = '$statementId'
+ORDER SIBLINGS BY ID
+"@
+
+            $planCommand = New-Object System.Data.OracleClient.OracleCommand($selectPlan, $this.Connection)
+            $adapter = New-Object System.Data.OracleClient.OracleDataAdapter($planCommand)
+            $dataTable = New-Object System.Data.DataTable
+            $adapter.Fill($dataTable)
+
+            # PLAN_TABLEから該当データを削除
+            $deletePlan = "DELETE FROM PLAN_TABLE WHERE STATEMENT_ID = '$statementId'"
+            $deleteCommand = New-Object System.Data.OracleClient.OracleCommand($deletePlan, $this.Connection)
+            $deleteCommand.ExecuteNonQuery()
+
+            Write-Host "EXPLAIN PLANを実行しました。" -ForegroundColor Green
+            return $dataTable
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0020", "EXPLAIN PLAN実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "EXPLAIN PLANの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "EXPLAIN PLANの実行に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # LOCK TABLEを実行
+    [void] ExecuteLockTable([string]$tableName, [string]$lockMode = "EXCLUSIVE")
+    {
+        try
+        {
+            if (-not $this.is_connected)
+            {
+                throw "データベースに接続されていません。Connect()を先に実行してください。"
+            }
+
+            $sql = "LOCK TABLE $tableName IN $lockMode MODE"
+
+            if (-not $this.is_transaction_active)
+            {
+                Write-Host "トランザクションが開始されていません。自動的に開始します。" -ForegroundColor Yellow
+                $this.BeginTransaction()
+            }
+
+            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection, $this.Transaction)
+            $command.ExecuteNonQuery()
+
+            Write-Host "LOCK TABLEを実行しました。テーブル: $tableName, モード: $lockMode" -ForegroundColor Green
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0021", "LOCK TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "LOCK TABLEの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "LOCK TABLEの実行に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ========================================
     # DDL (Data Definition Language) 操作
+    # CREATE, ALTER, DROP, TRUNCATE, RENAME, FLASHBACK, ANALYZE, AUDIT, COMMENT, ASSOCIATE/DISASSOCIATE STATISTICS, PURGE, NOAUDIT
     # ========================================
 
     # CREATE TABLE文を実行
@@ -696,7 +1208,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0015", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0022", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -735,7 +1247,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0016", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0023", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -775,7 +1287,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0017", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0024", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -814,7 +1326,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0018", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0025", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -853,7 +1365,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0019", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0026", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -892,7 +1404,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0020", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0027", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -908,8 +1420,89 @@ class OracleDriver
         }
     }
 
+    # TRUNCATE TABLEを実行
+    [void] ExecuteTruncate([string]$tableName)
+    {
+        try
+        {
+            if (-not $this.is_connected)
+            {
+                throw "データベースに接続されていません。Connect()を先に実行してください。"
+            }
+
+            $sql = "TRUNCATE TABLE $tableName"
+            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $command.ExecuteNonQuery()
+
+            Write-Host "TRUNCATE TABLEを実行しました。テーブル: $tableName" -ForegroundColor Green
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0028", "TRUNCATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "TRUNCATE TABLEの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "TRUNCATE TABLEの実行に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # RENAMEを実行
+    [void] ExecuteRename([string]$oldName, [string]$newName)
+    {
+        try
+        {
+            if (-not $this.is_connected)
+            {
+                throw "データベースに接続されていません。Connect()を先に実行してください。"
+            }
+
+            $sql = "RENAME $oldName TO $newName"
+            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $command.ExecuteNonQuery()
+
+            Write-Host "RENAMEを実行しました。$oldName -> $newName" -ForegroundColor Green
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0029", "RENAME実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "RENAMEの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "RENAMEの実行に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ========================================
     # DCL (Data Control Language) 操作
+    # GRANT, REVOKE
     # ========================================
 
     # GRANT文を実行
@@ -935,7 +1528,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0021", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0030", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -974,7 +1567,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0022", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0031", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -992,6 +1585,7 @@ class OracleDriver
 
     # ========================================
     # TCL (Transaction Control Language) 操作
+    # COMMIT, ROLLBACK, SAVEPOINT, SET TRANSACTION
     # ========================================
 
     # トランザクションを開始
@@ -1023,7 +1617,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0023", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0032", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1064,7 +1658,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0024", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0033", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1105,7 +1699,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0025", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0034", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1145,7 +1739,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0026", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0035", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1185,7 +1779,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0027", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0036", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1198,6 +1792,51 @@ class OracleDriver
             }
 
             throw "SAVEPOINTへのロールバックに失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # SET TRANSACTIONを実行
+    [void] SetTransaction([string]$isolationLevel = "READ COMMITTED")
+    {
+        try
+        {
+            if (-not $this.is_connected)
+            {
+                throw "データベースに接続されていません。Connect()を先に実行してください。"
+            }
+
+            if ($this.is_transaction_active)
+            {
+                throw "既にトランザクションが開始されています。先に完了またはロールバックしてください。"
+            }
+
+            $sql = "SET TRANSACTION ISOLATION LEVEL $isolationLevel"
+            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $command.ExecuteNonQuery()
+
+            Write-Host "SET TRANSACTIONを実行しました。分離レベル: $isolationLevel" -ForegroundColor Green
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0037", "SET TRANSACTION実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "SET TRANSACTIONの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "SET TRANSACTIONの実行に失敗しました: $($_.Exception.Message)"
         }
     }
 
@@ -1236,7 +1875,7 @@ ORDER BY TABLE_NAME
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0028", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0038", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1284,7 +1923,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0029", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0039", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1332,7 +1971,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleError_0009", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleError_0040", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
