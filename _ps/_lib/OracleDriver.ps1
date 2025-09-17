@@ -249,9 +249,10 @@ class OracleDriver
             $error = $process.StandardError.ReadToEnd()
 
             $process.WaitForExit()
+            $exitCode = $process.ExitCode
             $process.Close()
 
-            if ($process.ExitCode -eq 0 -and $output -match "1")
+            if ($exitCode -eq 0 -and $output -match "1")
             {
                 $this.is_connected = $true
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias" -ForegroundColor Green
@@ -326,9 +327,10 @@ class OracleDriver
             $error = $process.StandardError.ReadToEnd()
             
             $process.WaitForExit()
+            $exitCode = $process.ExitCode
             $process.Close()
 
-            if ($process.ExitCode -eq 0 -and $output -match "1")
+            if ($exitCode -eq 0 -and $output -match "1")
             {
                 $this.is_connected = $true
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name" -ForegroundColor Green
@@ -395,9 +397,10 @@ class OracleDriver
             $error = $process.StandardError.ReadToEnd()
             
             $process.WaitForExit()
+            $exitCode = $process.ExitCode
             $process.Close()
 
-            if ($process.ExitCode -eq 0 -and $output -match "1")
+            if ($exitCode -eq 0 -and $output -match "1")
             {
                 $this.is_connected = $true
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました。接続文字列: $connectionString" -ForegroundColor Green
