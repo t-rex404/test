@@ -29,7 +29,8 @@ class OracleDriver
             $this.last_error_message = ""
             $this.connection_parameters = @{}
             $this.sqlplus_path = "sqlplus"
-            $this.tns_admin_path = $env:TNS_ADMIN
+            # 環境変数TNS_ADMINがNULLの場合は空文字列を設定
+            $this.tns_admin_path = if ($null -eq $env:TNS_ADMIN) { "" } else { $env:TNS_ADMIN }
             $this.tns_alias = ""
             
             Write-Host "OracleDriverの初期化が完了しました。"
