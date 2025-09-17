@@ -1,0 +1,191 @@
+---
+globs: *.ps1
+description: PowerShellコーディング規約とベストプラクティス
+---
+
+# PowerShell コーディング規約
+
+このプロジェクトのPowerShellスクリプトは以下の規約に従ってください。
+
+## クラス定義
+
+### 基本構造
+```powershell
+class [ClassName]
+{
+    # プロパティ
+    [type]$PropertyName
+    
+    # コンストラクタ
+    [ClassName]()
+    {
+        # 初期化処理
+    }
+    
+    # メソッド
+    [returnType] MethodName([type]$parameter)
+    {
+        # 実装
+    }
+}
+```
+
+### 命名規則
+- クラス名: `PascalCase`（例: `ChromeDriver`）
+- メソッド名: `PascalCase`（例: `StartApplication`）
+- プロパティ名: `PascalCase`（例: `ErrorCodes`）
+- 変数名: `camelCase`（例: `$guiDriver`）
+
+## エラーハンドリング
+
+### 統一されたエラー処理
+```powershell
+try
+{
+    # 処理
+}
+catch
+{
+    $global:Common.HandleError("ErrorCode_0001", $_.Exception.Message, "ModuleName")
+    throw
+}
+```
+
+### エラーコードの使用
+- エラーコードは[ErrorCode.json](mdc:_json/ErrorCode.json)で定義
+- 形式: `[ModuleName]Error_[Number]`
+- 例: `WebError_0001`, `ChromeError_0001`
+
+## ログ出力
+
+### 統一されたログ形式
+```powershell
+# 情報ログ
+$global:Common.WriteLog("メッセージ", "INFO")
+
+# エラーログ
+$global:Common.WriteLog("エラーメッセージ", "ERROR")
+
+# デバッグログ
+$global:Common.WriteLog("デバッグ情報", "DEBUG")
+```
+
+### ログレベル
+- `INFO`: 一般的な情報
+- `WARNING`: 警告
+- `ERROR`: エラー
+- `DEBUG`: デバッグ情報
+
+## リソース管理
+
+### Dispose パターン
+```powershell
+class [ClassName] : IDisposable
+{
+    [bool]$Disposed = $false
+    
+    [void] Dispose()
+    {
+        if (-not $this.Disposed)
+        {
+            # リソース解放処理
+            $this.Disposed = $true
+        }
+    }
+}
+```
+
+### 使用例
+```powershell
+try
+{
+    $driver = [ClassName]::new()
+    # 処理
+}
+finally
+{
+    if ($driver)
+    {
+        $driver.Dispose()
+    }
+}
+```
+
+## コメント規約
+
+### クラスコメント
+```powershell
+# クラス名
+# クラスの目的と機能を説明
+class [ClassName]
+```
+
+### メソッドコメント
+```powershell
+# メソッドの説明
+# パラメータ: パラメータの説明
+# 戻り値: 戻り値の説明
+[returnType] MethodName([type]$parameter)
+```
+
+## インポートと依存関係
+
+### 必要なアセンブリ
+```powershell
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
+```
+
+### ライブラリの読み込み
+```powershell
+# スクリプトの基準パス
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$LibDir = Join-Path $ScriptDir '_lib'
+
+# 必要なモジュールを読み込み
+. (Join-Path $LibDir 'Common.ps1')
+. (Join-Path $LibDir 'TargetDriver.ps1')
+```
+
+## テストスクリプト規約
+
+### 基本構造
+```powershell
+# テスト名
+# テストの目的を説明
+
+# 必要なモジュールを読み込み
+. (Join-Path $LibDir 'Common.ps1')
+. (Join-Path $LibDir 'TargetDriver.ps1')
+
+Write-Host "=== テスト開始 ===" -ForegroundColor Cyan
+
+try
+{
+    # テスト実行
+}
+catch
+{
+    Write-Host "テスト実行中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+}
+finally
+{
+    # リソースのクリーンアップ
+    if ($driver)
+    {
+        $driver.Dispose()
+    }
+}
+```
+
+## ベストプラクティス
+
+1. **エラーハンドリング**: すべての外部呼び出しをtry-catchで囲む
+2. **リソース管理**: 使用後は必ずDispose()を呼び出す
+3. **ログ出力**: 重要な処理にはログを出力する
+4. **エラーコード**: 統一されたエラーコードシステムを使用する
+5. **コメント**: 複雑な処理にはコメントを記述する
+6. **変数スコープ**: 適切なスコープで変数を宣言する
+7. **パフォーマンス**: 不要な処理を避け、効率的なコードを書く

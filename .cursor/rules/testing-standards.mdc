@@ -1,0 +1,288 @@
+---
+globs: test_*.ps1
+description: テストスクリプト作成とテスト戦略の規約
+---
+
+# テストスクリプト作成規約
+
+このプロジェクトのテストスクリプトは以下の規約に従ってください。
+
+## テストスクリプト命名規則
+
+### ファイル名形式
+- `test_[DriverName]_[TestType].ps1`
+- 例: `test_EdgeDriver_AllMethods.ps1`, `test_ChromeDriver_Simple.ps1`
+
+### テストタイプ
+- `AllMethods`: 全メソッドのテスト
+- `Simple`: 基本的な機能テスト
+- `Calculator_Notepad`: 特定アプリケーションでのテスト
+- `AllWebDriverMethods`: WebDriver関連の全メソッドテスト
+
+## テストスクリプト構造
+
+### 基本テンプレート
+```powershell
+# テスト名
+# テストの目的と対象ドライバーを説明
+
+# 必要なアセンブリを読み込み
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
+
+# スクリプトの基準パス
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoRoot = Split-Path -Parent $ScriptDir
+$LibDir = Join-Path $ScriptDir '_lib'
+
+# 必要なモジュールを読み込み
+. (Join-Path $LibDir 'Common.ps1')
+. (Join-Path $LibDir 'TargetDriver.ps1')
+
+# グローバル変数の初期化
+$global:Common = [Common]::new()
+
+Write-Host "=== テスト開始 ===" -ForegroundColor Cyan
+
+try
+{
+    # テスト実行
+}
+catch
+{
+    Write-Host "テスト実行中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "スタックトレース: $($_.ScriptStackTrace)" -ForegroundColor Red
+}
+finally
+{
+    # リソースのクリーンアップ
+    if ($driver)
+    {
+        $driver.Dispose()
+    }
+}
+
+Write-Host "テストスクリプトが完了しました。" -ForegroundColor Green
+```
+
+## テストケース設計
+
+### テストカテゴリ
+1. **基本機能テスト**: ドライバーの基本操作
+2. **エラーハンドリングテスト**: エラー状況での動作確認
+3. **リソース管理テスト**: メモリリークの確認
+4. **統合テスト**: 実際のアプリケーションでの動作確認
+
+### テスト手順
+```powershell
+# 1. ドライバーインスタンス作成
+$driver = [DriverName]::new()
+
+# 2. アプリケーション起動
+$driver.StartApplication($appPath, $arguments)
+
+# 3. 基本操作テスト
+$driver.Method1($parameter1)
+$driver.Method2($parameter2)
+
+# 4. エラー処理テスト
+try
+{
+    $driver.InvalidMethod($invalidParameter)
+}
+catch
+{
+    Write-Host "期待通りのエラーが発生しました" -ForegroundColor Green
+}
+
+# 5. リソース解放テスト
+$driver.Dispose()
+```
+
+## アプリケーション固有テスト
+
+### ブラウザテスト
+```powershell
+# ブラウザパス検索
+$browserPaths = @(
+    "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
+    "${env:ProgramFiles}\Microsoft\Edge\Application\msedge.exe"
+)
+
+foreach ($path in $browserPaths)
+{
+    if (Test-Path $path)
+    {
+        $browserPath = $path
+        break
+    }
+}
+
+# ブラウザ起動とウィンドウ検索
+$driver.StartApplication($browserPath, "")
+Start-Sleep -Seconds 5
+
+$window = $driver.FindWindow("Microsoft Edge")
+if ($window -ne $null)
+{
+    Write-Host "ブラウザウィンドウを発見しました" -ForegroundColor Green
+}
+```
+
+### Office アプリケーションテスト
+```powershell
+# Word/Excel/PowerPoint テスト
+$officeApp = [WordDriver]::new()
+$officeApp.StartApplication()
+
+# ドキュメント作成
+$officeApp.CreateDocument()
+$officeApp.AddText("テスト文書")
+
+# 保存と終了
+$officeApp.SaveDocument("test.docx")
+$officeApp.CloseApplication()
+```
+
+## エラーテスト
+
+### エラーケースのテスト
+```powershell
+# 無効なパラメータでのテスト
+try
+{
+    $driver.InvalidMethod($null)
+    Write-Host "エラーが発生すべきでした" -ForegroundColor Red
+}
+catch
+{
+    Write-Host "期待通りのエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Green
+}
+
+# 存在しないファイルでのテスト
+try
+{
+    $driver.OpenFile("存在しないファイル.txt")
+    Write-Host "エラーが発生すべきでした" -ForegroundColor Red
+}
+catch
+{
+    Write-Host "期待通りのエラーが発生しました" -ForegroundColor Green
+}
+```
+
+## パフォーマンステスト
+
+### 実行時間測定
+```powershell
+$stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+# テスト実行
+$driver.PerformOperation()
+
+$stopwatch.Stop()
+$executionTime = $stopwatch.ElapsedMilliseconds
+Write-Host "実行時間: $executionTime ms" -ForegroundColor Yellow
+
+# パフォーマンス基準の確認
+if ($executionTime -lt 5000)  # 5秒以内
+{
+    Write-Host "パフォーマンステスト合格" -ForegroundColor Green
+}
+else
+{
+    Write-Host "パフォーマンステスト不合格" -ForegroundColor Red
+}
+```
+
+## ログとレポート
+
+### テスト結果の記録
+```powershell
+# テスト結果の記録
+$testResults = @{
+    TestName = "DriverName_AllMethods"
+    StartTime = Get-Date
+    EndTime = $null
+    Success = $true
+    ErrorCount = 0
+    TestCases = @()
+}
+
+# 各テストケースの結果を記録
+$testCase = @{
+    Name = "TestMethod1"
+    Success = $true
+    ErrorMessage = $null
+    ExecutionTime = $executionTime
+}
+$testResults.TestCases += $testCase
+```
+
+### スクリーンショット取得
+```powershell
+# テスト中のスクリーンショット
+$screenshotPath = ".\test_screenshot_$(Get-Date -Format 'yyyyMMdd_HHmmss').png"
+$driver.TakeScreenshot($screenshotPath)
+Write-Host "スクリーンショットを保存しました: $screenshotPath" -ForegroundColor Green
+```
+
+## テストデータ管理
+
+### テスト用ファイル
+```powershell
+# テスト用ファイルの作成
+$testFilePath = ".\test_data.txt"
+"テストデータ" | Out-File -FilePath $testFilePath -Encoding UTF8
+
+# テスト実行
+$driver.ProcessFile($testFilePath)
+
+# クリーンアップ
+Remove-Item $testFilePath -Force
+```
+
+### 設定ファイル
+```powershell
+# テスト設定の読み込み
+$testConfig = @{
+    BrowserPath = "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
+    TestTimeout = 30
+    ScreenshotEnabled = $true
+}
+```
+
+## 継続的テスト
+
+### 自動実行設定
+- [run.cmd](mdc:run.cmd)でテストスクリプトの実行
+- 複数のテストを順次実行
+- 実行時間の記録と表示
+
+### テスト結果の集約
+```powershell
+# 全テストの結果を集約
+$allTestResults = @()
+foreach ($testScript in Get-ChildItem "test_*.ps1")
+{
+    $result = & $testScript.FullName
+    $allTestResults += $result
+}
+
+# 結果レポートの生成
+$reportPath = ".\test_report_$(Get-Date -Format 'yyyyMMdd_HHmmss').html"
+# HTMLレポート生成処理
+```
+
+## ベストプラクティス
+
+1. **独立性**: 各テストは独立して実行可能
+2. **再現性**: 同じ結果が得られるテスト
+3. **クリーンアップ**: テスト後のリソース解放
+4. **エラーハンドリング**: 適切なエラー処理
+5. **ログ出力**: 詳細なログとデバッグ情報
+6. **ドキュメント**: テストの目的と手順の明記
+7. **パフォーマンス**: 実行時間の監視
+8. **セキュリティ**: テストデータの適切な管理
