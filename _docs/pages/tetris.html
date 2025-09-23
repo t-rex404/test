@@ -149,6 +149,8 @@
                     <p><strong>↓</strong> キー: ブロックを下に移動（ソフトドロップ）</p>
                     <p><strong>↑</strong> キー: ブロックを回転</p>
                     <p><strong>スペース</strong> キー: ブロックを一気に下に移動（ハードドロップ）</p>
+                    <p><strong>C/Shift</strong> キー: ブロックをホールド</p>
+                    <p><strong>1/2</strong> キー: ホールドピースと交換</p>
                     <p><strong>P</strong> キー: 一時停止/再開</p>
                 </div>
                 <div class="instructions">
@@ -172,6 +174,16 @@
                         <h4>次のピース</h4>
                         <canvas id="nextCanvas" width="120" height="120"></canvas>
                     </div>
+
+                    <div class="next-piece">
+                        <h4>ホールド</h4>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <canvas id="holdCanvas1" width="60" height="60" style="border: 2px solid #333; border-radius: 5px;"></canvas>
+                            <canvas id="holdCanvas2" width="60" height="60" style="border: 2px solid #333; border-radius: 5px;"></canvas>
+                        </div>
+                        <p style="font-size: 12px; margin: 5px 0;">C/Shift: ホールド</p>
+                        <p style="font-size: 12px; margin: 5px 0;">1/2: 交換</p>
+                    </div>
                     
                     <div class="score-display">
                         <h4>操作説明</h4>
@@ -179,6 +191,8 @@
                         <p>↑ : 回転</p>
                         <p>↓ : ソフトドロップ</p>
                         <p>スペース : ハードドロップ</p>
+                        <p>C/Shift : ホールド</p>
+                        <p>1/2 : ホールド交換</p>
                     </div>
                 </div>
             </div>
@@ -201,19 +215,31 @@
     <script>
         // ゲーム変数
         let canvas, ctx, nextCanvas, nextCtx;
+        let holdCanvas1, holdCtx1, holdCanvas2, holdCtx2;
         let gameRunning = false;
         let gamePaused = false;
         let score = 0;
         let lines = 0;
         let level = 1;
-        let dropTime = 0;
+        let dropCounter = 0;
         let dropInterval = 1000;
-        
+        let lastTime = 0;
+
+        // ホールド機能
+        let holdPieces = [null, null];  // 2つのホールドスロット
+        let canHold = true;  // ホールド可能フラグ
+        let selectedHoldSlot = 0;  // 選択中のホールドスロット
+
         // ゲームボード
         const BOARD_WIDTH = 10;
         const BOARD_HEIGHT = 20;
+        const BLOCK_SIZE = 30;
         let board = [];
-        
+
+        // アニメーション用
+        let particles = [];
+        let lineBreakAnimations = [];
+
         // テトロミノ（テトリスのピース）
         const PIECES = [
             // Iピース
@@ -231,7 +257,7 @@
             // Lピース
             [[0, 0, 1], [1, 1, 1]]
         ];
-        
+
         const PIECE_COLORS = [
             '#00f5ff', // I - シアン
             '#ffff00', // O - イエロー
@@ -241,290 +267,657 @@
             '#0000ff', // J - ブルー
             '#ffa500'  // L - オレンジ
         ];
-        
+
         // 現在のピース
         let currentPiece = null;
         let nextPiece = null;
-        let currentPieceColor = '';
-        
-        // キー入力
-        let keys = {};
-        let lastKeyTime = {};
-        let keyRepeatDelay = 50; // キーリピート開始までの遅延（ミリ秒）- 高速化
-        let keyRepeatInterval = 30; // キーリピート間隔（ミリ秒）- 高速化
+
+        // 入力管理
+        const inputState = {
+            moveLeft: false,
+            moveRight: false,
+            softDrop: false,
+            rotate: false,
+            hardDrop: false,
+            pause: false
+        };
+
+        const keyDownState = {};
+        const moveDelay = 100;  // 移動開始までの遅延
+        const moveSpeed = 50;   // 連続移動の速度
+        const lastMoveTime = {
+            left: 0,
+            right: 0,
+            down: 0
+        };
         
         // ゲーム開始
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameArea').style.display = 'flex';
-            
+
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
             nextCanvas = document.getElementById('nextCanvas');
             nextCtx = nextCanvas.getContext('2d');
-            
+            holdCanvas1 = document.getElementById('holdCanvas1');
+            holdCtx1 = holdCanvas1.getContext('2d');
+            holdCanvas2 = document.getElementById('holdCanvas2');
+            holdCtx2 = holdCanvas2.getContext('2d');
+
             initGame();
-            gameLoop();
+            requestAnimationFrame(gameLoop);
         }
-        
+
         // ゲーム初期化
         function initGame() {
             gameRunning = true;
+            gamePaused = false;
             score = 0;
             lines = 0;
             level = 1;
             dropInterval = 1000;
-            
+            dropCounter = 0;
+            lastTime = 0;
+
             // ボード初期化
             board = [];
             for (let y = 0; y < BOARD_HEIGHT; y++) {
                 board[y] = [];
                 for (let x = 0; x < BOARD_WIDTH; x++) {
-                    board[y][x] = 0;
+                    board[y][x] = null;
                 }
             }
-            
+
+            // ホールド機能初期化
+            holdPieces = [null, null];
+            canHold = true;
+            selectedHoldSlot = 0;
+
+            // アニメーション初期化
+            particles = [];
+            lineBreakAnimations = [];
+
             // 最初のピース生成
-            nextPiece = generateRandomPiece();
+            nextPiece = createPiece();
             spawnNewPiece();
-            
-            // キーイベント設定
+
+            // イベントリスナー設定
+            setupInputHandlers();
+        }
+
+        // 入力ハンドラー設定
+        function setupInputHandlers() {
+            // 既存のイベントリスナーを削除
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+
+            // 新しいイベントリスナーを追加
             document.addEventListener('keydown', handleKeyDown);
             document.addEventListener('keyup', handleKeyUp);
-            
-            // キー状態初期化
-            keys = {};
-            lastKeyTime = {};
         }
         
-        // ランダムピース生成
-        function generateRandomPiece() {
+        // ピース生成
+        function createPiece() {
             const pieceIndex = Math.floor(Math.random() * PIECES.length);
             return {
                 shape: PIECES[pieceIndex],
                 color: PIECE_COLORS[pieceIndex],
                 x: Math.floor(BOARD_WIDTH / 2) - Math.floor(PIECES[pieceIndex][0].length / 2),
-                y: 0
+                y: 0,
+                type: pieceIndex
             };
         }
-        
+
         // 新しいピース生成
         function spawnNewPiece() {
             currentPiece = nextPiece;
-            nextPiece = generateRandomPiece();
-            currentPieceColor = currentPiece.color;
-            
+            nextPiece = createPiece();
+
             // ゲームオーバー判定
-            if (isCollision(currentPiece)) {
+            if (!canMove(currentPiece.x, currentPiece.y, currentPiece.shape)) {
                 gameOver();
             }
         }
         
-        // 衝突判定
-        function isCollision(piece) {
-            for (let y = 0; y < piece.shape.length; y++) {
-                for (let x = 0; x < piece.shape[y].length; x++) {
-                    if (piece.shape[y][x]) {
-                        let boardX = piece.x + x;
-                        let boardY = piece.y + y;
-                        
-                        if (boardX < 0 || boardX >= BOARD_WIDTH || 
-                            boardY >= BOARD_HEIGHT || 
-                            (boardY >= 0 && board[boardY][boardX])) {
-                            return true;
+        // 移動可能かチェック
+        function canMove(newX, newY, shape) {
+            for (let y = 0; y < shape.length; y++) {
+                for (let x = 0; x < shape[y].length; x++) {
+                    if (shape[y][x]) {
+                        const boardX = newX + x;
+                        const boardY = newY + y;
+
+                        if (boardX < 0 || boardX >= BOARD_WIDTH ||
+                            boardY >= BOARD_HEIGHT) {
+                            return false;
+                        }
+
+                        if (boardY >= 0 && board[boardY][boardX]) {
+                            return false;
                         }
                     }
                 }
             }
-            return false;
+            return true;
         }
         
         // ピースをボードに固定
-        function placePiece() {
+        function lockPiece() {
             for (let y = 0; y < currentPiece.shape.length; y++) {
                 for (let x = 0; x < currentPiece.shape[y].length; x++) {
                     if (currentPiece.shape[y][x]) {
-                        let boardX = currentPiece.x + x;
-                        let boardY = currentPiece.y + y;
+                        const boardX = currentPiece.x + x;
+                        const boardY = currentPiece.y + y;
                         if (boardY >= 0) {
-                            board[boardY][boardX] = currentPieceColor;
+                            board[boardY][boardX] = currentPiece.color;
                         }
                     }
                 }
             }
-            
+
             // ライン消去チェック
-            checkLines();
-            
+            const linesCleared = clearLines();
+            if (linesCleared > 0) {
+                updateScore(linesCleared);
+            }
+
             // 新しいピース生成
             spawnNewPiece();
+
+            // ホールド可能に戻す
+            canHold = true;
         }
         
-        // ライン消去チェック
-        function checkLines() {
+        // ライン消去
+        function clearLines() {
             let linesCleared = 0;
-            
+            let clearedRows = [];
+
             for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
-                if (board[y].every(cell => cell !== 0)) {
+                if (board[y].every(cell => cell !== null)) {
+                    // 消去する行を記録
+                    clearedRows.push(y);
+
+                    // 破壊アニメーションを作成
+                    createLineBreakAnimation(y);
+
+                    // パーティクルを生成
+                    for (let x = 0; x < BOARD_WIDTH; x++) {
+                        if (board[y][x]) {
+                            createParticles(x * BLOCK_SIZE + BLOCK_SIZE / 2,
+                                          y * BLOCK_SIZE + BLOCK_SIZE / 2,
+                                          board[y][x]);
+                        }
+                    }
+
                     // ラインを削除
                     board.splice(y, 1);
-                    board.unshift(new Array(BOARD_WIDTH).fill(0));
+                    board.unshift(new Array(BOARD_WIDTH).fill(null));
                     linesCleared++;
                     y++; // 同じ行をもう一度チェック
                 }
             }
-            
-            if (linesCleared > 0) {
-                lines += linesCleared;
-                score += linesCleared * 100 * level;
-                
-                // レベルアップ
-                if (lines >= level * 10) {
-                    level++;
-                    dropInterval = Math.max(100, dropInterval - 100);
+
+            return linesCleared;
+        }
+
+        // ライン破壊アニメーション作成
+        function createLineBreakAnimation(row) {
+            lineBreakAnimations.push({
+                row: row,
+                progress: 0,
+                maxProgress: 30,
+                flash: true
+            });
+        }
+
+        // パーティクル生成
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI * 2 * i) / 8;
+                const speed = 2 + Math.random() * 3;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 2,
+                    color: color,
+                    size: 3 + Math.random() * 4,
+                    life: 1.0,
+                    gravity: 0.15,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.3
+                });
+            }
+        }
+
+        // パーティクル更新
+        function updateParticles(deltaTime) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+
+                // 位置更新
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.vy += particle.gravity;
+
+                // 回転
+                particle.rotation += particle.rotationSpeed;
+
+                // 減衰
+                particle.life -= 0.02;
+                particle.size *= 0.98;
+
+                // 削除
+                if (particle.life <= 0 || particle.y > canvas.height) {
+                    particles.splice(i, 1);
                 }
+            }
+        }
+
+        // ライン破壊アニメーション更新
+        function updateLineBreakAnimations(deltaTime) {
+            for (let i = lineBreakAnimations.length - 1; i >= 0; i--) {
+                const anim = lineBreakAnimations[i];
+                anim.progress++;
+
+                if (anim.progress >= anim.maxProgress) {
+                    lineBreakAnimations.splice(i, 1);
+                }
+            }
+        }
+
+        // スコア更新
+        function updateScore(linesCleared) {
+            lines += linesCleared;
+            const points = [0, 100, 300, 500, 800];
+            score += points[Math.min(linesCleared, 4)] * level;
+
+            // レベルアップ
+            const newLevel = Math.floor(lines / 10) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                dropInterval = Math.max(100, 1000 - (level - 1) * 100);
             }
         }
         
         // キー押下処理
         function handleKeyDown(e) {
-            const now = Date.now();
-            const key = e.key;
-            
-            // 既に押されているキーの場合は、リピート遅延をチェック
-            if (keys[key] && (now - lastKeyTime[key]) < keyRepeatDelay) {
-                return;
+            if (!gameRunning) return;
+
+            // キーリピートを無視
+            if (e.repeat) return;
+
+            if (keyDownState[e.key]) return;
+            keyDownState[e.key] = true;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    inputState.moveLeft = true;
+                    lastMoveTime.left = 0;
+                    movePiece(-1, 0);
+                    break;
+                case 'ArrowRight':
+                    inputState.moveRight = true;
+                    lastMoveTime.right = 0;
+                    movePiece(1, 0);
+                    break;
+                case 'ArrowDown':
+                    inputState.softDrop = true;
+                    lastMoveTime.down = 0;
+                    break;
+                case 'ArrowUp':
+                    rotatePiece();
+                    break;
+                case ' ':
+                    hardDrop();
+                    break;
+                case 'p':
+                case 'P':
+                    togglePause();
+                    break;
+                case 'c':
+                case 'C':
+                case 'Shift':
+                    holdCurrentPiece();
+                    break;
+                case '1':
+                    swapWithHold(0);
+                    break;
+                case '2':
+                    swapWithHold(1);
+                    break;
             }
-            
-            keys[key] = true;
-            lastKeyTime[key] = now;
-            
-            if (key === 'p' || key === 'P') {
-                togglePause();
-            }
-            
-            // キーリピートを防ぐため、preventDefaultを呼び出し
-            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(key)) {
+
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
                 e.preventDefault();
             }
         }
-        
+
         // キー離上処理
         function handleKeyUp(e) {
-            keys[e.key] = false;
-            
-            // 回転とハードドロップの処理フラグをリセット
-            if (e.key === 'ArrowUp') {
-                keys['ArrowUpProcessed'] = false;
-            }
-            if (e.key === ' ') {
-                keys['SpaceProcessed'] = false;
-            }
-            
-            // キー離上時にリピート処理をリセット
-            if (lastKeyTime[e.key]) {
-                delete lastKeyTime[e.key];
+            keyDownState[e.key] = false;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    inputState.moveLeft = false;
+                    break;
+                case 'ArrowRight':
+                    inputState.moveRight = false;
+                    break;
+                case 'ArrowDown':
+                    inputState.softDrop = false;
+                    break;
             }
         }
-        
+
         // 一時停止切り替え
         function togglePause() {
             gamePaused = !gamePaused;
         }
-        
-        // ゲームループ
-        function gameLoop() {
-            if (!gameRunning) return;
-            
-            if (!gamePaused) {
-                updateGame();
+
+        // ホールド機能
+        function holdCurrentPiece() {
+            if (!canHold || !currentPiece || gamePaused) return;
+
+            // 空いているスロットを探す
+            let targetSlot = -1;
+            if (holdPieces[0] === null) {
+                targetSlot = 0;
+            } else if (holdPieces[1] === null) {
+                targetSlot = 1;
+            } else {
+                // 両方埋まっている場合は選択中のスロットと交換
+                targetSlot = selectedHoldSlot;
             }
-            
-            drawGame();
-            requestAnimationFrame(gameLoop);
+
+            // ホールド処理
+            const temp = holdPieces[targetSlot];
+            holdPieces[targetSlot] = {
+                shape: currentPiece.shape,
+                color: currentPiece.color,
+                type: currentPiece.type
+            };
+
+            if (temp) {
+                // 既存のホールドピースがある場合は交換
+                currentPiece = {
+                    ...temp,
+                    x: Math.floor(BOARD_WIDTH / 2) - Math.floor(temp.shape[0].length / 2),
+                    y: 0
+                };
+                // 配置可能かチェック
+                if (!canMove(currentPiece.x, currentPiece.y, currentPiece.shape)) {
+                    // 配置不可能な場合は元に戻す
+                    holdPieces[targetSlot] = temp;
+                    currentPiece = {
+                        shape: holdPieces[targetSlot].shape,
+                        color: holdPieces[targetSlot].color,
+                        type: holdPieces[targetSlot].type,
+                        x: Math.floor(BOARD_WIDTH / 2) - Math.floor(holdPieces[targetSlot].shape[0].length / 2),
+                        y: 0
+                    };
+                    return;
+                }
+            } else {
+                // ホールドピースがない場合は新しいピースを生成
+                spawnNewPiece();
+            }
+
+            canHold = false;
+            // 次のスロットを選択
+            selectedHoldSlot = (selectedHoldSlot + 1) % 2;
+        }
+
+        // 特定のホールドスロットと交換
+        function swapWithHold(slotIndex) {
+            if (!currentPiece || gamePaused || !holdPieces[slotIndex]) return;
+
+            const temp = holdPieces[slotIndex];
+            holdPieces[slotIndex] = {
+                shape: currentPiece.shape,
+                color: currentPiece.color,
+                type: currentPiece.type
+            };
+
+            currentPiece = {
+                ...temp,
+                x: Math.floor(BOARD_WIDTH / 2) - Math.floor(temp.shape[0].length / 2),
+                y: 0
+            };
+
+            // 配置可能かチェック
+            if (!canMove(currentPiece.x, currentPiece.y, currentPiece.shape)) {
+                // 配置不可能な場合は元に戻す
+                const original = holdPieces[slotIndex];
+                holdPieces[slotIndex] = temp;
+                currentPiece = {
+                    shape: original.shape,
+                    color: original.color,
+                    type: original.type,
+                    x: Math.floor(BOARD_WIDTH / 2) - Math.floor(original.shape[0].length / 2),
+                    y: 0
+                };
+                return;
+            }
+
+            canHold = false;
+            selectedHoldSlot = slotIndex;
+        }
+
+        // 現在のピースをホールド
+        function holdCurrentPiece() {
+            if (!canHold || !currentPiece || gamePaused) return;
+
+            // 空いているホールドスロットを探す
+            let targetSlot = -1;
+            if (holdPieces[0] === null) {
+                targetSlot = 0;
+            } else if (holdPieces[1] === null) {
+                targetSlot = 1;
+            } else {
+                // 両方埋まっている場合は、選択中のスロットと交換
+                targetSlot = selectedHoldSlot;
+            }
+
+            if (targetSlot === -1) return;
+
+            // ホールドピースと現在のピースを交換
+            const temp = holdPieces[targetSlot];
+            holdPieces[targetSlot] = {
+                shape: currentPiece.shape,
+                color: currentPiece.color,
+                type: currentPiece.type
+            };
+
+            if (temp !== null) {
+                // ホールドピースがあった場合は交換
+                currentPiece = {
+                    ...temp,
+                    x: Math.floor(BOARD_WIDTH / 2) - Math.floor(temp.shape[0].length / 2),
+                    y: 0
+                };
+
+                // 交換したピースが配置可能かチェック
+                if (!canMove(currentPiece.x, currentPiece.y, currentPiece.shape)) {
+                    // 配置不可能な場合は元に戻す
+                    holdPieces[targetSlot] = temp;
+                    return;
+                }
+            } else {
+                // ホールドピースがなかった場合は新しいピースを生成
+                spawnNewPiece();
+            }
+
+            canHold = false;  // 同じピースを連続でホールドできないようにする
+            selectedHoldSlot = (selectedHoldSlot + 1) % 2;  // 次のホールドスロットを選択
+        }
+
+        // 特定のホールドスロットと交換
+        function swapWithHold(slotIndex) {
+            if (!currentPiece || gamePaused || holdPieces[slotIndex] === null) return;
+
+            const temp = holdPieces[slotIndex];
+            holdPieces[slotIndex] = {
+                shape: currentPiece.shape,
+                color: currentPiece.color,
+                type: currentPiece.type
+            };
+
+            currentPiece = {
+                ...temp,
+                x: Math.floor(BOARD_WIDTH / 2) - Math.floor(temp.shape[0].length / 2),
+                y: 0
+            };
+
+            // 交換したピースが配置可能かチェック
+            if (!canMove(currentPiece.x, currentPiece.y, currentPiece.shape)) {
+                // 配置不可能な場合は元に戻す
+                holdPieces[slotIndex] = temp;
+                currentPiece = {
+                    shape: holdPieces[slotIndex].shape,
+                    color: holdPieces[slotIndex].color,
+                    type: holdPieces[slotIndex].type,
+                    x: Math.floor(BOARD_WIDTH / 2) - Math.floor(holdPieces[slotIndex].shape[0].length / 2),
+                    y: 0
+                };
+                return;
+            }
+
+            canHold = false;  // 交換後はホールドを一時的に無効化
+            selectedHoldSlot = slotIndex;
         }
         
+        // ゲームループ
+        function gameLoop(currentTime) {
+            if (!gameRunning) return;
+
+            if (!lastTime) {
+                lastTime = currentTime;
+            }
+
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            if (!gamePaused) {
+                update(deltaTime);
+            }
+
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
         // ゲーム更新
-        function updateGame() {
-            const now = Date.now();
-            
-            // ピース移動（キーリピート制御付き）
-            if (keys['ArrowLeft'] && (now - lastKeyTime['ArrowLeft']) >= keyRepeatInterval) {
-                movePiece(-1, 0);
-                lastKeyTime['ArrowLeft'] = now;
-            }
-            if (keys['ArrowRight'] && (now - lastKeyTime['ArrowRight']) >= keyRepeatInterval) {
-                movePiece(1, 0);
-                lastKeyTime['ArrowRight'] = now;
-            }
-            if (keys['ArrowDown'] && (now - lastKeyTime['ArrowDown']) >= keyRepeatInterval) {
-                movePiece(0, 1);
-                lastKeyTime['ArrowDown'] = now;
-            }
-            
-            // 回転とハードドロップは単発処理
-            if (keys['ArrowUp'] && !keys['ArrowUpProcessed']) {
-                rotatePiece();
-                keys['ArrowUpProcessed'] = true;
-            }
-            if (keys[' '] && !keys['SpaceProcessed']) {
-                hardDrop();
-                keys['SpaceProcessed'] = true;
-            }
-            
+        function update(deltaTime) {
+            // 連続移動処理
+            handleContinuousInput(deltaTime);
+
             // 自動落下
-            dropTime += 16; // 約60FPS
-            if (dropTime >= dropInterval) {
-                dropTime = 0;
+            const dropSpeed = inputState.softDrop ? 50 : dropInterval;
+            dropCounter += deltaTime;
+
+            if (dropCounter > dropSpeed) {
+                dropCounter = 0;
                 if (!movePiece(0, 1)) {
-                    placePiece();
+                    lockPiece();
+                }
+            }
+
+            // パーティクル更新
+            updateParticles(deltaTime);
+
+            // ライン破壊アニメーション更新
+            updateLineBreakAnimations(deltaTime);
+        }
+
+        // 連続入力処理
+        function handleContinuousInput(deltaTime) {
+            // 左移動
+            if (inputState.moveLeft) {
+                lastMoveTime.left += deltaTime;
+                if (lastMoveTime.left > moveDelay) {
+                    if ((lastMoveTime.left - moveDelay) % moveSpeed < deltaTime) {
+                        movePiece(-1, 0);
+                    }
+                }
+            }
+
+            // 右移動
+            if (inputState.moveRight) {
+                lastMoveTime.right += deltaTime;
+                if (lastMoveTime.right > moveDelay) {
+                    if ((lastMoveTime.right - moveDelay) % moveSpeed < deltaTime) {
+                        movePiece(1, 0);
+                    }
                 }
             }
         }
         
         // ピース移動
         function movePiece(dx, dy) {
-            let newPiece = {
-                ...currentPiece,
-                x: currentPiece.x + dx,
-                y: currentPiece.y + dy
-            };
-            
-            if (!isCollision(newPiece)) {
-                currentPiece = newPiece;
+            if (!currentPiece) return false;
+
+            const newX = currentPiece.x + dx;
+            const newY = currentPiece.y + dy;
+
+            if (canMove(newX, newY, currentPiece.shape)) {
+                currentPiece.x = newX;
+                currentPiece.y = newY;
                 return true;
             }
             return false;
         }
-        
+
         // ピース回転
         function rotatePiece() {
-            let rotated = [];
-            let shape = currentPiece.shape;
-            
-            // 90度回転
-            for (let x = 0; x < shape[0].length; x++) {
-                rotated[x] = [];
-                for (let y = shape.length - 1; y >= 0; y--) {
-                    rotated[x][shape.length - 1 - y] = shape[y][x];
+            if (!currentPiece || gamePaused) return;
+
+            const rotated = rotate(currentPiece.shape);
+
+            // 通常の回転を試みる
+            if (canMove(currentPiece.x, currentPiece.y, rotated)) {
+                currentPiece.shape = rotated;
+                return;
+            }
+
+            // Wall kick - 左右に移動して回転を試みる
+            const kicks = [-1, 1, -2, 2];
+            for (const kick of kicks) {
+                if (canMove(currentPiece.x + kick, currentPiece.y, rotated)) {
+                    currentPiece.x += kick;
+                    currentPiece.shape = rotated;
+                    return;
                 }
             }
-            
-            let newPiece = {
-                ...currentPiece,
-                shape: rotated
-            };
-            
-            if (!isCollision(newPiece)) {
-                currentPiece = newPiece;
-            }
         }
-        
+
+        // 回転処理
+        function rotate(shape) {
+            const rows = shape.length;
+            const cols = shape[0].length;
+            const rotated = [];
+
+            for (let x = 0; x < cols; x++) {
+                rotated[x] = [];
+                for (let y = rows - 1; y >= 0; y--) {
+                    rotated[x][rows - 1 - y] = shape[y][x];
+                }
+            }
+
+            return rotated;
+        }
+
         // ハードドロップ
         function hardDrop() {
+            if (!currentPiece || gamePaused) return;
+
+            let dropDistance = 0;
             while (movePiece(0, 1)) {
-                score += 2;
+                dropDistance++;
             }
+            score += dropDistance * 2;
+            lockPiece();
         }
         
         // ゲームオーバー
@@ -535,47 +928,62 @@
             document.getElementById('gameOver').style.display = 'block';
         }
         
-        // ゲーム描画
-        function drawGame() {
-            // ボード描画
-            drawBoard();
-            
-            // 現在のピース描画
-            drawPiece(currentPiece, currentPieceColor);
-            
-            // 次のピース描画
-            drawNextPiece();
-            
-            // UI更新
-            document.getElementById('score').textContent = score;
-            document.getElementById('lines').textContent = lines;
-            document.getElementById('level').textContent = level;
-        }
-        
-        // ボード描画
-        function drawBoard() {
+        // 描画処理
+        function draw() {
+            // キャンバスをクリア
             ctx.fillStyle = '#2c3e50';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             // グリッド描画
+            drawGrid();
+
+            // ボード上のブロック描画
+            drawBoard();
+
+            // ゴーストピース描画
+            drawGhost();
+
+            // 現在のピース描画
+            drawCurrentPiece();
+
+            // ライン破壊エフェクト描画
+            drawLineBreakEffects();
+
+            // パーティクル描画
+            drawParticles();
+
+            // 次のピース描画
+            drawNextPiece();
+
+            // ホールドピース描画
+            drawHoldPieces();
+
+            // UI更新
+            updateUI();
+        }
+
+        // グリッド描画
+        function drawGrid() {
             ctx.strokeStyle = '#34495e';
-            ctx.lineWidth = 1;
-            
+            ctx.lineWidth = 0.5;
+
             for (let x = 0; x <= BOARD_WIDTH; x++) {
                 ctx.beginPath();
-                ctx.moveTo(x * 30, 0);
-                ctx.lineTo(x * 30, canvas.height);
+                ctx.moveTo(x * BLOCK_SIZE, 0);
+                ctx.lineTo(x * BLOCK_SIZE, canvas.height);
                 ctx.stroke();
             }
-            
+
             for (let y = 0; y <= BOARD_HEIGHT; y++) {
                 ctx.beginPath();
-                ctx.moveTo(0, y * 30);
-                ctx.lineTo(canvas.width, y * 30);
+                ctx.moveTo(0, y * BLOCK_SIZE);
+                ctx.lineTo(canvas.width, y * BLOCK_SIZE);
                 ctx.stroke();
             }
-            
-            // 配置済みブロック描画
+        }
+
+        // ボード描画
+        function drawBoard() {
             for (let y = 0; y < BOARD_HEIGHT; y++) {
                 for (let x = 0; x < BOARD_WIDTH; x++) {
                     if (board[y][x]) {
@@ -584,71 +992,228 @@
                 }
             }
         }
-        
+
         // ブロック描画
-        function drawBlock(x, y, color) {
+        function drawBlock(x, y, color, alpha = 1) {
             ctx.fillStyle = color;
-            ctx.fillRect(x * 30 + 1, y * 30 + 1, 28, 28);
-            
+            ctx.globalAlpha = alpha;
+            ctx.fillRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
+
             // ハイライト効果
             ctx.fillStyle = 'rgba(255,255,255,0.3)';
-            ctx.fillRect(x * 30 + 1, y * 30 + 1, 28, 4);
-            ctx.fillRect(x * 30 + 1, y * 30 + 1, 4, 28);
+            ctx.fillRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, BLOCK_SIZE - 2, 4);
+            ctx.fillRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, 4, BLOCK_SIZE - 2);
+
+            ctx.globalAlpha = 1;
         }
-        
-        // ピース描画
-        function drawPiece(piece, color) {
-            for (let y = 0; y < piece.shape.length; y++) {
-                for (let x = 0; x < piece.shape[y].length; x++) {
-                    if (piece.shape[y][x]) {
-                        let boardX = piece.x + x;
-                        let boardY = piece.y + y;
-                        
+
+        // 現在のピース描画
+        function drawCurrentPiece() {
+            if (!currentPiece) return;
+
+            for (let y = 0; y < currentPiece.shape.length; y++) {
+                for (let x = 0; x < currentPiece.shape[y].length; x++) {
+                    if (currentPiece.shape[y][x]) {
+                        const boardX = currentPiece.x + x;
+                        const boardY = currentPiece.y + y;
                         if (boardY >= 0) {
-                            ctx.fillStyle = color;
-                            ctx.fillRect(boardX * 30 + 1, boardY * 30 + 1, 28, 28);
-                            
-                            // ハイライト効果
-                            ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                            ctx.fillRect(boardX * 30 + 1, boardY * 30 + 1, 28, 4);
-                            ctx.fillRect(boardX * 30 + 1, boardY * 30 + 1, 4, 28);
+                            drawBlock(boardX, boardY, currentPiece.color);
                         }
                     }
                 }
             }
         }
-        
+
+        // ゴーストピース描画
+        function drawGhost() {
+            if (!currentPiece) return;
+
+            let ghostY = currentPiece.y;
+            while (canMove(currentPiece.x, ghostY + 1, currentPiece.shape)) {
+                ghostY++;
+            }
+
+            for (let y = 0; y < currentPiece.shape.length; y++) {
+                for (let x = 0; x < currentPiece.shape[y].length; x++) {
+                    if (currentPiece.shape[y][x]) {
+                        const boardX = currentPiece.x + x;
+                        const boardY = ghostY + y;
+                        if (boardY >= 0 && boardY !== currentPiece.y + y) {
+                            drawBlock(boardX, boardY, currentPiece.color, 0.3);
+                        }
+                    }
+                }
+            }
+        }
+
         // 次のピース描画
         function drawNextPiece() {
+            if (!nextPiece) return;
+
             nextCtx.fillStyle = '#2c3e50';
             nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-            
-            let offsetX = (nextCanvas.width - nextPiece.shape[0].length * 20) / 2;
-            let offsetY = (nextCanvas.height - nextPiece.shape.length * 20) / 2;
-            
+
+            const blockSize = 20;
+            const offsetX = (nextCanvas.width - nextPiece.shape[0].length * blockSize) / 2;
+            const offsetY = (nextCanvas.height - nextPiece.shape.length * blockSize) / 2;
+
             for (let y = 0; y < nextPiece.shape.length; y++) {
                 for (let x = 0; x < nextPiece.shape[y].length; x++) {
                     if (nextPiece.shape[y][x]) {
                         nextCtx.fillStyle = nextPiece.color;
-                        nextCtx.fillRect(offsetX + x * 20, offsetY + y * 20, 18, 18);
+                        nextCtx.fillRect(
+                            offsetX + x * blockSize + 1,
+                            offsetY + y * blockSize + 1,
+                            blockSize - 2,
+                            blockSize - 2
+                        );
+
+                        // ハイライト
+                        nextCtx.fillStyle = 'rgba(255,255,255,0.3)';
+                        nextCtx.fillRect(
+                            offsetX + x * blockSize + 1,
+                            offsetY + y * blockSize + 1,
+                            blockSize - 2,
+                            4
+                        );
                     }
                 }
             }
+        }
+
+        // ホールドピース描画
+        function drawHoldPieces() {
+            // ホールドスロット1
+            drawPieceOnCanvas(holdPieces[0], holdCtx1, holdCanvas1, selectedHoldSlot === 0);
+
+            // ホールドスロット2
+            drawPieceOnCanvas(holdPieces[1], holdCtx2, holdCanvas2, selectedHoldSlot === 1);
+        }
+
+        // キャンバスにピースを描画
+        function drawPieceOnCanvas(piece, ctx, canvas, isSelected) {
+            // キャンバスをクリア
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 選択中のスロットをハイライト
+            if (isSelected) {
+                ctx.strokeStyle = '#00cec9';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+            }
+
+            if (!piece) return;
+
+            const blockSize = 12;
+            const offsetX = (canvas.width - piece.shape[0].length * blockSize) / 2;
+            const offsetY = (canvas.height - piece.shape.length * blockSize) / 2;
+
+            for (let y = 0; y < piece.shape.length; y++) {
+                for (let x = 0; x < piece.shape[y].length; x++) {
+                    if (piece.shape[y][x]) {
+                        ctx.fillStyle = piece.color;
+                        ctx.fillRect(
+                            offsetX + x * blockSize + 1,
+                            offsetY + y * blockSize + 1,
+                            blockSize - 2,
+                            blockSize - 2
+                        );
+
+                        // ハイライト
+                        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                        ctx.fillRect(
+                            offsetX + x * blockSize + 1,
+                            offsetY + y * blockSize + 1,
+                            blockSize - 2,
+                            2
+                        );
+                    }
+                }
+            }
+        }
+
+        // ライン破壊エフェクト描画
+        function drawLineBreakEffects() {
+            lineBreakAnimations.forEach(anim => {
+                if (anim.flash && anim.progress < 10) {
+                    // フラッシュ効果
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * (1 - anim.progress / 10)})`;
+                    ctx.fillRect(0, anim.row * BLOCK_SIZE, canvas.width, BLOCK_SIZE);
+                }
+
+                // 波紋効果
+                const waveIntensity = Math.sin((anim.progress / anim.maxProgress) * Math.PI) * 10;
+                for (let x = 0; x < BOARD_WIDTH; x++) {
+                    const offsetY = Math.sin((x + anim.progress) * 0.5) * waveIntensity;
+                    if (board[anim.row] && board[anim.row][x]) {
+                        ctx.save();
+                        ctx.translate(0, offsetY);
+                        drawBlock(x, anim.row, board[anim.row][x], 1 - (anim.progress / anim.maxProgress) * 0.5);
+                        ctx.restore();
+                    }
+                }
+            });
+        }
+
+        // パーティクル描画
+        function drawParticles() {
+            particles.forEach(particle => {
+                ctx.save();
+                ctx.translate(particle.x, particle.y);
+                ctx.rotate(particle.rotation);
+                ctx.globalAlpha = particle.life;
+
+                // パーティクルを立方体風に描画
+                ctx.fillStyle = particle.color;
+                ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+
+                // ハイライト
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size * 0.3, particle.size * 0.3);
+
+                ctx.restore();
+            });
+        }
+
+        // UI更新
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('lines').textContent = lines;
+            document.getElementById('level').textContent = level;
         }
         
         // ゲーム再開
         function restartGame() {
             document.getElementById('gameOver').style.display = 'none';
+
+            // ホールドキャンバスをクリア
+            if (holdCtx1 && holdCtx2) {
+                holdCtx1.fillStyle = '#2c3e50';
+                holdCtx1.fillRect(0, 0, holdCanvas1.width, holdCanvas1.height);
+                holdCtx2.fillStyle = '#2c3e50';
+                holdCtx2.fillRect(0, 0, holdCanvas2.width, holdCanvas2.height);
+            }
+
+            // アニメーションをクリア
+            particles = [];
+            lineBreakAnimations = [];
+
             initGame();
+            requestAnimationFrame(gameLoop);
         }
-        
+
         // スタート画面表示
         function showStartScreen() {
             document.getElementById('gameOver').style.display = 'none';
             document.getElementById('startScreen').style.display = 'block';
             document.getElementById('gameArea').style.display = 'none';
-            
+
             gameRunning = false;
+
+            // イベントリスナーをクリーンアップ
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
         }
         
         // 検索機能

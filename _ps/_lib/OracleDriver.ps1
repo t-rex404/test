@@ -1848,6 +1848,265 @@ ORDER SIBLINGS BY ID
     # ユーティリティメソッド
     # ========================================
 
+    # tnsnames.oraのパスを取得
+    [string] GetTnsNamesPath()
+    {
+        try
+        {
+            Write-Host "tnsnames.oraファイルを検索しています..." -ForegroundColor Yellow
+
+            # 1. まずレジストリからOracleホームパスを取得
+            $tnsNamesPath = $this.GetTnsNamesFromRegistry()
+
+            if (-not [string]::IsNullOrEmpty($tnsNamesPath) -and (Test-Path $tnsNamesPath))
+            {
+                Write-Host "レジストリから tnsnames.ora を発見しました: $tnsNamesPath" -ForegroundColor Green
+                return $tnsNamesPath
+            }
+
+            # 2. レジストリから見つからない場合はファイルシステムを検索
+            Write-Host "レジストリから見つからないため、ファイルシステムを検索します..." -ForegroundColor Yellow
+            $foundFiles = $this.FindTnsNamesFiles()
+
+            if ($foundFiles.Count -eq 0)
+            {
+                throw "tnsnames.ora ファイルが見つかりませんでした。"
+            }
+            elseif ($foundFiles.Count -eq 1)
+            {
+                Write-Host "tnsnames.ora を発見しました: $($foundFiles[0])" -ForegroundColor Green
+                return $foundFiles[0]
+            }
+            else
+            {
+                # 複数見つかった場合は選択を促す
+                Write-Host "複数の tnsnames.ora ファイルが見つかりました。" -ForegroundColor Yellow
+                return $this.SelectTnsNamesFile($foundFiles)
+            }
+        }
+        catch
+        {
+            $this.last_error_message = $_.Exception.Message
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("OracleError_0041", "tnsnames.ora検索エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "tnsnames.oraの検索に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "tnsnames.oraの検索に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # レジストリからtnsnames.oraのパスを取得（プライベートヘルパーメソッド）
+    hidden [string] GetTnsNamesFromRegistry()
+    {
+        try
+        {
+            # Oracle関連のレジストリキーをチェック
+            $registryPaths = @(
+                "HKLM:\SOFTWARE\ORACLE",
+                "HKLM:\SOFTWARE\WOW6432Node\ORACLE",
+                "HKCU:\SOFTWARE\ORACLE",
+                "HKCU:\SOFTWARE\WOW6432Node\ORACLE"
+            )
+
+            foreach ($regPath in $registryPaths)
+            {
+                if (Test-Path $regPath)
+                {
+                    # Oracleホームを検索
+                    $oracleKeys = Get-ChildItem $regPath -ErrorAction SilentlyContinue
+
+                    foreach ($key in $oracleKeys)
+                    {
+                        # ORACLE_HOMEプロパティを探す
+                        $oracleHome = $null
+                        try
+                        {
+                            $oracleHome = (Get-ItemProperty -Path $key.PSPath -Name "ORACLE_HOME" -ErrorAction SilentlyContinue).ORACLE_HOME
+                        }
+                        catch
+                        {
+                            # このキーにはORACLE_HOMEがない
+                            continue
+                        }
+
+                        if (-not [string]::IsNullOrEmpty($oracleHome))
+                        {
+                            # tnsnames.oraの標準的な場所を確認
+                            $possiblePaths = @(
+                                (Join-Path $oracleHome "network\admin\tnsnames.ora"),
+                                (Join-Path $oracleHome "NETWORK\ADMIN\tnsnames.ora"),
+                                (Join-Path $oracleHome "admin\network\tnsnames.ora"),
+                                (Join-Path $oracleHome "ADMIN\NETWORK\tnsnames.ora")
+                            )
+
+                            foreach ($tnsPath in $possiblePaths)
+                            {
+                                if (Test-Path $tnsPath)
+                                {
+                                    return $tnsPath
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            # TNS_ADMIN環境変数もチェック
+            if (-not [string]::IsNullOrEmpty($env:TNS_ADMIN))
+            {
+                $tnsPath = Join-Path $env:TNS_ADMIN "tnsnames.ora"
+                if (Test-Path $tnsPath)
+                {
+                    return $tnsPath
+                }
+            }
+
+            return ""
+        }
+        catch
+        {
+            Write-Host "レジストリの検索中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            return ""
+        }
+    }
+
+    # ファイルシステムからtnsnames.oraを検索（プライベートヘルパーメソッド）
+    hidden [string[]] FindTnsNamesFiles()
+    {
+        try
+        {
+            $foundFiles = @()
+
+            # 検索対象のルートパス
+            $searchPaths = @(
+                "C:\oracle",
+                "C:\app",
+                "D:\oracle",
+                "D:\app",
+                $env:ProgramFiles,
+                ${env:ProgramFiles(x86)}
+            )
+
+            foreach ($rootPath in $searchPaths)
+            {
+                if (Test-Path $rootPath)
+                {
+                    Write-Host "検索中: $rootPath" -ForegroundColor Gray
+
+                    # tnsnames.oraファイルを再帰的に検索
+                    $files = Get-ChildItem -Path $rootPath -Filter "tnsnames.ora" -Recurse -ErrorAction SilentlyContinue |
+                             Where-Object { $_.PSIsContainer -eq $false }
+
+                    foreach ($file in $files)
+                    {
+                        # 既に見つかったファイルと重複していないか確認
+                        if ($foundFiles -notcontains $file.FullName)
+                        {
+                            $foundFiles += $file.FullName
+                        }
+                    }
+                }
+            }
+
+            # インスタントクライアントの一般的な場所もチェック
+            $instantClientPaths = @(
+                "C:\instantclient*",
+                "D:\instantclient*",
+                "$env:USERPROFILE\instantclient*"
+            )
+
+            foreach ($pattern in $instantClientPaths)
+            {
+                $paths = Get-Item $pattern -ErrorAction SilentlyContinue
+                foreach ($path in $paths)
+                {
+                    $tnsPath = Join-Path $path.FullName "network\admin\tnsnames.ora"
+                    if ((Test-Path $tnsPath) -and ($foundFiles -notcontains $tnsPath))
+                    {
+                        $foundFiles += $tnsPath
+                    }
+                }
+            }
+
+            return $foundFiles
+        }
+        catch
+        {
+            Write-Host "ファイルシステムの検索中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            return @()
+        }
+    }
+
+    # 複数のtnsnames.oraファイルから選択（プライベートヘルパーメソッド）
+    hidden [string] SelectTnsNamesFile([string[]]$files)
+    {
+        try
+        {
+            Write-Host "`n見つかった tnsnames.ora ファイル:" -ForegroundColor Cyan
+            Write-Host "=================================" -ForegroundColor Cyan
+
+            for ($i = 0; $i -lt $files.Count; $i++)
+            {
+                # ファイル情報を取得
+                $fileInfo = Get-Item $files[$i]
+                $lastModified = $fileInfo.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss")
+                $fileSize = "{0:N0}" -f ($fileInfo.Length / 1KB) + " KB"
+
+                Write-Host "$($i + 1). $($files[$i])" -ForegroundColor White
+                Write-Host "   最終更新: $lastModified | サイズ: $fileSize" -ForegroundColor Gray
+            }
+
+            Write-Host "=================================" -ForegroundColor Cyan
+
+            # ユーザーに選択を促す
+            do
+            {
+                $selection = Read-Host "`n使用するファイルの番号を入力してください (1-$($files.Count))"
+
+                # 入力値の検証
+                $isValid = $false
+                if ($selection -match '^\d+$')
+                {
+                    $index = [int]$selection - 1
+                    if ($index -ge 0 -and $index -lt $files.Count)
+                    {
+                        $isValid = $true
+                    }
+                }
+
+                if (-not $isValid)
+                {
+                    Write-Host "無効な入力です。1から$($files.Count)までの数字を入力してください。" -ForegroundColor Red
+                }
+            }
+            while (-not $isValid)
+
+            $selectedFile = $files[$index]
+            Write-Host "`n選択されたファイル: $selectedFile" -ForegroundColor Green
+
+            return $selectedFile
+        }
+        catch
+        {
+            Write-Host "ファイル選択中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+            # エラーの場合は最初のファイルを返す
+            return $files[0]
+        }
+    }
+
     # テーブル一覧を取得
     [System.Data.DataTable] GetTableList([string]$schema = "")
     {

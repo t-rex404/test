@@ -164,6 +164,17 @@ class UIAutomationDriver
                 "$window_title*"
             )
 
+            # VSCodeのような特殊なケースにも対応
+            if ($window_title -match "(?i)vscode|visual\s*studio\s*code")
+            {
+                $searchPatterns += @(
+                    "*Visual Studio Code*",
+                    "*VSCode*",
+                    "* - Visual Studio Code",
+                    "*Code.exe*"
+                )
+            }
+
             # タイムアウト付きでウィンドウ検索
             $timeout = 30000 # 30秒に延長
             $elapsed = 0
@@ -179,7 +190,6 @@ class UIAutomationDriver
                     try
                     {
                         # ウィンドウを検索する条件
-                        <#
                         $condition = New-Object System.Windows.Automation.AndCondition(
                             (New-Object System.Windows.Automation.PropertyCondition(
                                 [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
@@ -189,10 +199,6 @@ class UIAutomationDriver
                                 [System.Windows.Automation.AutomationElement]::NameProperty,
                                 $pattern
                             ))
-                        )
-                        #>
-                        $condition = new-object System.Windows.Automation.PropertyCondition(
-                            [System.Windows.Automation.AutomationElement]::NameProperty,$window_title
                         )
 
                         # プロセスに関連するウィンドウを検索
@@ -246,12 +252,26 @@ class UIAutomationDriver
                             [System.Windows.Automation.ControlType]::Window
                         )))
 
-                    foreach ($window in $allWindows)
+                        Write-Host "検出されたウィンドウ数: $($allWindows.Count)" -ForegroundColor Cyan
+
+                        foreach ($window in $allWindows)
                     {
                         if ($null -ne $window -and $window.Current.IsEnabled)
                         {
                             $windowName = $window.Current.Name
-                            if ($windowName -like "*$window_title*" -or $window_title -like "*$windowName*")
+                            $className = $window.Current.ClassName
+
+                            # デバッグ：すべてのウィンドウタイトルを表示
+                            if (-not [string]::IsNullOrEmpty($windowName))
+                            {
+                                Write-Host "  - ウィンドウ: '$windowName' (ClassName: $className)" -ForegroundColor DarkGray
+                            }
+
+                            # 大文字小文字を無視した比較も試す
+                            if ($windowName -like "*$window_title*" -or
+                                $window_title -like "*$windowName*" -or
+                                $windowName.ToLower() -like "*$($window_title.ToLower())*" -or
+                                $window_title.ToLower() -like "*$($windowName.ToLower())*")
                             {
                                 $this.root_element = $window
                                 Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
@@ -507,11 +527,15 @@ class UIAutomationDriver
                     try
                     {
                         $windowProcess = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
-                        $processName = $windowProcess.ProcessName
-                        
+                        $actualProcessName = $windowProcess.ProcessName
+                        #>
+                        $condition = new-object System.Windows.Automation.PropertyCondition(
+                            [System.Windows.Automation.AutomationElement]::NameProperty,$window_title
+                        )
+
                         $matchProcess = $false
                         $matchTitle = $false
-                        
+
                         # プロセス名のマッチング
                         if ([string]::IsNullOrEmpty($process_name))
                         {
@@ -519,7 +543,7 @@ class UIAutomationDriver
                         }
                         else
                         {
-                            $matchProcess = $processName -like "*$process_name*"
+                            $matchProcess = $actualProcessName -like "*$process_name*"
                         }
                         
                         # ウィンドウタイトルのマッチング
@@ -537,7 +561,7 @@ class UIAutomationDriver
                         {
                             $candidates += @{
                                 Window = $window
-                                ProcessName = $processName
+                                ProcessName = $actualProcessName
                                 WindowName = $windowName
                                 ProcessId = $windowProcessId
                                 Score = 0
@@ -691,11 +715,11 @@ class UIAutomationDriver
                         try
                         {
                             $windowProcess = [System.Diagnostics.Process]::GetProcessById($windowProcessId)
-                            $processName = $windowProcess.ProcessName
-                            
+                            $actualProcessName = $windowProcess.ProcessName
+
                             $matchProcess = $false
                             $matchTitle = $false
-                            
+
                             # プロセス名のマッチング
                             if ([string]::IsNullOrEmpty($processName))
                             {
@@ -705,11 +729,11 @@ class UIAutomationDriver
                             {
                                 if ($exactMatch)
                                 {
-                                    $matchProcess = $processName -eq $processName
+                                    $matchProcess = $actualProcessName -eq $processName
                                 }
                                 else
                                 {
-                                    $matchProcess = $processName -like "*$processName*"
+                                    $matchProcess = $actualProcessName -like "*$processName*"
                                 }
                             }
                             
@@ -735,7 +759,7 @@ class UIAutomationDriver
                             {
                                 $candidates += @{
                                     Window = $window
-                                    ProcessName = $processName
+                                    ProcessName = $actualProcessName
                                     WindowName = $windowName
                                     ProcessId = $windowProcessId
                                 }
