@@ -226,12 +226,12 @@ class OracleDriver
             $this.tns_alias = $tnsAlias
 
             # SQLPLUS接続文字列を構築（TNSエイリアス使用）
-            $connectionString = "$username/$password@$tnsAlias"
+            $sqlPlusConnectionStr = "$username/$password@$tnsAlias"
 
             # SQLPLUSプロセスを開始
             $processInfo = New-Object System.Diagnostics.ProcessStartInfo
             $processInfo.FileName = $this.sqlplus_path
-            $processInfo.Arguments = $connectionString
+            $processInfo.Arguments = $sqlPlusConnectionStr
             $processInfo.UseShellExecute = $false
             $processInfo.RedirectStandardInput = $true
             $processInfo.RedirectStandardOutput = $true
@@ -304,12 +304,12 @@ class OracleDriver
             $this.connection_parameters.ServiceName = $service_name
 
             # SQLPLUS接続文字列を構築
-            $connectionString = "$username/$password@$service_name"
-            
+            $sqlPlusConnectionStr = "$username/$password@$service_name"
+
             # SQLPLUSプロセスを開始
             $processInfo = New-Object System.Diagnostics.ProcessStartInfo
             $processInfo.FileName = $this.sqlplus_path
-            $processInfo.Arguments = $connectionString
+            $processInfo.Arguments = $sqlPlusConnectionStr
             $processInfo.UseShellExecute = $false
             $processInfo.RedirectStandardInput = $true
             $processInfo.RedirectStandardOutput = $true
@@ -366,7 +366,7 @@ class OracleDriver
     }
 
     # SQLPLUSで接続（接続文字列を指定）
-    [void] ConnectWithSqlPlusString([string]$connectionString)
+    [void] ConnectWithSqlPlusString([string]$sqlPlusConnStr)
     {
         try
         {
@@ -379,7 +379,7 @@ class OracleDriver
             # SQLPLUSプロセスを開始
             $processInfo = New-Object System.Diagnostics.ProcessStartInfo
             $processInfo.FileName = $this.sqlplus_path
-            $processInfo.Arguments = $connectionString
+            $processInfo.Arguments = $sqlPlusConnStr
             $processInfo.UseShellExecute = $false
             $processInfo.RedirectStandardInput = $true
             $processInfo.RedirectStandardOutput = $true
@@ -404,7 +404,7 @@ class OracleDriver
             if ($exitCode -eq 0 -and $output -match "1")
             {
                 $this.is_connected = $true
-                Write-Host "SQLPLUSでORACLEデータベースに接続しました。接続文字列: $connectionString" -ForegroundColor Green
+                Write-Host "SQLPLUSでORACLEデータベースに接続しました。接続文字列: $sqlPlusConnStr" -ForegroundColor Green
             }
             else
             {
@@ -2072,6 +2072,8 @@ ORDER SIBLINGS BY ID
             Write-Host "=================================" -ForegroundColor Cyan
 
             # ユーザーに選択を促す
+            $isValid = $false
+            $index = -1
             do
             {
                 $selection = Read-Host "`n使用するファイルの番号を入力してください (1-$($files.Count))"
