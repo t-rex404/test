@@ -600,11 +600,19 @@ class WinSCPDriver
             }
 
             # ファイル情報を取得
-            $fileInfo = $this.Session.GetFileInfo($remotePath)
-            $exists = $fileInfo -ne $null
-
-            $this.Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: $exists", "DEBUG")
-            return $exists
+            try
+            {
+                $fileInfo = $this.Session.GetFileInfo($remotePath)
+                $exists = $null -ne $fileInfo
+                $this.Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+                return $exists
+            }
+            catch [WinSCP.SessionRemoteException]
+            {
+                # ファイルが存在しない場合の正常な動作
+                $this.Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: False", "DEBUG")
+                return $false
+            }
         }
         catch
         {
@@ -640,11 +648,19 @@ class WinSCPDriver
             }
 
             # ディレクトリ情報を取得
-            $fileInfo = $this.Session.GetFileInfo($remotePath)
-            $exists = $fileInfo -ne $null -and $fileInfo.IsDirectory
-
-            $this.Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: $exists", "DEBUG")
-            return $exists
+            try
+            {
+                $fileInfo = $this.Session.GetFileInfo($remotePath)
+                $exists = ($null -ne $fileInfo) -and $fileInfo.IsDirectory
+                $this.Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+                return $exists
+            }
+            catch [WinSCP.SessionRemoteException]
+            {
+                # ディレクトリが存在しない場合の正常な動作
+                $this.Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: False", "DEBUG")
+                return $false
+            }
         }
         catch
         {
@@ -689,7 +705,7 @@ class WinSCPDriver
             }
 
             # 上書き設定
-            $this.TransferOptions.OverwriteMode = if ($overwrite) { [WinSCP.OverwriteMode]::Overwrite } else { [WinSCP.OverwriteMode]::Resume }
+            $this.TransferOptions.OverwriteMode = if ($overwrite) { [WinSCP.OverwriteMode]::Overwrite } else { [WinSCP.OverwriteMode]::Exception }
 
             $this.Common.WriteLog("転送オプションが設定されました。モード: $transferMode, 上書き: $overwrite", "INFO")
         }
@@ -719,7 +735,24 @@ class WinSCPDriver
     # 接続状態を取得
     [bool] IsConnectedToServer()
     {
-        return $this.IsConnected
+        if ($null -eq $this.Session)
+        {
+            $this.IsConnected = $false
+            return $false
+        }
+
+        try
+        {
+            # 実際のセッション状態を確認
+            $opened = $this.Session.Opened
+            $this.IsConnected = $opened
+            return $opened
+        }
+        catch
+        {
+            $this.IsConnected = $false
+            return $false
+        }
     }
 
     # リソースの破棄
@@ -750,7 +783,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0007", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPError_0016", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

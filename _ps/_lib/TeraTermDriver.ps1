@@ -16,6 +16,33 @@ class TeraTermDriver
     [int]$current_port
 
     # ========================================
+    # エラーハンドリングヘルパー
+    # ========================================
+
+    # 共通エラーハンドリング
+    hidden [void] HandleCommonError([string]$errorCode, [string]$errorMessage, [string]$methodName)
+    {
+        $this.last_error_message = $errorMessage
+
+        # Commonオブジェクトが利用可能な場合はエラーログに記録
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, "$methodName エラー: $errorMessage", "TeraTermDriver", ".\AllDrivers_Error.log")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            Write-Host "$methodName に失敗しました: $errorMessage" -ForegroundColor Red
+        }
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -303,15 +330,15 @@ logopen '$logFilePath'
 connect '$host' /$protocol /$port
 
 ; 接続待機
-wait 'login:'
+wait 'login:' 30
 if result = 1 then
     ; ユーザー名を入力
     sendln '$username'
-    wait 'Password:'
+    wait 'Password:' 10
     if result = 1 then
         ; パスワードを入力
         sendln '$password'
-        wait '$'
+        wait '$' 10
         if result = 1 then
             ; 接続成功
             messagebox '接続が完了しました' 'TeraTermDriver'
@@ -329,7 +356,7 @@ endif
 "@
 
             # マクロファイルに書き込み
-            $macroContent | Out-File -FilePath $macroFilePath -Encoding UTF8
+            $macroContent | Out-File -FilePath $macroFilePath -Encoding Default
 
             Write-Host "接続マクロファイルを作成しました: $macroFilePath"
             return $macroFilePath
@@ -470,7 +497,7 @@ logclose
 "@
 
             # マクロファイルに書き込み
-            $macroContent | Out-File -FilePath $macroFilePath -Encoding UTF8
+            $macroContent | Out-File -FilePath $macroFilePath -Encoding Default
 
             Write-Host "切断マクロファイルを作成しました: $macroFilePath"
             return $macroFilePath
@@ -627,7 +654,7 @@ wait '$expectedPrompt' $timeoutSeconds
 "@
 
             # マクロファイルに書き込み
-            $macroContent | Out-File -FilePath $macroFilePath -Encoding UTF8
+            $macroContent | Out-File -FilePath $macroFilePath -Encoding Default
 
             Write-Host "コマンド実行マクロファイルを作成しました: $macroFilePath"
             return $macroFilePath
@@ -668,22 +695,34 @@ wait '$expectedPrompt' $timeoutSeconds
             }
 
             $latestLogFile = $logFiles[0].FullName
-            $logContent = Get-Content -Path $latestLogFile -Raw -Encoding UTF8
+            $logContent = Get-Content -Path $latestLogFile -Raw -Encoding Default
 
-            # 最後の数行を取得（プロンプト以降の内容）
+            # 最後のコマンドとその結果のみを取得
             $lines = $logContent -split "`n"
             $resultLines = @()
-            $foundPrompt = $false
+            $lastPromptIndex = -1
 
-            foreach ($line in $lines)
+            # 最後のプロンプトを見つける
+            for ($i = $lines.Count - 1; $i -ge 0; $i--)
             {
-                if ($foundPrompt)
+                if ($lines[$i] -match '\$$' -or $lines[$i] -match '#$' -or $lines[$i] -match '>$')
                 {
-                    $resultLines += $line
+                    $lastPromptIndex = $i
+                    break
                 }
-                elseif ($line -match '\$' -or $line -match '#' -or $line -match '>')
+            }
+
+            # 最後のプロンプトの次の行から最後までを取得
+            if ($lastPromptIndex -ge 0 -and $lastPromptIndex + 1 -lt $lines.Count)
+            {
+                for ($i = $lastPromptIndex + 1; $i -lt $lines.Count; $i++)
                 {
-                    $foundPrompt = $true
+                    # 次のプロンプトが見つかったら終了
+                    if ($lines[$i] -match '\$$' -or $lines[$i] -match '#$' -or $lines[$i] -match '>$')
+                    {
+                        break
+                    }
+                    $resultLines += $lines[$i]
                 }
             }
 
@@ -716,7 +755,7 @@ wait '$expectedPrompt' $timeoutSeconds
     # ファイル転送関連
     # ========================================
 
-    # ファイルをアップロード（SCP使用）
+    # ファイルをアップロード（ZMODEMプロトコル使用）
     [void] UploadFile([string]$localFilePath, [string]$remoteFilePath)
     {
         try
@@ -731,9 +770,11 @@ wait '$expectedPrompt' $timeoutSeconds
                 throw "ローカルファイルが見つかりません: $localFilePath"
             }
 
-            # SCPコマンドを実行
-            $scpCommand = "scp `"$localFilePath`" $($this.connection_parameters.Username)@$($this.connection_parameters.Host):`"$remoteFilePath`""
-            $result = $this.ExecuteCommand($scpCommand, "$", 60)
+            # ZMODEMプロトコルを使用したファイルアップロード用マクロを作成
+            $macroFile = $this.CreateFileUploadMacro($localFilePath, $remoteFilePath)
+
+            # マクロを実行
+            $this.ExecuteMacro($macroFile)
 
             Write-Host "ファイルをアップロードしました: $localFilePath -> $remoteFilePath"
         }
@@ -760,7 +801,7 @@ wait '$expectedPrompt' $timeoutSeconds
         }
     }
 
-    # ファイルをダウンロード（SCP使用）
+    # ファイルをダウンロード（ZMODEMプロトコル使用）
     [void] DownloadFile([string]$remoteFilePath, [string]$localFilePath)
     {
         try
@@ -777,9 +818,11 @@ wait '$expectedPrompt' $timeoutSeconds
                 New-Item -ItemType Directory -Path $localDir -Force | Out-Null
             }
 
-            # SCPコマンドを実行
-            $scpCommand = "scp $($this.connection_parameters.Username)@$($this.connection_parameters.Host):`"$remoteFilePath`" `"$localFilePath`""
-            $result = $this.ExecuteCommand($scpCommand, "$", 60)
+            # ZMODEMプロトコルを使用したファイルダウンロード用マクロを作成
+            $macroFile = $this.CreateFileDownloadMacro($remoteFilePath, $localFilePath)
+
+            # マクロを実行
+            $this.ExecuteMacro($macroFile)
 
             Write-Host "ファイルをダウンロードしました: $remoteFilePath -> $localFilePath"
         }
@@ -806,14 +849,167 @@ wait '$expectedPrompt' $timeoutSeconds
         }
     }
 
+    # ZMODEMファイルアップロード用マクロファイルを作成
+    [string] CreateFileUploadMacro([string]$localFilePath, [string]$remoteFilePath)
+    {
+        try
+        {
+            $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+            $macroFileName = "upload_$timestamp.ttl"
+            $macroFilePath = Join-Path $this.MacroPath $macroFileName
+
+            # ローカルファイルパスをTeraTermのパス形式に変換
+            $ttLocalPath = $localFilePath.Replace('\', '/')
+
+            # マクロ内容を作成
+            $macroContent = @"
+; TeraTermファイルアップロードマクロ (ZMODEM)
+; 作成日時: $(Get-Date -Format "yyyy/MM/dd HH:mm:ss")
+
+; ファイル送信準備
+sendln 'cd $(Split-Path $remoteFilePath -Parent)'
+wait '$' 10
+
+; ZMODEMファイル送信を開始
+zmodemfile '$ttLocalPath' 1
+
+; 送信完了待機
+wait '$' 30
+
+; ファイル名変更（必要な場合）
+sendln 'mv $(Split-Path $localFilePath -Leaf) $(Split-Path $remoteFilePath -Leaf)'
+wait '$' 5
+
+; マクロ終了
+"@
+
+            # マクロファイルに書き込み
+            $macroContent | Out-File -FilePath $macroFilePath -Encoding Default
+
+            Write-Host "ファイルアップロードマクロファイルを作成しました: $macroFilePath"
+            return $macroFilePath
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("TeraTermError_0017", "アップロードマクロ作成エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "アップロードマクロの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "アップロードマクロの作成に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
+    # ZMODEMファイルダウンロード用マクロファイルを作成
+    [string] CreateFileDownloadMacro([string]$remoteFilePath, [string]$localFilePath)
+    {
+        try
+        {
+            $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+            $macroFileName = "download_$timestamp.ttl"
+            $macroFilePath = Join-Path $this.MacroPath $macroFileName
+
+            # ローカルディレクトリをTeraTermのパス形式に変換
+            $ttLocalDir = (Split-Path $localFilePath -Parent).Replace('\', '/')
+
+            # マクロ内容を作成
+            $macroContent = @"
+; TeraTermファイルダウンロードマクロ (ZMODEM)
+; 作成日時: $(Get-Date -Format "yyyy/MM/dd HH:mm:ss")
+
+; ダウンロード先ディレクトリを設定
+zmodemrecv '$ttLocalDir'
+
+; ファイル受信開始
+sendln 'sz $remoteFilePath'
+
+; 受信完了待機
+wait '$' 30
+
+; マクロ終了
+"@
+
+            # マクロファイルに書き込み
+            $macroContent | Out-File -FilePath $macroFilePath -Encoding Default
+
+            Write-Host "ファイルダウンロードマクロファイルを作成しました: $macroFilePath"
+            return $macroFilePath
+        }
+        catch
+        {
+            # Commonオブジェクトが利用可能な場合はエラーログに記録
+            if ($global:Common)
+            {
+                try
+                {
+                    $global:Common.HandleError("TeraTermError_0018", "ダウンロードマクロ作成エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                }
+                catch
+                {
+                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else
+            {
+                Write-Host "ダウンロードマクロの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            }
+
+            throw "ダウンロードマクロの作成に失敗しました: $($_.Exception.Message)"
+        }
+    }
+
     # ========================================
     # ユーティリティ関連
     # ========================================
 
-    # 接続状態を確認
+    # 接続状態を確認（プロセス状態も含めて実際の接続を検証）
     [bool] IsConnected()
     {
-        return $this.is_connected
+        # 接続フラグがfalseの場合は即座にfalseを返す
+        if (-not $this.is_connected)
+        {
+            return $false
+        }
+
+        # TeraTermプロセスが実行中かを確認
+        if ($null -eq $this.teraterm_process -or $this.teraterm_process.HasExited)
+        {
+            $this.is_connected = $false
+            return $false
+        }
+
+        # プロセスが応答しているかを確認
+        try
+        {
+            $this.teraterm_process.Refresh()
+            if ($this.teraterm_process.Responding)
+            {
+                return $true
+            }
+            else
+            {
+                Write-Host "TeraTermプロセスが応答していません。" -ForegroundColor Yellow
+                $this.is_connected = $false
+                return $false
+            }
+        }
+        catch
+        {
+            $this.is_connected = $false
+            return $false
+        }
     }
 
     # 接続情報を取得
