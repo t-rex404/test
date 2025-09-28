@@ -58,7 +58,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0001", "TeraTermDriver初期化エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0380", "TeraTermDriver初期化エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -117,7 +117,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0002", "TeraTerm実行ファイルパス取得エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0381", "TeraTerm実行ファイルパス取得エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -163,7 +163,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0003", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0382", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -281,7 +281,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0004", "接続パラメータ設定エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0383", "接続パラメータ設定エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -335,7 +335,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0011", "PEM接続パラメータ設定エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0390", "PEM接続パラメータ設定エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -388,7 +388,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0005", "サーバー接続エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0384", "サーバー接続エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -431,7 +431,7 @@ class TeraTermDriver
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0006", "接続切断エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0385", "接続切断エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -734,7 +734,7 @@ logclose
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0007", "コマンド実行エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0386", "コマンド実行エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -872,7 +872,7 @@ wait '$expected_prompt' $timeout_seconds
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0008", "ファイルアップロードエラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0387", "ファイルアップロードエラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -920,7 +920,7 @@ wait '$expected_prompt' $timeout_seconds
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0009", "ファイルダウンロードエラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0388", "ファイルダウンロードエラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1154,7 +1154,7 @@ wait '$' 30
             {
                 try
                 {
-                    $global:Common.HandleError("TeraTermError_0010", "TeraTermDriver破棄エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("TeraTermError_0389", "TeraTermDriver破棄エラー: $($_.Exception.Message)", "TeraTermDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

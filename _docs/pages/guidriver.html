@@ -144,13 +144,13 @@ try {
 }
 catch {
     # コンストラクタ内でエラーログが自動的に記録されます
-    # GUIError_0001がエラーログに記録される
+    # GUIError_0400がエラーログに記録される
     Write-Host "GUIDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 # Commonオブジェクトが利用可能な場合：
 # - エラーログファイル（AllDrivers_Error.log）に記録
-# - エラーコード（GUIError_0001）で識別可能
+# - エラーコード（GUIError_0400）で識別可能
 # - 詳細なエラー情報が保存される</code></pre>
                 </div>
             </div>
@@ -432,82 +432,82 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>GUIDriverクラスでは、GUIError_0001からGUIError_0019までのエラーコードが使用されます（19個）。</p>
+                <p>GUIDriverクラスでは、GUIError_0400からGUIError_0418までのエラーコードが使用されます（19個）。</p>
                 <table class="error-table">
                     <tr>
-                        <td class="range">GUIError_0001</td>
+                        <td class="range">GUIError_0400</td>
                         <td>GUIDriver初期化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0002</td>
+                        <td class="range">GUIError_0401</td>
                         <td>アプリケーション起動エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0003</td>
+                        <td class="range">GUIError_0402</td>
                         <td>ウィンドウ検索エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0004</td>
+                        <td class="range">GUIError_0403</td>
                         <td>ウィンドウアクティブ化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0005</td>
+                        <td class="range">GUIError_0404</td>
                         <td>マウスクリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0006</td>
+                        <td class="range">GUIError_0405</td>
                         <td>マウス右クリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0007</td>
+                        <td class="range">GUIError_0406</td>
                         <td>マウスダブルクリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0008</td>
+                        <td class="range">GUIError_0407</td>
                         <td>マウス移動エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0009</td>
+                        <td class="range">GUIError_0408</td>
                         <td>キーボード入力エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0010</td>
+                        <td class="range">GUIError_0409</td>
                         <td>特殊キー送信エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0011</td>
+                        <td class="range">GUIError_0410</td>
                         <td>キー組み合わせ送信エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0012</td>
+                        <td class="range">GUIError_0411</td>
                         <td>テキスト入力エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0013</td>
+                        <td class="range">GUIError_0412</td>
                         <td>スクリーンショット取得エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0014</td>
+                        <td class="range">GUIError_0413</td>
                         <td>ウィンドウスクリーンショット取得エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0015</td>
+                        <td class="range">GUIError_0414</td>
                         <td>プロセス終了エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0016</td>
+                        <td class="range">GUIError_0415</td>
                         <td>プロセス強制終了エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0017</td>
+                        <td class="range">GUIError_0416</td>
                         <td>プロセス状態確認エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0018</td>
+                        <td class="range">GUIError_0417</td>
                         <td>GUIDriver破棄エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">GUIError_0019</td>
+                        <td class="range">GUIError_0418</td>
                         <td>タイムアウトエラー</td>
                     </tr>
                 </table>

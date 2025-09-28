@@ -404,6 +404,10 @@
                             <label for="powerpointdriver">PowerPointDriver（PowerPoint操作）</label>
                         </div>
                         <div class="radio-item">
+                            <input type="radio" id="accessdriver" name="driver" value="AccessDriver" required>
+                            <label for="accessdriver">AccessDriver（Access操作）</label>
+                        </div>
+                        <div class="radio-item">
                             <input type="radio" id="oracledriver" name="driver" value="OracleDriver" required>
                             <label for="oracledriver">OracleDriver（Oracle DB操作）</label>
                         </div>
@@ -451,24 +455,14 @@
                                     <span class="method-desc">コンストラクタ</span>
                                 </label>
                                 <label class="method-item">
-                                    <input type="radio" name="method" value="InitializeWebDriver" required>
-                                    <span class="method-name">InitializeWebDriver</span>
-                                    <span class="method-desc">WebDriver初期化</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SetDriverPath" required>
-                                    <span class="method-name">SetDriverPath</span>
-                                    <span class="method-desc">ドライバーパス設定</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SetBrowserOptions" required>
-                                    <span class="method-name">SetBrowserOptions</span>
-                                    <span class="method-desc">ブラウザオプション設定</span>
-                                </label>
-                                <label class="method-item">
                                     <input type="radio" name="method" value="StartBrowser" required>
                                     <span class="method-name">StartBrowser</span>
                                     <span class="method-desc">ブラウザ起動</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetTabInfomation" required>
+                                    <span class="method-name">GetTabInfomation</span>
+                                    <span class="method-desc">タブ情報取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetWebSocketInfomation" required>
@@ -491,151 +485,6 @@
                                     <span class="method-desc">指定したURLに移動</span>
                                 </label>
                                 <label class="method-item">
-                                    <input type="radio" name="method" value="FindElement" required>
-                                    <span class="method-name">FindElement</span>
-                                    <span class="method-desc">要素を検索</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="FindElements" required>
-                                    <span class="method-name">FindElements</span>
-                                    <span class="method-desc">複数要素を検索</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="ClickElement" required>
-                                    <span class="method-name">ClickElement</span>
-                                    <span class="method-desc">要素をクリック</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SendKeys" required>
-                                    <span class="method-name">SendKeys</span>
-                                    <span class="method-desc">テキストを入力</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GetText" required>
-                                    <span class="method-name">GetText</span>
-                                    <span class="method-desc">テキストを取得</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GetAttribute" required>
-                                    <span class="method-name">GetAttribute</span>
-                                    <span class="method-desc">属性値を取得</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SetAttribute" required>
-                                    <span class="method-name">SetAttribute</span>
-                                    <span class="method-desc">属性値を設定</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="IsElementDisplayed" required>
-                                    <span class="method-name">IsElementDisplayed</span>
-                                    <span class="method-desc">要素表示確認</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="IsElementEnabled" required>
-                                    <span class="method-name">IsElementEnabled</span>
-                                    <span class="method-desc">要素有効確認</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="IsElementSelected" required>
-                                    <span class="method-name">IsElementSelected</span>
-                                    <span class="method-desc">要素選択確認</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="TakeScreenshot" required>
-                                    <span class="method-name">TakeScreenshot</span>
-                                    <span class="method-desc">スクリーンショット取得</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="WaitForElement" required>
-                                    <span class="method-name">WaitForElement</span>
-                                    <span class="method-desc">要素の表示待機</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="WaitForElementVisible" required>
-                                    <span class="method-name">WaitForElementVisible</span>
-                                    <span class="method-desc">要素の可視待機</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="WaitForElementClickable" required>
-                                    <span class="method-name">WaitForElementClickable</span>
-                                    <span class="method-desc">要素のクリック可能待機</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="ExecuteJavaScript" required>
-                                    <span class="method-name">ExecuteJavaScript</span>
-                                    <span class="method-desc">JavaScript実行</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SwitchToFrame" required>
-                                    <span class="method-name">SwitchToFrame</span>
-                                    <span class="method-desc">フレーム切り替え</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SwitchToWindow" required>
-                                    <span class="method-name">SwitchToWindow</span>
-                                    <span class="method-desc">ウィンドウ切り替え</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SwitchToDefaultContent" required>
-                                    <span class="method-name">SwitchToDefaultContent</span>
-                                    <span class="method-desc">デフォルトコンテンツに切り替え</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GetCurrentUrl" required>
-                                    <span class="method-name">GetCurrentUrl</span>
-                                    <span class="method-desc">現在のURL取得</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GetTitle" required>
-                                    <span class="method-name">GetTitle</span>
-                                    <span class="method-desc">ページタイトル取得</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="RefreshPage" required>
-                                    <span class="method-name">RefreshPage</span>
-                                    <span class="method-desc">ページ更新</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GoBack" required>
-                                    <span class="method-name">GoBack</span>
-                                    <span class="method-desc">戻る</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GoForward" required>
-                                    <span class="method-name">GoForward</span>
-                                    <span class="method-desc">進む</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="MaximizeWindow" required>
-                                    <span class="method-name">MaximizeWindow</span>
-                                    <span class="method-desc">ウィンドウ最大化</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="MinimizeWindow" required>
-                                    <span class="method-name">MinimizeWindow</span>
-                                    <span class="method-desc">ウィンドウ最小化</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SetWindowSize" required>
-                                    <span class="method-name">SetWindowSize</span>
-                                    <span class="method-desc">ウィンドウサイズ設定</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GetWindowSize" required>
-                                    <span class="method-name">GetWindowSize</span>
-                                    <span class="method-desc">ウィンドウサイズ取得</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SetWindowPosition" required>
-                                    <span class="method-name">SetWindowPosition</span>
-                                    <span class="method-desc">ウィンドウ位置設定</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="GetWindowPosition" required>
-                                    <span class="method-name">GetWindowPosition</span>
-                                    <span class="method-desc">ウィンドウ位置取得</span>
-                                </label>
-                                <label class="method-item">
                                     <input type="radio" name="method" value="WaitForAdToLoad" required>
                                     <span class="method-name">WaitForAdToLoad</span>
                                     <span class="method-desc">広告読み込み待機</span>
@@ -644,16 +493,6 @@
                                     <input type="radio" name="method" value="CloseWindow" required>
                                     <span class="method-name">CloseWindow</span>
                                     <span class="method-desc">ウィンドウを閉じる</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="CloseBrowser" required>
-                                    <span class="method-name">CloseBrowser</span>
-                                    <span class="method-desc">ブラウザ終了</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="QuitDriver" required>
-                                    <span class="method-name">QuitDriver</span>
-                                    <span class="method-desc">ドライバー終了</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="Dispose" required>
@@ -699,6 +538,11 @@
                                     <input type="radio" name="method" value="EnablePageEvents" required>
                                     <span class="method-name">EnablePageEvents</span>
                                     <span class="method-desc">ページイベント有効化</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SetZoomLevel" required>
+                                    <span class="method-name">SetZoomLevel</span>
+                                    <span class="method-desc">ズームレベル設定</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="FindElement" required>
@@ -791,14 +635,24 @@
                                     <span class="method-desc">タグ名で要素存在確認</span>
                                 </label>
                                 <label class="method-item">
+                                    <input type="radio" name="method" value="FindChildElement" required>
+                                    <span class="method-name">FindChildElement</span>
+                                    <span class="method-desc">親要素内の子要素検索</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="FindChildElements" required>
+                                    <span class="method-name">FindChildElements</span>
+                                    <span class="method-desc">親要素内の子要素検索（複数）</span>
+                                </label>
+                                <label class="method-item">
                                     <input type="radio" name="method" value="GetElementText" required>
                                     <span class="method-name">GetElementText</span>
-                                    <span class="method-desc">要素のテキストを取得</span>
+                                    <span class="method-desc">要素のテキスト取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="SetElementText" required>
                                     <span class="method-name">SetElementText</span>
-                                    <span class="method-desc">要素のテキストを設定</span>
+                                    <span class="method-desc">要素にテキスト設定</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="ClickElement" required>
@@ -808,17 +662,17 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetElementAttribute" required>
                                     <span class="method-name">GetElementAttribute</span>
-                                    <span class="method-desc">要素の属性を取得</span>
+                                    <span class="method-desc">要素の属性値取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="SetElementAttribute" required>
                                     <span class="method-name">SetElementAttribute</span>
-                                    <span class="method-desc">要素の属性を設定</span>
+                                    <span class="method-desc">要素の属性値設定</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetHrefFromAnchor" required>
                                     <span class="method-name">GetHrefFromAnchor</span>
-                                    <span class="method-desc">アンカー要素のhref属性取得</span>
+                                    <span class="method-desc">アンカーからHref取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetElementCssProperty" required>
@@ -843,12 +697,12 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="DeselectAllOptions" required>
                                     <span class="method-name">DeselectAllOptions</span>
-                                    <span class="method-desc">すべてのオプション選択解除</span>
+                                    <span class="method-desc">全オプション選択解除</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="ClearElement" required>
                                     <span class="method-name">ClearElement</span>
-                                    <span class="method-desc">要素の内容をクリア</span>
+                                    <span class="method-desc">要素をクリア</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="ResizeWindow" required>
@@ -863,52 +717,52 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="MaximizeWindow" required>
                                     <span class="method-name">MaximizeWindow</span>
-                                    <span class="method-desc">ウィンドウを最大化</span>
+                                    <span class="method-desc">ウィンドウ最大化</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="MinimizeWindow" required>
                                     <span class="method-name">MinimizeWindow</span>
-                                    <span class="method-desc">ウィンドウを最小化</span>
+                                    <span class="method-desc">ウィンドウ最小化</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="FullscreenWindow" required>
                                     <span class="method-name">FullscreenWindow</span>
-                                    <span class="method-desc">ウィンドウをフルスクリーンに</span>
+                                    <span class="method-desc">ウィンドウフルスクリーン</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="MoveWindow" required>
                                     <span class="method-name">MoveWindow</span>
-                                    <span class="method-desc">ウィンドウを移動</span>
+                                    <span class="method-desc">ウィンドウ移動</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GoBack" required>
                                     <span class="method-name">GoBack</span>
-                                    <span class="method-desc">前のページに戻る</span>
+                                    <span class="method-desc">戻る</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GoForward" required>
                                     <span class="method-name">GoForward</span>
-                                    <span class="method-desc">次のページに進む</span>
+                                    <span class="method-desc">進む</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="Refresh" required>
                                     <span class="method-name">Refresh</span>
-                                    <span class="method-desc">ページをリフレッシュ</span>
+                                    <span class="method-desc">ページ更新</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetUrl" required>
                                     <span class="method-name">GetUrl</span>
-                                    <span class="method-desc">現在のURLを取得</span>
+                                    <span class="method-desc">現在のURL取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetTitle" required>
                                     <span class="method-name">GetTitle</span>
-                                    <span class="method-desc">ページタイトルを取得</span>
+                                    <span class="method-desc">ページタイトル取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetSourceCode" required>
                                     <span class="method-name">GetSourceCode</span>
-                                    <span class="method-desc">ページソースを取得</span>
+                                    <span class="method-desc">ページソースコード取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetWindowHandle" required>
@@ -918,7 +772,7 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetWindowHandles" required>
                                     <span class="method-name">GetWindowHandles</span>
-                                    <span class="method-desc">ウィンドウハンドル一覧取得</span>
+                                    <span class="method-desc">全ウィンドウハンドル取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetWindowSize" required>
@@ -933,42 +787,42 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetScreenshotObjectId" required>
                                     <span class="method-name">GetScreenshotObjectId</span>
-                                    <span class="method-desc">特定要素のスクリーンショット取得</span>
+                                    <span class="method-desc">要素スクリーンショット取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetScreenshotObjectIds" required>
                                     <span class="method-name">GetScreenshotObjectIds</span>
-                                    <span class="method-desc">複数要素のスクリーンショット取得</span>
+                                    <span class="method-desc">複数要素スクリーンショット取得</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="WaitForElementVisible" required>
                                     <span class="method-name">WaitForElementVisible</span>
-                                    <span class="method-desc">要素の表示を待機</span>
+                                    <span class="method-desc">要素の可視待機</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="WaitForElementClickable" required>
                                     <span class="method-name">WaitForElementClickable</span>
-                                    <span class="method-desc">要素のクリック可能を待機</span>
+                                    <span class="method-desc">要素のクリック可能待機</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="WaitForPageLoad" required>
                                     <span class="method-name">WaitForPageLoad</span>
-                                    <span class="method-desc">ページ読み込み完了を待機</span>
+                                    <span class="method-desc">ページ読み込み待機</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="WaitForCondition" required>
                                     <span class="method-name">WaitForCondition</span>
-                                    <span class="method-desc">JavaScript条件の成立を待機</span>
+                                    <span class="method-desc">条件待機</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="SendKeys" required>
                                     <span class="method-name">SendKeys</span>
-                                    <span class="method-desc">テキストを入力</span>
+                                    <span class="method-desc">キー送信</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="SendSpecialKey" required>
                                     <span class="method-name">SendSpecialKey</span>
-                                    <span class="method-desc">特殊キーを送信</span>
+                                    <span class="method-desc">特殊キー送信</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="MouseHover" required>
@@ -1028,7 +882,7 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="ClearAllCookies" required>
                                     <span class="method-name">ClearAllCookies</span>
-                                    <span class="method-desc">すべてのCookie削除</span>
+                                    <span class="method-desc">全Cookie削除</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="GetLocalStorage" required>
@@ -1048,22 +902,7 @@
                                 <label class="method-item">
                                     <input type="radio" name="method" value="ClearLocalStorage" required>
                                     <span class="method-name">ClearLocalStorage</span>
-                                    <span class="method-desc">LocalStorageクリア</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="SetZoomLevel" required>
-                                    <span class="method-name">SetZoomLevel</span>
-                                    <span class="method-desc">ブラウザの表示倍率変更</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="FindChildElement" required>
-                                    <span class="method-name">FindChildElement</span>
-                                    <span class="method-desc">親要素内の子要素検索（単数）</span>
-                                </label>
-                                <label class="method-item">
-                                    <input type="radio" name="method" value="FindChildElements" required>
-                                    <span class="method-name">FindChildElements</span>
-                                    <span class="method-desc">親要素内の子要素検索（複数）</span>
+                                    <span class="method-desc">LocalStorage全削除</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="その他" required>
@@ -1469,6 +1308,128 @@
                                     <input type="radio" name="method" value="OpenPresentation" required>
                                     <span class="method-name">OpenPresentation</span>
                                     <span class="method-desc">プレゼンテーションを開く</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CleanupOnInitializationFailure" required>
+                                    <span class="method-name">CleanupOnInitializationFailure</span>
+                                    <span class="method-desc">初期化失敗時のクリーンアップ</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="Dispose" required>
+                                    <span class="method-name">Dispose</span>
+                                    <span class="method-desc">リソース解放</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="その他" required>
+                                    <span class="method-name">その他</span>
+                                    <span class="method-desc">上記以外のメソッド</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- AccessDriver Methods -->
+                        <div class="method-group" id="accessdriver-methods" style="display: none;">
+                            <h4>AccessDriver メソッド一覧</h4>
+                            <div class="method-grid">
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="AccessDriver" required>
+                                    <span class="method-name">AccessDriver</span>
+                                    <span class="method-desc">コンストラクタ</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateTempDirectory" required>
+                                    <span class="method-name">CreateTempDirectory</span>
+                                    <span class="method-desc">一時ディレクトリ作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InitializeAccessApplication" required>
+                                    <span class="method-name">InitializeAccessApplication</span>
+                                    <span class="method-desc">Accessアプリケーション初期化</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateNewDatabase" required>
+                                    <span class="method-name">CreateNewDatabase</span>
+                                    <span class="method-desc">新規データベース作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateTable" required>
+                                    <span class="method-name">CreateTable</span>
+                                    <span class="method-desc">テーブル作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="GetTableList" required>
+                                    <span class="method-name">GetTableList</span>
+                                    <span class="method-desc">テーブル一覧取得</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DropTable" required>
+                                    <span class="method-name">DropTable</span>
+                                    <span class="method-desc">テーブル削除</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="InsertData" required>
+                                    <span class="method-name">InsertData</span>
+                                    <span class="method-desc">データ挿入</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="UpdateData" required>
+                                    <span class="method-name">UpdateData</span>
+                                    <span class="method-desc">データ更新</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="DeleteData" required>
+                                    <span class="method-name">DeleteData</span>
+                                    <span class="method-desc">データ削除</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SelectData" required>
+                                    <span class="method-name">SelectData</span>
+                                    <span class="method-desc">データ検索</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateQuery" required>
+                                    <span class="method-name">CreateQuery</span>
+                                    <span class="method-desc">クエリ作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="ExecuteQuery" required>
+                                    <span class="method-name">ExecuteQuery</span>
+                                    <span class="method-desc">クエリ実行</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateForm" required>
+                                    <span class="method-name">CreateForm</span>
+                                    <span class="method-desc">フォーム作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="OpenForm" required>
+                                    <span class="method-name">OpenForm</span>
+                                    <span class="method-desc">フォームを開く</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CreateReport" required>
+                                    <span class="method-name">CreateReport</span>
+                                    <span class="method-desc">レポート作成</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="OpenReport" required>
+                                    <span class="method-name">OpenReport</span>
+                                    <span class="method-desc">レポートを開く</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="SaveDatabase" required>
+                                    <span class="method-name">SaveDatabase</span>
+                                    <span class="method-desc">データベース保存</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="OpenDatabase" required>
+                                    <span class="method-name">OpenDatabase</span>
+                                    <span class="method-desc">データベースを開く</span>
+                                </label>
+                                <label class="method-item">
+                                    <input type="radio" name="method" value="CompactDatabase" required>
+                                    <span class="method-name">CompactDatabase</span>
+                                    <span class="method-desc">データベース最適化</span>
                                 </label>
                                 <label class="method-item">
                                     <input type="radio" name="method" value="CleanupOnInitializationFailure" required>

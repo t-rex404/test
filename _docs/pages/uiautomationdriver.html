@@ -146,13 +146,13 @@ try {
 }
 catch {
     # コンストラクタ内でエラーログが自動的に記録されます
-    # UIAError_0001がエラーログに記録される
+    # UIAError_0420がエラーログに記録される
     Write-Host "UIAutomationDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 # Commonオブジェクトが利用可能な場合：
 # - エラーログファイル（AllDrivers_Error.log）に記録
-# - エラーコード（UIAError_0001）で識別可能
+# - エラーコード（UIAError_0420）で識別可能
 # - 詳細なエラー情報が保存される</code></pre>
                 </div>
             </div>
@@ -644,126 +644,126 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>UIAutomationDriverクラスでは、UIAError_0001からUIAError_0030までのエラーコードが使用されます（30個）。</p>
+                <p>UIAutomationDriverクラスでは、UIAError_0420からUIAError_0449までのエラーコードが使用されます（30個）。</p>
                 <table class="error-table">
                     <tr>
-                        <td class="range">UIAError_0001</td>
+                        <td class="range">UIAError_0420</td>
                         <td>UIAutomationDriver初期化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0002</td>
+                        <td class="range">UIAError_0421</td>
                         <td>アプリケーション起動エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0003</td>
+                        <td class="range">UIAError_0422</td>
                         <td>ウィンドウ検索エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0004</td>
+                        <td class="range">UIAError_0423</td>
                         <td>ウィンドウアクティブ化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0005</td>
+                        <td class="range">UIAError_0424</td>
                         <td>部分一致ウィンドウ検索エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0006</td>
+                        <td class="range">UIAError_0425</td>
                         <td>プロセス名ウィンドウ検索エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0007</td>
+                        <td class="range">UIAError_0426</td>
                         <td>プロセス名とウィンドウタイトル検索エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0008</td>
+                        <td class="range">UIAError_0427</td>
                         <td>柔軟なウィンドウ検索エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0009</td>
+                        <td class="range">UIAError_0428</td>
                         <td>ウィンドウアクティブ化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0010</td>
+                        <td class="range">UIAError_0429</td>
                         <td>要素検索エラー（名前）</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0011</td>
+                        <td class="range">UIAError_0430</td>
                         <td>要素検索エラー（コントロールタイプ）</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0012</td>
+                        <td class="range">UIAError_0431</td>
                         <td>要素検索エラー（複合条件）</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0013</td>
+                        <td class="range">UIAError_0432</td>
                         <td>要素クリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0014</td>
+                        <td class="range">UIAError_0433</td>
                         <td>要素テキスト設定エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0015</td>
+                        <td class="range">UIAError_0434</td>
                         <td>要素テキスト取得エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0016</td>
+                        <td class="range">UIAError_0435</td>
                         <td>マウスクリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0017</td>
+                        <td class="range">UIAError_0436</td>
                         <td>マウスダブルクリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0018</td>
+                        <td class="range">UIAError_0437</td>
                         <td>マウス右クリックエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0019</td>
+                        <td class="range">UIAError_0438</td>
                         <td>マウス移動エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0020</td>
+                        <td class="range">UIAError_0439</td>
                         <td>キーボード入力エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0021</td>
+                        <td class="range">UIAError_0440</td>
                         <td>特殊キー送信エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0022</td>
+                        <td class="range">UIAError_0441</td>
                         <td>キー組み合わせ送信エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0023</td>
+                        <td class="range">UIAError_0442</td>
                         <td>テキスト入力エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0024</td>
+                        <td class="range">UIAError_0443</td>
                         <td>スクリーンショット取得エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0025</td>
+                        <td class="range">UIAError_0444</td>
                         <td>ウィンドウスクリーンショット取得エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0026</td>
+                        <td class="range">UIAError_0445</td>
                         <td>プロセス終了エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0027</td>
+                        <td class="range">UIAError_0446</td>
                         <td>プロセス強制終了エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0028</td>
+                        <td class="range">UIAError_0447</td>
                         <td>プロセス状態確認エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0029</td>
+                        <td class="range">UIAError_0448</td>
                         <td>タイムアウトエラー</td>
                     </tr>
                     <tr>
-                        <td class="range">UIAError_0030</td>
+                        <td class="range">UIAError_0449</td>
                         <td>UIAutomationDriver破棄エラー</td>
                     </tr>
                 </table>

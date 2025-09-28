@@ -49,7 +49,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0001", "GUIDriver初期化エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0400", "GUIDriver初期化エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -116,7 +116,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0002", "アプリケーション起動エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0401", "アプリケーション起動エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -205,7 +205,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0003", "ウィンドウ検索エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0402", "ウィンドウ検索エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -241,7 +241,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0004", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0403", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -288,7 +288,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0005", "マウスクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0404", "マウスクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -335,7 +335,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0006", "マウスダブルクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0405", "マウスダブルクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -378,7 +378,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0007", "マウス右クリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0406", "マウス右クリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -411,7 +411,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0008", "マウス移動エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0407", "マウス移動エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -456,7 +456,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0009", "キーボード入力エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0408", "キーボード入力エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -533,7 +533,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0010", "特殊キー送信エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0409", "特殊キー送信エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -575,7 +575,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0011", "キー組み合わせ送信エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0410", "キー組み合わせ送信エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -616,7 +616,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0012", "テキスト入力エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0411", "テキスト入力エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -666,7 +666,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0013", "スクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0412", "スクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -720,7 +720,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0014", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0413", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -768,7 +768,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0015", "プロセス終了エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0414", "プロセス終了エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -804,7 +804,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0016", "プロセス強制終了エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0415", "プロセス強制終了エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -838,7 +838,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0017", "プロセス状態確認エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0416", "プロセス状態確認エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -869,7 +869,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0018", "タイムアウトエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0417", "タイムアウトエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -911,7 +911,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIError_0019", "GUIDriver破棄エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIError_0418", "GUIDriver破棄エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

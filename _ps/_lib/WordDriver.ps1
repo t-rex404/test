@@ -47,7 +47,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0001", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0220", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -93,7 +93,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0221", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -220,7 +220,7 @@ class WordDriver
             if ($global:Common)
             {
                 try {
-                    $global:Common.HandleError("WordError_0003", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0222", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 } catch {
                     Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
@@ -252,7 +252,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0004", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0223", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -453,7 +453,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0005", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0224", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -506,7 +506,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0006", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0225", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -580,7 +580,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0007", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0226", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -629,7 +629,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0008", "段落追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0227", "段落追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -709,7 +709,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0009", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0228", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -813,7 +813,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0010", "画像追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0229", "画像追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -852,7 +852,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0011", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0230", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -896,7 +896,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0012", "セクション追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0231", "セクション追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -955,7 +955,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0013", "セクション区切り挿入エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0232", "セクション区切り挿入エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -992,7 +992,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0014", "セクション数取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0233", "セクション数取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1043,7 +1043,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0015", "現在のセクションインデックス取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0234", "現在のセクションインデックス取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1148,7 +1148,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0016", "セクションページ設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0235", "セクションページ設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1196,7 +1196,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0017", "セクション移動エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0236", "セクション移動エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1255,7 +1255,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0018", "目次追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0237", "目次追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1308,7 +1308,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0019", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0238", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1366,7 +1366,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0020", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0239", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1421,7 +1421,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0021", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0240", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1464,7 +1464,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0022", "目次更新エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0241", "目次更新エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1518,7 +1518,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0023", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0242", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1596,7 +1596,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0024", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0243", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1676,7 +1676,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordError_0025", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordError_0244", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

@@ -87,7 +87,7 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("EdgeError_0001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("EdgeError_0200", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -158,7 +158,7 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("EdgeError_0002", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("EdgeError_0201", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -226,7 +226,7 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("EdgeError_0003", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("EdgeError_0202", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -268,7 +268,7 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("EdgeError_0004", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("EdgeError_0203", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -349,7 +349,7 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("EdgeError_0005", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("EdgeError_0204", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -393,7 +393,7 @@ class EdgeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("EdgeError_0006", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("EdgeError_0205", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

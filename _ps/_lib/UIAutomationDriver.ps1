@@ -37,7 +37,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0001", "UIAutomationDriver初期化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0420", "UIAutomationDriver初期化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -111,7 +111,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0002", "アプリケーション起動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0421", "アプリケーション起動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -333,7 +333,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0003", "ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0422", "ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -399,7 +399,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0005", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0424", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -473,7 +473,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0006", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0425", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -641,7 +641,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0007", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0426", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -797,7 +797,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0008", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0427", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -846,7 +846,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0009", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0428", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -897,7 +897,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0010", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0429", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -944,7 +944,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0011", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0430", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -994,7 +994,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0012", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0431", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1045,7 +1045,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0013", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0432", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1095,7 +1095,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0014", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0433", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1137,7 +1137,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0015", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0434", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1191,7 +1191,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0016", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0435", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1236,7 +1236,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0017", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0436", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1278,7 +1278,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0018", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0437", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1311,7 +1311,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0019", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0438", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1348,7 +1348,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0020", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0439", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1417,7 +1417,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0021", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0440", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1451,7 +1451,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0022", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0441", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1484,7 +1484,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0023", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0442", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1534,7 +1534,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0024", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0443", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1587,7 +1587,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0025", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0444", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1635,7 +1635,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0026", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0445", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1671,7 +1671,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0027", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0446", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1705,7 +1705,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0028", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0447", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1736,7 +1736,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0029", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0448", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1779,7 +1779,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAError_0030", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAError_0449", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

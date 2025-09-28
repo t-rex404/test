@@ -413,47 +413,47 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>OracleDriverクラスでは、OracleError_0001からOracleError_0040までのエラーコードが使用されます。</p>
+                <p>OracleDriverクラスでは、OracleError_0320からOracleError_0359までのエラーコードが使用されます。</p>
                 <table class="error-table">
                     <tr>
-                        <td class="range">OracleError_0001</td>
+                        <td class="range">OracleError_0320</td>
                         <td>OracleDriver初期化エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0002</td>
+                        <td class="range">OracleError_0321</td>
                         <td>SQLPLUSパス設定エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0003</td>
+                        <td class="range">OracleError_0322</td>
                         <td>接続パラメータ設定エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0004</td>
+                        <td class="range">OracleError_0323</td>
                         <td>SQLPLUS接続エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0005</td>
+                        <td class="range">OracleError_0324</td>
                         <td>SQLPLUS接続文字列接続エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0006</td>
+                        <td class="range">OracleError_0325</td>
                         <td>SQLPLUS実行エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0007</td>
+                        <td class="range">OracleError_0326</td>
                         <td>データベース接続エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0008</td>
+                        <td class="range">OracleError_0327</td>
                         <td>接続切断エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">OracleError_0009</td>
+                        <td class="range">OracleError_0328</td>
                         <td>OracleDriver破棄エラー</td>
                     </tr>
                     <tr>
                         <td class="range">...</td>
-                        <td>その他のエラーコード（OracleError_0010～OracleError_0040）</td>
+                        <td>その他のエラーコード（OracleError_0329～OracleError_0359）</td>
                     </tr>
                 </table>
                 <p class="note">※ エラーコードの詳細はErrorCode.jsonファイルを参照してください。</p>
@@ -480,7 +480,7 @@ catch {
     # Commonクラスのエラー処理を使用
     if ($global:Common) {
         $global:Common.HandleError(
-            "OracleError_0001", 
+            "OracleError_0320", 
             "OracleDriver初期化エラー: $($_.Exception.Message)", 
             "OracleDriver",
             ".\AllDrivers_Error.log"

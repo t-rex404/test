@@ -1,3 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(dir \"_ps\\_lib\" /B)",
+      "Bash(dir:*)",
+      "Bash(sort:*)"
+    ]
+  },
   "outputStyle": "default"
 }
