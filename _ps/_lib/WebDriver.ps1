@@ -22,7 +22,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0100", "WebDriver初期化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0001", "WebDriver初期化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -115,7 +115,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0101", "ブラウザ起動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WebDriverError_0010", "ブラウザ起動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -230,7 +230,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0102", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0011", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -333,7 +333,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0103", "WebSocket接続エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0012", "WebSocket接続エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -393,7 +393,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0104", "WebSocket メッセージ送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0013", "WebSocket メッセージ送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -529,7 +529,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0105", "WebSocket メッセージ受信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0014", "WebSocket メッセージ受信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -673,7 +673,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0107", "ページ遷移エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0020", "ページ遷移エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -742,7 +742,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0108", "広告読み込み待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0021", "広告読み込み待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -789,7 +789,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0109", "ウィンドウを閉じるエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0022", "ウィンドウを閉じるエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -873,7 +873,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0106", "Disposeエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0090", "Disposeエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -920,7 +920,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0110", "ターゲット発見エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0015", "ターゲット発見エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -964,7 +964,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0111", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0016", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1009,7 +1009,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0112", "タブアクティブ化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0017", "タブアクティブ化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1054,7 +1054,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0113", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0018", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1107,7 +1107,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0114", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0019", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1141,7 +1141,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0115", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0015", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1186,7 +1186,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0116", "セッションデタッチエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0016", "セッションデタッチエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1226,7 +1226,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0117", "ページイベント有効化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0017", "ページイベント有効化エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1277,7 +1277,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0118", "ブラウザ表示倍率変更エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0018", "ブラウザ表示倍率変更エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1335,7 +1335,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0119", "要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0040", "要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1389,7 +1389,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0120", "複数要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0041", "複数要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1443,7 +1443,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0121", "要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0042", "要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1497,7 +1497,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0122", "複数要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0043", "複数要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1543,7 +1543,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0123", "XPath単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0044", "XPath単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1588,7 +1588,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0124", "ClassName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0045", "ClassName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1633,7 +1633,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0125", "Name単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0046", "Name単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1673,7 +1673,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0126", "Id単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0047", "Id単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1718,7 +1718,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0127", "TagName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0048", "TagName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1776,7 +1776,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0128", "複数要素検索エラー (ClassName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0049", "複数要素検索エラー (ClassName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1830,7 +1830,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0129", "複数要素検索エラー (Name): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0050", "複数要素検索エラー (Name): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1884,7 +1884,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0130", "複数要素検索エラー (TagName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0051", "複数要素検索エラー (TagName): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1938,7 +1938,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0131", "要素存在確認エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0052", "要素存在確認エラー ($query_type): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -1973,7 +1973,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0132", "XPath要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0053", "XPath要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2013,7 +2013,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0133", "ClassName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0054", "ClassName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2048,7 +2048,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0134", "Id要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0055", "Id要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2088,7 +2088,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0135", "Name要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0056", "Name要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2128,7 +2128,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0136", "TagName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0057", "TagName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2198,7 +2198,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0137", "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0058", "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2292,7 +2292,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0138", "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0059", "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2343,7 +2343,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0139", "要素テキスト取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0060", "要素テキスト取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2388,7 +2388,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0140", "要素テキスト設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0061", "要素テキスト設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2433,7 +2433,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0141", "要素クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0062", "要素クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2485,7 +2485,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0142", "要素属性取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0063", "要素属性取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2535,7 +2535,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0143", "要素属性設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0064", "要素属性設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2583,7 +2583,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0144", "href取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0065", "href取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2635,7 +2635,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0145", "CSSプロパティ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0066", "CSSプロパティ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2685,7 +2685,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0146", "CSSプロパティ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0067", "CSSプロパティ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2739,7 +2739,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0147", "オプション選択エラー (インデックス): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0068", "オプション選択エラー (インデックス): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2789,7 +2789,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0148", "オプション選択エラー (テキスト): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0069", "オプション選択エラー (テキスト): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2834,7 +2834,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0149", "オプション未選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0070", "オプション未選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2879,7 +2879,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0150", "要素クリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0071", "要素クリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2933,7 +2933,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0151", "ウィンドウリサイズエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0072", "ウィンドウリサイズエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -2978,7 +2978,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0152", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0073", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3023,7 +3023,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0153", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0074", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3068,7 +3068,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0154", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0075", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3113,7 +3113,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0155", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0076", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3158,7 +3158,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0156", "ウィンドウ移動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0023", "ウィンドウ移動エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3209,7 +3209,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0157", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0024", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3256,7 +3256,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0158", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0025", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3296,7 +3296,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0159", "ブラウザ更新エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0026", "ブラウザ更新エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3353,7 +3353,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0160", "URL取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0027", "URL取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3406,7 +3406,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0161", "タイトル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0028", "タイトル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3448,7 +3448,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0162", "ソースコード取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0029", "ソースコード取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3498,7 +3498,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0188", "ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0079", "ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3549,7 +3549,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0189", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0075", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3594,7 +3594,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0190", "ウィンドウサイズ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0076", "ウィンドウサイズ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3719,7 +3719,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0163", "スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3830,7 +3830,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0164", "要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0081", "要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -3938,7 +3938,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0165", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0082", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4009,7 +4009,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0177", "要素表示待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0031", "要素表示待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4086,7 +4086,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0178", "要素クリック可能性待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0032", "要素クリック可能性待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4148,7 +4148,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0176", "ページロード待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0030", "ページロード待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4215,7 +4215,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0179", "カスタム条件待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0033", "カスタム条件待機エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4269,7 +4269,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0183", "キーボード入力エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0037", "キーボード入力エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4354,7 +4354,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0184", "特殊キー送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0038", "特殊キー送信エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4403,7 +4403,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0182", "マウスホバーエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0036", "マウスホバーエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4448,7 +4448,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0180", "ダブルクリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0034", "ダブルクリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4493,7 +4493,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0181", "右クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0035", "右クリックエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4542,7 +4542,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0185", "チェックボックス設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0039", "チェックボックス設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4587,7 +4587,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0186", "ラジオボタン選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0077", "ラジオボタン選択エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4661,7 +4661,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0187", "ファイルアップロードエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0078", "ファイルアップロードエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4712,7 +4712,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0166", "JavaScript実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0083", "JavaScript実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4757,7 +4757,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0167", "JavaScript非同期実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0084", "JavaScript非同期実行エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4808,7 +4808,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0168", "クッキー取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0085", "クッキー取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4861,7 +4861,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0169", "クッキー設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0086", "クッキー設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4906,7 +4906,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0170", "クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0087", "クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4946,7 +4946,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0171", "全クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0088", "全クッキー削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -4997,7 +4997,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0172", "ローカルストレージ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0087", "ローカルストレージ取得エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -5042,7 +5042,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0173", "ローカルストレージ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0088", "ローカルストレージ設定エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -5087,7 +5087,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0174", "ローカルストレージ削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0089", "ローカルストレージ削除エラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {
@@ -5127,7 +5127,7 @@
             {
                 try
                 {
-                    $global:Common.HandleError("WebError_0175", "ローカルストレージクリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
+                    $global:Common.HandleError("WebDriverError_0089", "ローカルストレージクリアエラー: $($_.Exception.Message)", "WebDriver", ".\AllDrivers_Error.log") | Out-Null
                 }
                 catch
                 {

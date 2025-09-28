@@ -87,7 +87,7 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ChromeError_0210", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ChromeDriverError_0001", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -162,7 +162,7 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ChromeError_0211", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ChromeDriverError_0010", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -230,7 +230,7 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ChromeError_0212", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ChromeDriverError_0011", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -272,7 +272,7 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ChromeError_0213", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ChromeDriverError_0012", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -353,7 +353,7 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ChromeError_0214", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ChromeDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -397,7 +397,7 @@ class ChromeDriver : WebDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ChromeError_0215", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ChromeDriverError_0091", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

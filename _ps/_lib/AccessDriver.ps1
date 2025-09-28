@@ -45,7 +45,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0290", "AccessDriver初期化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0001", "AccessDriver初期化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -91,7 +91,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0291", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -140,7 +140,7 @@ class AccessDriver
             if ($global:Common)
             {
                 try {
-                    $global:Common.HandleError("AccessError_0292", "Accessアプリケーション初期化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0010", "Accessアプリケーション初期化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 } catch {
                     Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
@@ -174,7 +174,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0293", "新規データベース作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0011", "新規データベース作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -237,7 +237,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0294", "テーブル作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0020", "テーブル作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -285,7 +285,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0295", "テーブル一覧取得エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0021", "テーブル一覧取得エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -328,7 +328,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0296", "テーブル削除エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0022", "テーブル削除エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -400,7 +400,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0297", "データ挿入エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0030", "データ挿入エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -473,7 +473,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0298", "データ更新エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0031", "データ更新エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -521,7 +521,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0299", "データ削除エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0032", "データ削除エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -586,7 +586,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0300", "データ検索エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0033", "データ検索エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -638,7 +638,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0301", "クエリ作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0040", "クエリ作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -703,7 +703,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0302", "クエリ実行エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0041", "クエリ実行エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -759,7 +759,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0303", "フォーム作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0050", "フォーム作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -811,7 +811,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0304", "フォームを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0051", "フォームを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -867,7 +867,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0305", "レポート作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0052", "レポート作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -919,7 +919,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0306", "レポートを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0053", "レポートを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -975,7 +975,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0307", "データベース保存エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0060", "データベース保存エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1029,7 +1029,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0308", "データベースを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0061", "データベースを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1088,7 +1088,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0309", "データベースコンパクト化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0080", "データベースコンパクト化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1165,7 +1165,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0310", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -1243,7 +1243,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessError_0311", "AccessDriver Disposeエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0091", "AccessDriver Disposeエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {

@@ -97,7 +97,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0361", "WinSCPDriver初期化エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0001", "WinSCPDriver初期化エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -165,7 +165,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0362", "接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0010", "接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -257,7 +257,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0375", "秘密鍵接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0013", "秘密鍵接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -316,7 +316,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0363", "サーバー接続エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0011", "サーバー接続エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -372,7 +372,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0364", "接続切断エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0012", "接続切断エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -429,7 +429,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0365", "ファイルアップロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0020", "ファイルアップロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -484,7 +484,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0366", "ファイルダウンロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0021", "ファイルダウンロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -529,7 +529,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0367", "ファイル削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0022", "ファイル削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -586,7 +586,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0371", "ファイル存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0041", "ファイル存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -635,7 +635,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0368", "ディレクトリ作成エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0030", "ディレクトリ作成エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -680,7 +680,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0369", "ディレクトリ削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0031", "ディレクトリ削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -737,7 +737,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0372", "ディレクトリ存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0042", "ディレクトリ存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -801,7 +801,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0370", "ファイル一覧取得エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0040", "ファイル一覧取得エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -859,7 +859,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0373", "転送オプション設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0080", "転送オプション設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
@@ -973,7 +973,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPError_0374", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0090", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
                 }
                 catch
                 {
