@@ -4,7 +4,8 @@
       "Bash(dir \"_ps\\_lib\" /B)",
       "Bash(dir:*)",
       "Bash(sort:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(powershell:*)"
     ]
   },
   "outputStyle": "default"
