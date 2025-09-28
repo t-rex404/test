@@ -105,8 +105,9 @@
             </div>
 
             <div class="note-card success">
-                <h3>✨ 対応プロトコル</h3>
-                <p>SSH、Telnetプロトコルに対応し、TeraTermのマクロ機能を活用した高精度な自動化を実現します。</p>
+                <h3>✨ 対応プロトコル・認証方式</h3>
+                <p>SSH（パスワード認証/PEM鍵認証）、Telnetプロトコルに対応し、TeraTermのマクロ機能を活用した高精度な自動化を実現します。</p>
+                <p>ファイル転送はZMODEMプロトコルを使用し、安定した転送を実現します。</p>
             </div>
         </section>
 
@@ -132,18 +133,38 @@ $teraterm = [TeraTermDriver]::new()
             </div>
 
             <div class="method-card">
-                <div class="method-name">SetConnectionParameters([string]$host, [string]$port, [string]$protocol, [string]$username, [string]$password) - 接続パラメータ設定</div>
-                <p>サーバー接続に必要なパラメータを設定します。</p>
-                
+                <div class="method-name">SetConnectionParameters([string]$hostname, [string]$port, [string]$protocol, [string]$username, [string]$password) - 接続パラメータ設定（パスワード認証）</div>
+                <p>サーバー接続に必要なパラメータを設定します（パスワード認証用）。</p>
+
                 <div class="code-example">
-                    <pre><code># 接続パラメータを設定
+                    <pre><code># 接続パラメータを設定（パスワード認証）
 $teraterm.SetConnectionParameters(
-    -host "192.168.1.100"
-    -port "22"
-    -protocol "SSH"
-    -username "admin"
-    -password "password"
+    "192.168.1.100",  # ホスト名
+    "22",             # ポート
+    "SSH",            # プロトコル
+    "admin",          # ユーザー名
+    "password"        # パスワード
 )</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetConnectionParametersWithPem([string]$hostname, [string]$port, [string]$username, [string]$pem_file_path) - 接続パラメータ設定（PEM認証）</div>
+                <p>PEMファイルを使用したSSH鍵認証の接続パラメータを設定します。AWS EC2インスタンスなどへの接続に使用します。</p>
+
+                <div class="code-example">
+                    <pre><code># 接続パラメータを設定（PEM認証）
+$teraterm.SetConnectionParametersWithPem(
+    "ec2-xxx.amazonaws.com",  # ホスト名
+    "22",                     # ポート
+    "ec2-user",              # ユーザー名
+    "C:\keys\my-key.pem"     # PEMファイルパス
+)
+
+# AWS EC2の場合のユーザー名例：
+# - Amazon Linux: "ec2-user"
+# - Ubuntu: "ubuntu"
+# - RHEL/CentOS: "ec2-user" または "root"</code></pre>
                 </div>
             </div>
 
@@ -210,7 +231,7 @@ if ($teraterm.IsConnected()) {
 
             <div class="method-card">
                 <div class="method-name">UploadFile([string]$localFilePath, [string]$remoteFilePath) - ファイルアップロード</div>
-                <p>SCPを使用してローカルファイルをリモートサーバーにアップロードします。</p>
+                <p>ZMODEMプロトコルを使用してローカルファイルをリモートサーバーにアップロードします。</p>
                 
                 <div class="code-example">
                     <pre><code># ファイルをアップロード
@@ -227,7 +248,7 @@ foreach ($file in $localFiles) {
 
             <div class="method-card">
                 <div class="method-name">DownloadFile([string]$remoteFilePath, [string]$localFilePath) - ファイルダウンロード</div>
-                <p>SCPを使用してリモートサーバーからファイルをダウンロードします。</p>
+                <p>ZMODEMプロトコルを使用してリモートサーバーからファイルをダウンロードします。</p>
                 
                 <div class="code-example">
                     <pre><code># ファイルをダウンロード
@@ -246,20 +267,20 @@ $teraterm.DownloadFile("/backup/data.zip", "C:\backup\data_$(Get-Date -Format 'y
             </h2>
 
             <div class="method-card">
-                <div class="method-name">例1: 基本的なサーバー管理</div>
+                <div class="method-name">例1: パスワード認証での接続</div>
                 
                 <div class="code-example">
-                    <pre><code># サーバー管理の自動化
+                    <pre><code># サーバー管理の自動化（パスワード認証）
 $teraterm = [TeraTermDriver]::new()
 
 try {
-    # 接続パラメータを設定
+    # 接続パラメータを設定（パスワード認証）
     $teraterm.SetConnectionParameters(
-        -host "192.168.1.100"
-        -port "22"
-        -protocol "SSH"
-        -username "admin"
-        -password "adminpass"
+        "192.168.1.100",
+        "22",
+        "SSH",
+        "admin",
+        "adminpass"
     )
     
     # サーバーに接続
@@ -284,19 +305,56 @@ finally {
             </div>
 
             <div class="method-card">
-                <div class="method-name">例2: バッチファイル転送</div>
+                <div class="method-name">例2: PEM認証での接続（AWS EC2など）</div>
+
+                <div class="code-example">
+                    <pre><code># AWS EC2への接続（PEM認証）
+$teraterm = [TeraTermDriver]::new()
+
+try {
+    # PEM認証パラメータを設定
+    $teraterm.SetConnectionParametersWithPem(
+        "ec2-xxx-xxx-xxx.compute.amazonaws.com",
+        "22",
+        "ec2-user",  # Amazon Linuxの場合
+        "C:\aws\keys\my-instance.pem"
+    )
+
+    # サーバーに接続
+    $teraterm.Connect()
+
+    # EC2インスタンス情報を取得
+    $instance_id = $teraterm.ExecuteCommand("ec2-metadata --instance-id", "$", 10)
+    $instance_type = $teraterm.ExecuteCommand("ec2-metadata --instance-type", "$", 10)
+    $availability_zone = $teraterm.ExecuteCommand("ec2-metadata --availability-zone", "$", 10)
+
+    Write-Host "インスタンスID: $instance_id"
+    Write-Host "インスタンスタイプ: $instance_type"
+    Write-Host "アベイラビリティゾーン: $availability_zone"
+
+    # 接続を切断
+    $teraterm.Disconnect()
+}
+finally {
+    $teraterm.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例3: バッチファイル転送（ZMODEM）</div>
                 
                 <div class="code-example">
-                    <pre><code># 複数ファイルの一括転送
+                    <pre><code># 複数ファイルの一括転送（ZMODEMプロトコル使用）
 $teraterm = [TeraTermDriver]::new()
 
 try {
     $teraterm.SetConnectionParameters(
-        -host "backup.example.com"
-        -port "22"
-        -protocol "SSH"
-        -username "backup"
-        -password "backuppass"
+        "backup.example.com",
+        "22",
+        "SSH",
+        "backup",
+        "backuppass"
     )
     
     $teraterm.Connect()
@@ -333,7 +391,7 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>TeraTermDriverクラスでは、TeraTermError_0001からTeraTermError_0016までのエラーコードが使用されます。</p>
+                <p>TeraTermDriverクラスでは、TeraTermError_0001からTeraTermError_0011までのエラーコードが使用されます。</p>
                 <table class="error-table">
                     <tr>
                         <td class="range">TeraTermError_0001</td>
@@ -349,7 +407,7 @@ finally {
                     </tr>
                     <tr>
                         <td class="range">TeraTermError_0004</td>
-                        <td>接続パラメータ設定エラー</td>
+                        <td>接続パラメータ設定エラー（パスワード認証）</td>
                     </tr>
                     <tr>
                         <td class="range">TeraTermError_0005</td>
@@ -357,50 +415,30 @@ finally {
                     </tr>
                     <tr>
                         <td class="range">TeraTermError_0006</td>
-                        <td>接続マクロ作成エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">TeraTermError_0007</td>
-                        <td>TeraTerm起動エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">TeraTermError_0008</td>
                         <td>接続切断エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">TeraTermError_0009</td>
-                        <td>切断マクロ作成エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">TeraTermError_0010</td>
-                        <td>マクロ実行エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">TeraTermError_0011</td>
+                        <td class="range">TeraTermError_0007</td>
                         <td>コマンド実行エラー</td>
                     </tr>
                     <tr>
-                        <td class="range">TeraTermError_0012</td>
-                        <td>コマンド実行マクロ作成エラー</td>
+                        <td class="range">TeraTermError_0008</td>
+                        <td>ファイルアップロードエラー（ZMODEM）</td>
                     </tr>
                     <tr>
-                        <td class="range">TeraTermError_0013</td>
-                        <td>コマンド結果取得エラー</td>
+                        <td class="range">TeraTermError_0009</td>
+                        <td>ファイルダウンロードエラー（ZMODEM）</td>
                     </tr>
                     <tr>
-                        <td class="range">TeraTermError_0014</td>
-                        <td>ファイルアップロードエラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">TeraTermError_0015</td>
-                        <td>ファイルダウンロードエラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">TeraTermError_0016</td>
+                        <td class="range">TeraTermError_0010</td>
                         <td>TeraTermDriver破棄エラー</td>
                     </tr>
+                    <tr>
+                        <td class="range">TeraTermError_0011</td>
+                        <td>PEM接続パラメータ設定エラー</td>
+                    </tr>
                 </table>
-                <p class="note">※ 全16個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+                <p class="note">※ 全11個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 

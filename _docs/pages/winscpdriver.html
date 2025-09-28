@@ -93,7 +93,13 @@
                 <span class="icon">📖</span> 概要
             </h2>
             <p>WinSCPDriverクラスは、WinSCPライブラリを使用してSFTP、FTP、SCP、FTPSプロトコルでのファイル転送とサーバー管理を自動化するためのPowerShellクラスです。リモートサーバーへの接続、ファイルのアップロード・ダウンロード、ディレクトリ操作などを簡単に実行できます。</p>
-            
+
+            <div class="note-card warning">
+                <h3>⚠️ 前提条件</h3>
+                <p>このクラスを使用するには、<strong>WinSCPがインストールされている必要があります</strong>。</p>
+                <p>ダウンロード: <a href="https://winscp.net/" target="_blank">https://winscp.net/</a></p>
+            </div>
+
             <div class="note-card info">
                 <h3>🎯 主な用途</h3>
                 <ul>
@@ -101,12 +107,19 @@
                     <li>サーバー管理の自動化</li>
                     <li>バックアップ処理の自動化</li>
                     <li>データ同期の自動化</li>
+                    <li>AWS EC2やAzure VMへのセキュア接続</li>
                 </ul>
             </div>
 
             <div class="note-card success">
-                <h3>✨ 対応プロトコル</h3>
-                <p>SFTP、FTP、SCP、FTPSなど、セキュアなファイル転送プロトコルをサポートしています。</p>
+                <h3>✨ 対応プロトコルと認証方法</h3>
+                <p><strong>プロトコル:</strong> SFTP、FTP、SCP、FTPS</p>
+                <p><strong>認証方法:</strong></p>
+                <ul>
+                    <li>パスワード認証</li>
+                    <li>秘密鍵認証（PEMファイル - AWS EC2等）</li>
+                    <li>秘密鍵認証（PPKファイル - PuTTY形式）</li>
+                </ul>
             </div>
         </section>
 
@@ -131,18 +144,48 @@ $winSCP = [WinSCPDriver]::new()
             </div>
 
             <div class="method-card">
-                <div class="method-name">SetConnectionParameters([string]$hostName, [string]$userName, [string]$password, [string]$protocol, [int]$port, [string]$hostKeyFingerprint) - 接続パラメータ設定</div>
-                <p>サーバー接続に必要なパラメータを設定します。</p>
-                
+                <div class="method-name">SetConnectionParameters([string]$hostName, [string]$userName, [string]$password, [string]$protocol, [int]$port, [string]$hostKeyFingerprint) - 接続パラメータ設定（パスワード認証）</div>
+                <p>パスワード認証でサーバー接続に必要なパラメータを設定します。</p>
+
                 <div class="code-example">
-                    <pre><code># 接続パラメータを設定
+                    <pre><code># 接続パラメータを設定（パスワード認証）
 $winSCP.SetConnectionParameters(
-    -hostName "example.com"
-    -userName "username"
-    -password "password"
-    -protocol "SFTP"
-    -port 22
-    -hostKeyFingerprint "ssh-rsa 2048 xx:xx:xx..."
+    "example.com",
+    "username",
+    "password",
+    "SFTP",  # SFTP, FTP, SCP, FTPS
+    22,      # ポート番号（省略可）
+    ""       # ホストキーフィンガープリント（省略可）
+)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SetConnectionParametersWithKey([string]$hostName, [string]$userName, [string]$privateKeyPath, [string]$passphrase, [string]$protocol, [int]$port, [string]$hostKeyFingerprint) - 接続パラメータ設定（秘密鍵認証）</div>
+                <p>PEM/PPKファイルを使用した秘密鍵認証でサーバー接続に必要なパラメータを設定します。</p>
+
+                <div class="code-example">
+                    <pre><code># 接続パラメータを設定（秘密鍵認証）
+# PEMファイル使用例（AWS EC2など）
+$winSCP.SetConnectionParametersWithKey(
+    "ec2-xx-xx-xx-xx.compute.amazonaws.com",
+    "ec2-user",
+    "C:\keys\my-ec2-key.pem",
+    "",      # パスフレーズ（設定されている場合）
+    "SFTP",  # SFTP or SCP のみサポート
+    22,      # ポート番号（省略時は22）
+    ""       # ホストキーフィンガープリント（省略可）
+)
+
+# PPKファイル使用例（PuTTY形式）
+$winSCP.SetConnectionParametersWithKey(
+    "server.example.com",
+    "admin",
+    "C:\keys\private-key.ppk",
+    "passphrase123",  # パスフレーズ
+    "SFTP",
+    22,
+    "ssh-rsa 2048 xx:xx:xx..."
 )</code></pre>
                 </div>
             </div>
@@ -273,7 +316,7 @@ if ($winSCP.DirectoryExists("/remote/temp")) {
 
             <div class="method-card">
                 <div class="method-name">例1: 基本的なファイル転送</div>
-                
+
                 <div class="code-example">
                     <pre><code># WinSCPDriverを初期化
 $winSCP = [WinSCPDriver]::new()
@@ -281,11 +324,11 @@ $winSCP = [WinSCPDriver]::new()
 try {
     # 接続パラメータを設定
     $winSCP.SetConnectionParameters(
-        -hostName "ftp.example.com"
-        -userName "myuser"
-        -password "mypassword"
-        -protocol "FTP"
-        -port 21
+        "ftp.example.com",
+        "myuser",
+        "mypassword",
+        "FTP",
+        21
     )
     
     # サーバーに接続
@@ -309,21 +352,21 @@ finally {
 
             <div class="method-card">
                 <div class="method-name">例2: バッチファイル転送</div>
-                
+
                 <div class="code-example">
                     <pre><code># 複数ファイルの一括アップロード
 $winSCP = [WinSCPDriver]::new()
 
 try {
     $winSCP.SetConnectionParameters(
-        -hostName "sftp.example.com"
-        -userName "backup"
-        -password "securepass"
-        -protocol "SFTP"
+        "sftp.example.com",
+        "backup",
+        "securepass",
+        "SFTP"
     )
-    
+
     $winSCP.Connect()
-    
+
     # ローカルディレクトリの全ファイルをアップロード
     $localFiles = Get-ChildItem "C:\backup\*" -File
     foreach ($file in $localFiles) {
@@ -331,8 +374,50 @@ try {
         $winSCP.UploadFile($file.FullName, $remotePath)
         Write-Host "アップロード完了: $($file.Name)"
     }
-    
+
     $winSCP.Disconnect()
+}
+finally {
+    $winSCP.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例3: AWS EC2への秘密鍵接続</div>
+
+                <div class="code-example">
+                    <pre><code># AWS EC2インスタンスへPEMファイルで接続
+$winSCP = [WinSCPDriver]::new()
+
+try {
+    # PEMファイルを使用した秘密鍵認証
+    $winSCP.SetConnectionParametersWithKey(
+        "ec2-12-34-56-78.us-west-2.compute.amazonaws.com",
+        "ec2-user",
+        "C:\aws\my-key-pair.pem",
+        "",      # パスフレーズなし
+        "SFTP",
+        22,
+        ""       # ホストキーを自動承認（本番環境では設定推奨）
+    )
+
+    $winSCP.Connect()
+
+    # EC2からログファイルをダウンロード
+    $winSCP.DownloadFile(
+        "/var/log/application.log",
+        "C:\logs\ec2-app-$(Get-Date -Format 'yyyyMMdd').log"
+    )
+
+    # EC2へ設定ファイルをアップロード
+    $winSCP.UploadFile(
+        "C:\config\app.config",
+        "/home/ec2-user/app.config"
+    )
+
+    $winSCP.Disconnect()
+    Write-Host "EC2との通信が完了しました" -ForegroundColor Green
 }
 finally {
     $winSCP.Dispose()
@@ -348,7 +433,7 @@ finally {
             </h2>
             
             <div class="error-range-card">
-                <p>WinSCPDriverクラスでは、WinSCPError_0001からWinSCPError_0015までのエラーコードが使用されます（15個）。</p>
+                <p>WinSCPDriverクラスでは、WinSCPError_0001からWinSCPError_0017までのエラーコードが使用されます（17個）。</p>
                 <table class="error-table">
                     <tr>
                         <td class="range">WinSCPError_0001</td>
@@ -410,8 +495,16 @@ finally {
                         <td class="range">WinSCPError_0015</td>
                         <td>転送オプション設定エラー</td>
                     </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0016</td>
+                        <td>WinSCPDriver破棄エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">WinSCPError_0017</td>
+                        <td>秘密鍵接続パラメータ設定エラー</td>
+                    </tr>
                 </table>
-                <p class="note">※ 全15個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+                <p class="note">※ 全17個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 

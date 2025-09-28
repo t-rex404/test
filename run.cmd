@@ -16,8 +16,8 @@ REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_UIAutomationDri
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_GUIDriver_Calculator_Notepad.ps1"
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_UIAutomationDriver_AllMethods.ps1"
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_TeraTermDriver_AllMethods.ps1"
-REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_WinSCPDriver_AllMethods.ps1"
-powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\aaa.ps1"
+powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_WinSCPDriver_AllMethods.ps1"
+REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\aaa.ps1"
 
 
 POPD

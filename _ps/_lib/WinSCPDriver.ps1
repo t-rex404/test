@@ -1,6 +1,52 @@
 # WinSCPを操作するためのPowerShellクラス
 # ファイル転送、接続管理などの機能を提供
 
+# WinSCPアセンブリの事前読み込み
+# クラス定義前にアセンブリを読み込む必要がある
+$script:WinSCPAssemblyLoaded = $false
+if (-not $script:WinSCPAssemblyLoaded)
+{
+    # WinSCPのインストールパスを検索
+    $possiblePaths = @(
+        "${env:ProgramFiles}\WinSCP\WinSCPnet.dll",
+        "${env:ProgramFiles(x86)}\WinSCP\WinSCPnet.dll",
+        "C:\Program Files\WinSCP\WinSCPnet.dll",
+        "C:\Program Files (x86)\WinSCP\WinSCPnet.dll"
+    )
+
+    $assemblyPath = $null
+    foreach ($path in $possiblePaths)
+    {
+        if (Test-Path $path)
+        {
+            $assemblyPath = $path
+            break
+        }
+    }
+
+    if ($assemblyPath)
+    {
+        try
+        {
+            Add-Type -Path $assemblyPath
+            $script:WinSCPAssemblyLoaded = $true
+            Write-Host "WinSCPアセンブリを読み込みました: $assemblyPath" -ForegroundColor Green
+        }
+        catch
+        {
+            Write-Host "WinSCPアセンブリの読み込みに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "WinSCPがインストールされていることを確認してください。" -ForegroundColor Yellow
+            throw
+        }
+    }
+    else
+    {
+        Write-Host "WinSCPが見つかりません。WinSCPをインストールしてください。" -ForegroundColor Red
+        Write-Host "ダウンロード: https://winscp.net/" -ForegroundColor Yellow
+        throw "WinSCPアセンブリが見つかりません"
+    }
+}
+
 class WinSCPDriver
 {
     # プロパティ
@@ -21,17 +67,6 @@ class WinSCPDriver
         {
             $this.IsConnected = $false
 
-            # WinSCPのインストールパスを検索
-            $this.WinSCPPath = $this.FindWinSCPPath()
-
-            if ([string]::IsNullOrEmpty($this.WinSCPPath))
-            {
-                throw "WinSCPのインストールパスが見つかりません。"
-            }
-
-            # WinSCPアセンブリを読み込み
-            $this.LoadWinSCPAssembly()
-
             # セッションオプションを初期化
             $this.SessionOptions = New-Object WinSCP.SessionOptions
 
@@ -42,12 +77,19 @@ class WinSCPDriver
             # セッションを初期化
             $this.Session = New-Object WinSCP.Session
 
-            $global:Common.WriteLog("WinSCPDriverが正常に初期化されました。", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("WinSCPDriverが正常に初期化されました。", "INFO")
+            }
+            else
+            {
+                Write-Host "WinSCPDriverが正常に初期化されました。" -ForegroundColor Green
+            }
         }
         catch
         {
             # 初期化失敗時のクリーンアップ
-            Write-Host "WinSCPDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
+            Write-Host "WinSCPDriver初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
             $this.CleanupOnInitializationFailure()
 
             # Commonオブジェクトが利用可能な場合はエラーログに記録
@@ -62,103 +104,8 @@ class WinSCPDriver
                     Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
             }
-            else
-            {
-                Write-Host "WinSCPDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
 
             throw "WinSCPDriverの初期化に失敗しました: $($_.Exception.Message)"
-        }
-    }
-
-    # WinSCPアセンブリの読み込み
-    [void] LoadWinSCPAssembly()
-    {
-        try
-        {
-            $assemblyPath = Join-Path $this.WinSCPPath "WinSCPnet.dll"
-
-            if (-not (Test-Path $assemblyPath))
-            {
-                throw "WinSCPアセンブリが見つかりません: $assemblyPath"
-            }
-
-            # アセンブリを読み込み
-            Add-Type -Path $assemblyPath
-
-            $global:Common.WriteLog("WinSCPアセンブリが正常に読み込まれました。", "INFO")
-        }
-        catch
-        {
-            throw "WinSCPアセンブリの読み込みに失敗しました: $($_.Exception.Message)"
-        }
-    }
-
-    # WinSCPのインストールパスを検索
-    [string] FindWinSCPPath()
-    {
-        try
-        {
-            # 一般的なインストールパスをチェック
-            $possiblePaths = @(
-                "${env:ProgramFiles}\WinSCP",
-                "${env:ProgramFiles(x86)}\WinSCP",
-                "C:\Program Files\WinSCP",
-                "C:\Program Files (x86)\WinSCP"
-            )
-
-            foreach ($path in $possiblePaths)
-            {
-                if (Test-Path $path)
-                {
-                    $global:Common.WriteLog("WinSCPパスが見つかりました: $path", "INFO")
-                    return $path
-                }
-            }
-
-            # レジストリから検索
-            try
-            {
-                $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"
-                $installedPrograms = Get-ItemProperty $regPath | Where-Object { $_.DisplayName -like "*WinSCP*" }
-
-                if ($installedPrograms)
-                {
-                    $installLocation = $installedPrograms[0].InstallLocation
-                    if (-not [string]::IsNullOrEmpty($installLocation) -and (Test-Path $installLocation))
-                    {
-                        $global:Common.WriteLog("レジストリからWinSCPパスが見つかりました: $installLocation", "INFO")
-                        return $installLocation
-                    }
-                }
-            }
-            catch
-            {
-                $global:Common.WriteLog("レジストリ検索でエラーが発生しました: $($_.Exception.Message)", "WARNING")
-            }
-
-            return ""
-        }
-        catch
-        {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WinSCPError_0003", "WinSCPパス検索エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WinSCPパスの検索に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
-
-            return ""
         }
     }
 
@@ -202,7 +149,14 @@ class WinSCPDriver
             # タイムアウト設定
             $this.SessionOptions.Timeout = [TimeSpan]::FromSeconds(30)
 
-            $global:Common.WriteLog("接続パラメータが設定されました。ホスト: $hostName, ユーザー: $userName, プロトコル: $protocol", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("接続パラメータが設定されました。ホスト: $hostName, ユーザー: $userName, プロトコル: $protocol", "INFO")
+            }
+            else
+            {
+                Write-Host "接続パラメータが設定されました。ホスト: $hostName, ユーザー: $userName" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -287,7 +241,14 @@ class WinSCPDriver
             # タイムアウト設定
             $this.SessionOptions.Timeout = [TimeSpan]::FromSeconds(30)
 
-            $global:Common.WriteLog("接続パラメータが設定されました（秘密鍵認証）。ホスト: $hostName, ユーザー: $userName, 鍵: $privateKeyPath", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("接続パラメータが設定されました（秘密鍵認証）。ホスト: $hostName, ユーザー: $userName, 鍵: $privateKeyPath", "INFO")
+            }
+            else
+            {
+                Write-Host "接続パラメータが設定されました（秘密鍵認証）。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -319,7 +280,14 @@ class WinSCPDriver
         {
             if ($this.IsConnected)
             {
-                $global:Common.WriteLog("既に接続されています。", "WARNING")
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("既に接続されています。", "WARNING")
+                }
+                else
+                {
+                    Write-Host "既に接続されています。" -ForegroundColor Yellow
+                }
                 return
             }
 
@@ -332,7 +300,14 @@ class WinSCPDriver
             $this.Session.Open($this.SessionOptions)
             $this.IsConnected = $true
 
-            $global:Common.WriteLog("サーバーに正常に接続されました。", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("サーバーに正常に接続されました。", "INFO")
+            }
+            else
+            {
+                Write-Host "サーバーに正常に接続されました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -364,7 +339,14 @@ class WinSCPDriver
         {
             if (-not $this.IsConnected)
             {
-                $global:Common.WriteLog("接続されていません。", "WARNING")
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("接続されていません。", "WARNING")
+                }
+                else
+                {
+                    Write-Host "接続されていません。" -ForegroundColor Yellow
+                }
                 return
             }
 
@@ -372,7 +354,15 @@ class WinSCPDriver
             {
                 $this.Session.Close()
                 $this.IsConnected = $false
-                $global:Common.WriteLog("接続が正常に切断されました。", "INFO")
+
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("接続が正常に切断されました。", "INFO")
+                }
+                else
+                {
+                    Write-Host "接続が正常に切断されました。" -ForegroundColor Green
+                }
             }
         }
         catch
@@ -423,7 +413,14 @@ class WinSCPDriver
             # 転送結果をチェック
             $transferResult.Check()
 
-            $global:Common.WriteLog("ファイルが正常にアップロードされました。ローカル: $localPath, リモート: $remotePath", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ファイルが正常にアップロードされました。ローカル: $localPath, リモート: $remotePath", "INFO")
+            }
+            else
+            {
+                Write-Host "ファイルが正常にアップロードされました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -471,7 +468,14 @@ class WinSCPDriver
             # 転送結果をチェック
             $transferResult.Check()
 
-            $global:Common.WriteLog("ファイルが正常にダウンロードされました。リモート: $remotePath, ローカル: $localPath", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ファイルが正常にダウンロードされました。リモート: $remotePath, ローカル: $localPath", "INFO")
+            }
+            else
+            {
+                Write-Host "ファイルが正常にダウンロードされました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -509,7 +513,14 @@ class WinSCPDriver
             # ファイルを削除
             $this.Session.RemoveFiles($remotePath)
 
-            $global:Common.WriteLog("ファイルが正常に削除されました: $remotePath", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ファイルが正常に削除されました: $remotePath", "INFO")
+            }
+            else
+            {
+                Write-Host "ファイルが正常に削除されました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -549,13 +560,22 @@ class WinSCPDriver
             {
                 $fileInfo = $this.Session.GetFileInfo($remotePath)
                 $exists = $null -ne $fileInfo
-                $global:Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+                }
+
                 return $exists
             }
             catch [WinSCP.SessionRemoteException]
             {
                 # ファイルが存在しない場合の正常な動作
-                $global:Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: False", "DEBUG")
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: False", "DEBUG")
+                }
+
                 return $false
             }
         }
@@ -599,7 +619,14 @@ class WinSCPDriver
             # ディレクトリを作成
             $this.Session.CreateDirectory($remotePath)
 
-            $global:Common.WriteLog("ディレクトリが正常に作成されました: $remotePath", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ディレクトリが正常に作成されました: $remotePath", "INFO")
+            }
+            else
+            {
+                Write-Host "ディレクトリが正常に作成されました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -637,7 +664,14 @@ class WinSCPDriver
             # ディレクトリを削除
             $this.Session.RemoveFiles($remotePath)
 
-            $global:Common.WriteLog("ディレクトリが正常に削除されました: $remotePath", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ディレクトリが正常に削除されました: $remotePath", "INFO")
+            }
+            else
+            {
+                Write-Host "ディレクトリが正常に削除されました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -677,13 +711,22 @@ class WinSCPDriver
             {
                 $fileInfo = $this.Session.GetFileInfo($remotePath)
                 $exists = ($null -ne $fileInfo) -and $fileInfo.IsDirectory
-                $global:Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+                }
+
                 return $exists
             }
             catch [WinSCP.SessionRemoteException]
             {
                 # ディレクトリが存在しない場合の正常な動作
-                $global:Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: False", "DEBUG")
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: False", "DEBUG")
+                }
+
                 return $false
             }
         }
@@ -740,7 +783,15 @@ class WinSCPDriver
                 }
             }
 
-            $global:Common.WriteLog("ファイル一覧を取得しました。パス: $remotePath, 件数: $($fileList.Count)", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ファイル一覧を取得しました。パス: $remotePath, 件数: $($fileList.Count)", "INFO")
+            }
+            else
+            {
+                Write-Host "ファイル一覧を取得しました。件数: $($fileList.Count)" -ForegroundColor Green
+            }
+
             return $fileList
         }
         catch
@@ -792,7 +843,14 @@ class WinSCPDriver
             # 上書き設定
             $this.TransferOptions.OverwriteMode = if ($overwrite) { [WinSCP.OverwriteMode]::Overwrite } else { [WinSCP.OverwriteMode]::Exception }
 
-            $global:Common.WriteLog("転送オプションが設定されました。モード: $transferMode, 上書き: $overwrite", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("転送オプションが設定されました。モード: $transferMode, 上書き: $overwrite", "INFO")
+            }
+            else
+            {
+                Write-Host "転送オプションが設定されました。" -ForegroundColor Green
+            }
         }
         catch
         {
@@ -899,7 +957,14 @@ class WinSCPDriver
             $this.SessionOptions = $null
             $this.TransferOptions = $null
 
-            $global:Common.WriteLog("WinSCPDriverが正常に破棄されました。", "INFO")
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("WinSCPDriverが正常に破棄されました。", "INFO")
+            }
+            else
+            {
+                Write-Host "WinSCPDriverが正常に破棄されました。" -ForegroundColor Green
+            }
         }
         catch
         {
