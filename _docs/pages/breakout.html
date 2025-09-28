@@ -197,11 +197,12 @@
         let blocks = [];
         let blockRowCount = 5;
         let blockColumnCount = 10;
-        let blockWidth = 75;
+        let blockWidth = 70;
         let blockHeight = 20;
-        let blockPadding = 10;
+        let blockPadding = 8;
         let blockOffsetTop = 80;
-        let blockOffsetLeft = 30;
+        // 中央揃えのための計算: (800 - (70 * 10 + 8 * 9)) / 2 = 14
+        let blockOffsetLeft = 14;
         
         // キー入力
         let keys = {};

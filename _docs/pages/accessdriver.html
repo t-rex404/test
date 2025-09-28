@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccessDriver - PowerShell Driver Classes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .method-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .method-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .method-name {
+            font-size: 1.3em;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-example {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-example pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .breadcrumb {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- パンくずリスト -->
+        <div class="breadcrumb">
+            <a href="../index.html">🏠 ホーム</a> / <span>AccessDriver</span>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">
+                <span class="emoji">🗃️</span>
+                AccessDriver クラス
+                <span class="emoji">🗃️</span>
+            </h1>
+            <p class="subtitle">Microsoft Accessでデータベースを自在に操作する強力なツール 🔧</p>
+
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <button id="themeToggle" class="theme-btn">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">ダークモード</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="メソッド名を検索..." />
+            </div>
+        </div>
+
+        <!-- 概要 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">📖</span> 概要
+            </h2>
+            <p>AccessDriverクラスは、Microsoft Accessデータベースを自動操作するためのドライバークラスです。テーブル操作、データの挿入・更新・削除、クエリの作成・実行、フォームやレポートの管理など、Accessの主要機能をPowerShellから簡単に利用できます。</p>
+
+            <div class="note-card info">
+                <h3>🎯 主な用途</h3>
+                <ul>
+                    <li>データベースの自動作成・管理</li>
+                    <li>データの一括処理・移行</li>
+                    <li>レポートの自動生成</li>
+                    <li>フォームベースのアプリケーション開発</li>
+                    <li>定期的なデータメンテナンス作業</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 初期化関連 -->
+        <section class="method-section" data-searchable="初期化 接続">
+            <h2 class="section-title">
+                <span class="icon">🚀</span> 初期化・接続関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">AccessDriver() - コンストラクタ</div>
+                <p>AccessDriverインスタンスを作成し、Accessアプリケーションを初期化します。</p>
+
+                <div class="code-example">
+                    <pre><code># AccessDriverのインスタンスを作成
+$driver = [AccessDriver]::new()
+
+# 自動的に以下が実行されます：
+# - Accessアプリケーションの起動（非表示）
+# - 新規データベースの作成
+# - 一時ディレクトリの作成</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- テーブル操作関連 -->
+        <section class="method-section" data-searchable="テーブル 作成 削除">
+            <h2 class="section-title">
+                <span class="icon">📋</span> テーブル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CreateTable([string]$tableName, [hashtable]$columns) - テーブル作成</div>
+                <p>指定したカラム定義でテーブルを作成します。</p>
+
+                <div class="code-example">
+                    <pre><code># カラム定義を準備
+$columns = @{
+    "ID" = "AUTOINCREMENT PRIMARY KEY"
+    "名前" = "TEXT(50)"
+    "年齢" = "INTEGER"
+    "部署" = "TEXT(30)"
+    "入社日" = "DATE"
+    "給与" = "CURRENCY"
+}
+
+# テーブルを作成
+$driver.CreateTable("社員マスタ", $columns)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">GetTableList() - テーブル一覧取得</div>
+                <p>データベース内のテーブル一覧を取得します（システムテーブルを除く）。</p>
+
+                <div class="code-example">
+                    <pre><code># テーブル一覧を取得
+$tables = $driver.GetTableList()
+foreach ($table in $tables) {
+    Write-Host "テーブル: $table"
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DropTable([string]$tableName) - テーブル削除</div>
+                <p>指定したテーブルを削除します。</p>
+
+                <div class="code-example">
+                    <pre><code># テーブルを削除
+$driver.DropTable("古いテーブル")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- データ操作関連 -->
+        <section class="method-section" data-searchable="データ 挿入 更新 削除 検索">
+            <h2 class="section-title">
+                <span class="icon">💾</span> データ操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">InsertData([string]$tableName, [hashtable]$data) - データ挿入</div>
+                <p>テーブルにデータを挿入します。</p>
+
+                <div class="code-example">
+                    <pre><code># データを挿入
+$newData = @{
+    "名前" = "田中太郎"
+    "年齢" = 30
+    "部署" = "営業部"
+    "入社日" = "2020/04/01"
+    "給与" = 350000
+}
+$driver.InsertData("社員マスタ", $newData)
+
+# 複数のデータを挿入
+$employees = @(
+    @{名前="鈴木花子"; 年齢=25; 部署="開発部"},
+    @{名前="佐藤次郎"; 年齢=35; 部署="総務部"}
+)
+foreach ($emp in $employees) {
+    $driver.InsertData("社員マスタ", $emp)
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">UpdateData([string]$tableName, [hashtable]$data, [string]$whereClause) - データ更新</div>
+                <p>条件に一致するデータを更新します。</p>
+
+                <div class="code-example">
+                    <pre><code># データを更新
+$updateData = @{
+    "部署" = "管理部"
+    "給与" = 400000
+}
+$driver.UpdateData("社員マスタ", $updateData, "名前 = '田中太郎'")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">DeleteData([string]$tableName, [string]$whereClause) - データ削除</div>
+                <p>条件に一致するデータを削除します。</p>
+
+                <div class="code-example">
+                    <pre><code># データを削除
+$driver.DeleteData("社員マスタ", "年齢 > 65")
+
+# 特定のレコードを削除
+$driver.DeleteData("社員マスタ", "名前 = '退職者'")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">SelectData([string]$sql) - データ検索</div>
+                <p>SQL文を実行してデータを取得します。</p>
+
+                <div class="code-example">
+                    <pre><code># 全データを取得
+$allData = $driver.SelectData("SELECT * FROM 社員マスタ")
+
+# 条件付き検索
+$youngEmployees = $driver.SelectData("SELECT * FROM 社員マスタ WHERE 年齢 < 30")
+
+# 結果を表示
+foreach ($employee in $youngEmployees) {
+    Write-Host "$($employee.名前) - $($employee.部署)"
+}
+
+# 集計クエリ
+$avgSalary = $driver.SelectData("SELECT AVG(給与) as 平均給与 FROM 社員マスタ")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- クエリ操作関連 -->
+        <section class="method-section" data-searchable="クエリ 作成 実行">
+            <h2 class="section-title">
+                <span class="icon">🔍</span> クエリ操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CreateQuery([string]$queryName, [string]$sql) - クエリ作成</div>
+                <p>保存されたクエリを作成します。</p>
+
+                <div class="code-example">
+                    <pre><code># 選択クエリを作成
+$sql = "SELECT 名前, 部署, 給与 FROM 社員マスタ WHERE 部署 = '営業部'"
+$driver.CreateQuery("営業部社員一覧", $sql)
+
+# 集計クエリを作成
+$sql = "SELECT 部署, COUNT(*) as 人数, AVG(給与) as 平均給与 FROM 社員マスタ GROUP BY 部署"
+$driver.CreateQuery("部署別統計", $sql)</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">ExecuteQuery([string]$queryName) - クエリ実行</div>
+                <p>保存されたクエリを実行します。</p>
+
+                <div class="code-example">
+                    <pre><code># クエリを実行
+$results = $driver.ExecuteQuery("営業部社員一覧")
+
+# 結果を処理
+foreach ($row in $results) {
+    Write-Host "$($row.名前) - 給与: $($row.給与)"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- フォーム操作関連 -->
+        <section class="method-section" data-searchable="フォーム 作成 開く">
+            <h2 class="section-title">
+                <span class="icon">📝</span> フォーム操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CreateForm([string]$formName, [string]$recordSource) - フォーム作成</div>
+                <p>新しいフォームを作成します。</p>
+
+                <div class="code-example">
+                    <pre><code># データソース付きフォームを作成
+$driver.CreateForm("社員入力フォーム", "社員マスタ")
+
+# データソースなしのフォームを作成
+$driver.CreateForm("メニューフォーム", "")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">OpenForm([string]$formName, [string]$view) - フォームを開く</div>
+                <p>指定したフォームを開きます。</p>
+
+                <div class="code-example">
+                    <pre><code># 通常ビューで開く
+$driver.OpenForm("社員入力フォーム", "Normal")
+
+# デザインビューで開く
+$driver.OpenForm("社員入力フォーム", "Design")
+
+# プレビューで開く
+$driver.OpenForm("社員入力フォーム", "Preview")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- レポート操作関連 -->
+        <section class="method-section" data-searchable="レポート 作成 開く">
+            <h2 class="section-title">
+                <span class="icon">📊</span> レポート操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">CreateReport([string]$reportName, [string]$recordSource) - レポート作成</div>
+                <p>新しいレポートを作成します。</p>
+
+                <div class="code-example">
+                    <pre><code># データソース付きレポートを作成
+$driver.CreateReport("月次売上レポート", "売上集計クエリ")
+
+# 社員一覧レポートを作成
+$driver.CreateReport("社員名簿", "社員マスタ")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">OpenReport([string]$reportName, [string]$view) - レポートを開く</div>
+                <p>指定したレポートを開きます。</p>
+
+                <div class="code-example">
+                    <pre><code># プレビューで開く（デフォルト）
+$driver.OpenReport("月次売上レポート", "Preview")
+
+# レポートビューで開く
+$driver.OpenReport("社員名簿", "Report")
+
+# デザインビューで開く
+$driver.OpenReport("月次売上レポート", "Design")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ファイル操作関連 -->
+        <section class="method-section" data-searchable="保存 ファイル データベース">
+            <h2 class="section-title">
+                <span class="icon">💾</span> ファイル操作関連
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">SaveDatabase([string]$file_path) - データベース保存</div>
+                <p>作成したデータベースを保存します。</p>
+
+                <div class="code-example">
+                    <pre><code># データベースを保存
+$driver.SaveDatabase("C:\Databases\company.accdb")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">OpenDatabase([string]$file_path) - データベースを開く</div>
+                <p>既存のAccessデータベースを開きます。</p>
+
+                <div class="code-example">
+                    <pre><code># 既存のデータベースを開く
+$driver.OpenDatabase("C:\Databases\existing.accdb")
+
+# データを操作
+$data = $driver.SelectData("SELECT * FROM Customers")</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">CompactDatabase([string]$source_path, [string]$dest_path) - データベース最適化</div>
+                <p>データベースをコンパクト化して最適化します。</p>
+
+                <div class="code-example">
+                    <pre><code># データベースをコンパクト化
+$driver.CompactDatabase()  # 現在のデータベースを最適化
+
+# 別のデータベースをコンパクト化
+$driver.CompactDatabase("C:\Databases\old.accdb", "C:\Databases\optimized.accdb")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践的な使用例 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">💡</span> 実践的な使用例
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">例1: 社員管理データベースの構築</div>
+
+                <div class="code-example">
+                    <pre><code># AccessDriverを初期化
+$driver = [AccessDriver]::new()
+
+try {
+    # 社員テーブルを作成
+    $employeeColumns = @{
+        "社員ID" = "AUTOINCREMENT PRIMARY KEY"
+        "氏名" = "TEXT(50) NOT NULL"
+        "フリガナ" = "TEXT(50)"
+        "部署コード" = "TEXT(10)"
+        "役職" = "TEXT(30)"
+        "入社日" = "DATE"
+        "基本給" = "CURRENCY"
+        "メールアドレス" = "TEXT(100)"
+    }
+    $driver.CreateTable("社員マスタ", $employeeColumns)
+
+    # 部署テーブルを作成
+    $deptColumns = @{
+        "部署コード" = "TEXT(10) PRIMARY KEY"
+        "部署名" = "TEXT(50) NOT NULL"
+        "責任者" = "TEXT(50)"
+    }
+    $driver.CreateTable("部署マスタ", $deptColumns)
+
+    # 部署データを挿入
+    $departments = @(
+        @{部署コード="001"; 部署名="営業部"; 責任者="山田部長"},
+        @{部署コード="002"; 部署名="開発部"; 責任者="鈴木部長"},
+        @{部署コード="003"; 部署名="総務部"; 責任者="佐藤部長"}
+    )
+
+    foreach ($dept in $departments) {
+        $driver.InsertData("部署マスタ", $dept)
+    }
+
+    # 社員データを挿入
+    $employees = @(
+        @{氏名="田中太郎"; フリガナ="タナカタロウ"; 部署コード="001"; 役職="主任"; 入社日="2018/04/01"; 基本給=350000},
+        @{氏名="鈴木花子"; フリガナ="スズキハナコ"; 部署コード="002"; 役職="係長"; 入社日="2015/10/01"; 基本給=450000}
+    )
+
+    foreach ($emp in $employees) {
+        $driver.InsertData("社員マスタ", $emp)
+    }
+
+    # 部署別社員一覧クエリを作成
+    $sql = @"
+SELECT
+    s.氏名,
+    s.役職,
+    d.部署名,
+    s.基本給
+FROM
+    社員マスタ s
+    INNER JOIN 部署マスタ d ON s.部署コード = d.部署コード
+ORDER BY
+    d.部署コード, s.氏名
+"@
+    $driver.CreateQuery("部署別社員一覧", $sql)
+
+    # データベースを保存
+    $driver.SaveDatabase("C:\Databases\社員管理.accdb")
+    Write-Host "社員管理データベースが作成されました！"
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">例2: CSVデータのインポートと集計</div>
+
+                <div class="code-example">
+                    <pre><code># AccessDriverを初期化
+$driver = [AccessDriver]::new()
+
+try {
+    # 売上テーブルを作成
+    $salesColumns = @{
+        "ID" = "AUTOINCREMENT PRIMARY KEY"
+        "日付" = "DATE"
+        "商品名" = "TEXT(100)"
+        "数量" = "INTEGER"
+        "単価" = "CURRENCY"
+        "売上金額" = "CURRENCY"
+        "担当者" = "TEXT(50)"
+    }
+    $driver.CreateTable("売上データ", $salesColumns)
+
+    # CSVファイルからデータを読み込み
+    $csvData = Import-Csv "C:\Data\sales.csv"
+
+    foreach ($row in $csvData) {
+        $data = @{
+            "日付" = $row.日付
+            "商品名" = $row.商品名
+            "数量" = [int]$row.数量
+            "単価" = [decimal]$row.単価
+            "売上金額" = [int]$row.数量 * [decimal]$row.単価
+            "担当者" = $row.担当者
+        }
+        $driver.InsertData("売上データ", $data)
+    }
+
+    # 月別集計クエリを作成
+    $sql = @"
+SELECT
+    Format([日付],'yyyy/mm') as 年月,
+    COUNT(*) as 件数,
+    SUM(売上金額) as 売上合計,
+    AVG(売上金額) as 平均売上
+FROM 売上データ
+GROUP BY Format([日付],'yyyy/mm')
+ORDER BY Format([日付],'yyyy/mm')
+"@
+    $driver.CreateQuery("月別売上集計", $sql)
+
+    # 集計結果を取得
+    $results = $driver.ExecuteQuery("月別売上集計")
+
+    # 結果を表示
+    Write-Host "=== 月別売上集計 ==="
+    foreach ($row in $results) {
+        Write-Host "$($row.年月): 売上合計 $($row.売上合計)円 (件数: $($row.件数))"
+    }
+
+    # レポートを作成
+    $driver.CreateReport("売上集計レポート", "月別売上集計")
+
+    # データベースを保存
+    $driver.SaveDatabase("C:\Databases\売上分析.accdb")
+}
+finally {
+    $driver.Dispose()
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーハンドリング -->
+        <section class="method-section" data-searchable="エラー処理 クリーンアップ">
+            <h2 class="section-title">
+                <span class="icon">⚠️</span> エラーハンドリング・クリーンアップ
+            </h2>
+
+            <div class="method-card">
+                <div class="method-name">統一されたエラー処理</div>
+                <p>AccessDriverは、Commonクラスの統一されたエラー処理システムを使用して、エラーの詳細な記録と適切なクリーンアップを行います。</p>
+
+                <div class="code-example">
+                    <pre><code># エラー処理の例
+try {
+    $driver = [AccessDriver]::new()
+    # 処理を実行
+}
+catch {
+    # Commonクラスのエラー処理を使用
+    if ($global:Common) {
+        $global:Common.HandleError(
+            "AccessError_0001",
+            "AccessDriver初期化エラー: $($_.Exception.Message)",
+            "AccessDriver",
+            ".\AllDrivers_Error.log"
+        )
+    }
+    throw
+}
+finally {
+    if ($driver) {
+        $driver.Dispose()
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-name">自動クリーンアップ機能</div>
+                <p>初期化に失敗した場合、AccessDriverは自動的にクリーンアップを実行し、リソースの適切な解放を試みます。</p>
+
+                <div class="code-example">
+                    <pre><code># 初期化失敗時の自動クリーンアップ
+try {
+    $driver = [AccessDriver]::new()
+}
+catch {
+    # CleanupOnInitializationFailure()が自動的に呼び出される
+    Write-Host "初期化に失敗しました。クリーンアップが実行されました。" -ForegroundColor Yellow
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- エラーコード一覧 -->
+        <section class="method-section">
+            <h2 class="section-title">
+                <span class="icon">🚨</span> AccessDriver固有のエラーコード
+            </h2>
+
+            <div class="error-range-card">
+                <p>AccessDriverクラスでは、AccessError_0001からAccessError_0022までのエラーコードが使用されます。</p>
+                <table class="error-table">
+                    <tr>
+                        <td class="range">AccessError_0001</td>
+                        <td>AccessDriver初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0002</td>
+                        <td>一時ディレクトリ作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0003</td>
+                        <td>Accessアプリケーション初期化エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0004</td>
+                        <td>新規データベース作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0005</td>
+                        <td>テーブル作成エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0006</td>
+                        <td>テーブル一覧取得エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0007</td>
+                        <td>テーブル削除エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0008</td>
+                        <td>データ挿入エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0009</td>
+                        <td>データ更新エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0010</td>
+                        <td>データ削除エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">AccessError_0011</td>
+                        <td>データ検索エラー</td>
+                    </tr>
+                    <tr>
+                        <td class="range">...</td>
+                        <td>その他のエラーコード（AccessError_0012～AccessError_0022）</td>
+                    </tr>
+                </table>
+                <p class="note">※ 全22個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><a href="../index.html">← ドキュメントホームに戻る</a></p>
+                <p class="version">AccessDriver Documentation v1.0.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
