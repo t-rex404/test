@@ -30,6 +30,10 @@ class GUIDriver
     [bool]$is_initialized
     [string]$temp_directory
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\GUIDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\GUIDriver_$($env:USERNAME)_Error.log"
+
     # コンストラクタ
     GUIDriver()
     {
@@ -41,6 +45,15 @@ class GUIDriver
             $this.application_path = ""
             $this.window_title = ""
             $this.temp_directory = ""
+
+            $this.is_initialized = $true
+            Write-Host "GUIDriverの初期化が完了しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common) {
+                $global:Common.WriteLog("GUIDriverの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] GUIDriverの初期化が完了しました" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -49,7 +62,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0001", "GUIDriver初期化エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0001", "GUIDriver初期化エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -108,6 +121,13 @@ class GUIDriver
             Start-Sleep -Milliseconds 1000
 
             Write-Host "アプリケーションを起動しました: $app_path" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("アプリケーションを起動しました: $app_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを起動しました: $app_path" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -116,7 +136,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0010", "アプリケーション起動エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0010", "アプリケーション起動エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -163,6 +183,14 @@ class GUIDriver
                         # プロセスのメインウィンドウハンドルを直接使用
                         $this.window_handle = $main_window_handle
                         Write-Host "ウィンドウを発見しました: $window_title" -ForegroundColor Green
+
+                        # 正常ログ出力
+                        if ($global:Common)
+                        {
+                            $global:Common.WriteLog("ウィンドウを発見しました: $window_title", "INFO")
+                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを発見しました: $window_title" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                        }
+
                         return $main_window_handle
                     }
                     else
@@ -183,6 +211,14 @@ class GUIDriver
                         {
                             $this.window_handle = $processes[0].MainWindowHandle
                             Write-Host "プロセス名でウィンドウを発見しました: $window_title (プロセス: $($processes[0].ProcessName))" -ForegroundColor Green
+
+                            # 正常ログ出力
+                            if ($global:Common)
+                            {
+                                $global:Common.WriteLog("プロセス名でウィンドウを発見しました: $window_title (プロセス: $($processes[0].ProcessName))", "INFO")
+                                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名でウィンドウを発見しました: $window_title (プロセス: $($processes[0].ProcessName))" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                            }
+
                             return $this.window_handle
                         }
                     }
@@ -205,7 +241,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0020", "ウィンドウ検索エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0020", "ウィンドウ検索エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -233,6 +269,13 @@ class GUIDriver
 
             # 簡略化されたアクティブ化（一時的）
             Write-Host "ウィンドウをアクティブ化しました（簡略版）。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ウィンドウをアクティブ化しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウをアクティブ化しました" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -241,7 +284,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0021", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0021", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -280,6 +323,13 @@ class GUIDriver
 
             # クリック実行（簡略化版）
             Write-Host "マウスクリックを実行しました: ($x, $y) $button" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウスクリックを実行しました: ($x, $y) $button", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスクリックを実行しました: ($x, $y) $button" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -288,7 +338,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0030", "マウスクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0030", "マウスクリックエラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -327,6 +377,13 @@ class GUIDriver
             [System.Windows.Forms.Cursor]::Click()
 
             Write-Host "マウスダブルクリックを実行しました: ($x, $y)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウスダブルクリックを実行しました: ($x, $y)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスダブルクリックを実行しました: ($x, $y)" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -335,7 +392,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0031", "マウスダブルクリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0031", "マウスダブルクリックエラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -370,6 +427,13 @@ class GUIDriver
 
             # 右クリック実行（簡略化版）
             Write-Host "マウス右クリックを実行しました: ($x, $y)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウス右クリックを実行しました: ($x, $y)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウス右クリックを実行しました: ($x, $y)" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -378,7 +442,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0032", "マウス右クリックエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0032", "マウス右クリックエラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -403,6 +467,13 @@ class GUIDriver
             Start-Sleep -Milliseconds 100
 
             Write-Host "マウスを移動しました: ($x, $y)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウスを移動しました: ($x, $y)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスを移動しました: ($x, $y)" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -411,7 +482,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0033", "マウス移動エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0033", "マウス移動エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -448,6 +519,13 @@ class GUIDriver
             [System.Windows.Forms.SendKeys]::SendWait($keys)
 
             Write-Host "キーボード入力を実行しました: $keys" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("キーボード入力を実行しました: $keys", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キーボード入力を実行しました: $keys" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -456,7 +534,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0040", "キーボード入力エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0040", "キーボード入力エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -525,6 +603,13 @@ class GUIDriver
             }
 
             Write-Host "特殊キーを送信しました: $key" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("特殊キーを送信しました: $key", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 特殊キーを送信しました: $key" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -533,7 +618,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0041", "特殊キー送信エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0041", "特殊キー送信エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -567,6 +652,13 @@ class GUIDriver
             [System.Windows.Forms.SendKeys]::SendWait($keyCombination)
 
             Write-Host "キー組み合わせを送信しました: $keyCombination" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("キー組み合わせを送信しました: $keyCombination", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キー組み合わせを送信しました: $keyCombination" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -575,7 +667,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0042", "キー組み合わせ送信エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0042", "キー組み合わせ送信エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -608,6 +700,13 @@ class GUIDriver
             [System.Windows.Forms.SendKeys]::SendWait($text)
 
             Write-Host "テキストを入力しました: $text" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テキストを入力しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを入力しました: $text" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -616,7 +715,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0043", "テキスト入力エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0043", "テキスト入力エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -658,6 +757,13 @@ class GUIDriver
             $bitmap.Dispose()
 
             Write-Host "スクリーンショットを保存しました: $file_path" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("スクリーンショットを保存しました: $file_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] スクリーンショットを保存しました: $file_path" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -666,7 +772,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -712,6 +818,13 @@ class GUIDriver
             $bitmap.Dispose()
 
             Write-Host "ウィンドウスクリーンショットを保存しました: $file_path" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ウィンドウスクリーンショットを保存しました: $file_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウスクリーンショットを保存しました: $file_path" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -720,7 +833,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0081", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0081", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -759,6 +872,13 @@ class GUIDriver
                 }
 
                 Write-Host "アプリケーションを終了しました。" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("アプリケーションを終了しました", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを終了しました" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
         }
         catch
@@ -768,7 +888,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0070", "プロセス終了エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0070", "プロセス終了エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -795,6 +915,13 @@ class GUIDriver
                 $this.process.WaitForExit(5000)
 
                 Write-Host "アプリケーションを強制終了しました。" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("アプリケーションを強制終了しました", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを強制終了しました" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
         }
         catch
@@ -804,7 +931,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0071", "プロセス強制終了エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0071", "プロセス強制終了エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -838,7 +965,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0072", "プロセス状態確認エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0072", "プロセス状態確認エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -861,6 +988,13 @@ class GUIDriver
         {
             Start-Sleep -Milliseconds $milliseconds
             Write-Host "待機しました: $milliseconds ms" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("待機しました: $milliseconds ms", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 待機しました: $milliseconds ms" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -869,7 +1003,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0082", "タイムアウトエラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0082", "タイムアウトエラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -903,6 +1037,13 @@ class GUIDriver
 
             $this.is_initialized = $false
             Write-Host "GUIDriverを破棄しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("GUIDriverを破棄しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] GUIDriverを破棄しました" | Out-File -Append -FilePath ([GUIDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -911,7 +1052,7 @@ class GUIDriver
             {
                 try
                 {
-                    $global:Common.HandleError("GUIDriverError_0090", "GUIDriver破棄エラー: $($_.Exception.Message)", "GUIDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("GUIDriverError_0090", "GUIDriver破棄エラー: $($_.Exception.Message)", "GUIDriver", [GUIDriver]::ErrorLogFile)
                 }
                 catch
                 {

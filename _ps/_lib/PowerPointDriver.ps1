@@ -12,6 +12,10 @@ class PowerPointDriver
     [bool]$is_saved
     [string]$temp_directory
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\PowerPointDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\PowerPointDriver_$($env:USERNAME)_Error.log"
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -34,6 +38,13 @@ class PowerPointDriver
             
             $this.is_initialized = $true
             Write-Host "PowerPointDriverの初期化が完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("PowerPointDriverの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] PowerPointDriverの初期化が完了しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -46,7 +57,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -81,8 +92,16 @@ class PowerPointDriver
             {
                 New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null
             }
-            
+
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $temp_dir
         }
         catch
@@ -92,7 +111,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -116,8 +135,15 @@ class PowerPointDriver
             $this.powerpoint_app = New-Object -ComObject PowerPoint.Application
             $this.powerpoint_app.Visible = [Microsoft.Office.Core.MsoTriState]::msoTrue
             $this.powerpoint_app.DisplayAlerts = [Microsoft.Office.Interop.PowerPoint.PpAlertLevel]::ppAlertsNone
-            
+
             Write-Host "PowerPointアプリケーションを初期化しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("PowerPointアプリケーションを初期化しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] PowerPointアプリケーションを初期化しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -126,7 +152,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0010", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0010", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -151,8 +177,15 @@ class PowerPointDriver
             $this.powerpoint_slide = $this.powerpoint_presentation.Slides.Add(1, 1) # タイトルスライド
             $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
             $this.file_path = Join-Path $this.temp_directory "Presentation_$timestamp.pptx"
-            
+
             Write-Host "新規プレゼンテーションを作成しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新規プレゼンテーションを作成しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規プレゼンテーションを作成しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -161,7 +194,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0011", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0011", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -194,6 +227,13 @@ class PowerPointDriver
             $slideCount = $this.powerpoint_presentation.Slides.Count
             $this.powerpoint_slide = $this.powerpoint_presentation.Slides.Add($slideCount + 1, $layoutType)
             Write-Host "新しいスライドを追加しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新しいスライドを追加しました。レイアウトタイプ: $layoutType", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新しいスライドを追加しました。レイアウトタイプ: $layoutType" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -202,7 +242,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0020", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0020", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -235,6 +275,13 @@ class PowerPointDriver
 
             $this.powerpoint_slide = $this.powerpoint_presentation.Slides.Item($slideIndex)
             Write-Host "スライドを選択しました: $slideIndex"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("スライドを選択しました: $slideIndex", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] スライドを選択しました: $slideIndex" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -243,7 +290,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0021", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0021", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -280,6 +327,13 @@ class PowerPointDriver
 
             $this.powerpoint_slide.Shapes.Title.TextFrame.TextRange.Text = $title
             Write-Host "タイトルを設定しました: $title"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("タイトルを設定しました: $title", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] タイトルを設定しました: $title" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -288,7 +342,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0022", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0022", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -322,6 +376,13 @@ class PowerPointDriver
             $textBox = $this.powerpoint_slide.Shapes.AddTextbox(1, $left, $top, $width, $height)
             $textBox.TextFrame.TextRange.Text = $text
             Write-Host "テキストボックスを追加しました: $text"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テキストボックスを追加しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストボックスを追加しました: $text" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -330,7 +391,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0023", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0023", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -364,6 +425,13 @@ class PowerPointDriver
             $textShape = $this.powerpoint_slide.Shapes.AddTextbox(1, $left, $top, 400, 100)
             $textShape.TextFrame.TextRange.Text = $text
             Write-Host "テキストを追加しました: $text"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テキストを追加しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを追加しました: $text" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -372,7 +440,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0024", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0024", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -404,6 +472,13 @@ class PowerPointDriver
 
             $shape = $this.powerpoint_slide.Shapes.AddShape($shapeType, $left, $top, $width, $height)
             Write-Host "図形を追加しました: タイプ $shapeType"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("図形を追加しました。タイプ: $shapeType", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 図形を追加しました。タイプ: $shapeType" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -412,7 +487,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0025", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0025", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -450,6 +525,13 @@ class PowerPointDriver
 
             $picture = $this.powerpoint_slide.Shapes.AddPicture($imagePath, $false, $true, $left, $top, $width, $height)
             Write-Host "画像を追加しました: $imagePath"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("画像を追加しました: $imagePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 画像を追加しました: $imagePath" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -458,7 +540,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0026", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0026", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -502,8 +584,15 @@ class PowerPointDriver
                     $shape.TextFrame.TextRange.Font.Size = $fontSize
                 }
             }
-            
+
             Write-Host "フォントを設定しました: $fontName, $fontSize"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("フォントを設定しました: $fontName, サイズ: $fontSize", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォントを設定しました: $fontName, サイズ: $fontSize" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -512,7 +601,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0040", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0040", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -540,6 +629,13 @@ class PowerPointDriver
 
             $this.powerpoint_slide.Background.Fill.ForeColor.RGB = $colorIndex
             Write-Host "背景色を設定しました: $colorIndex"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("背景色を設定しました。カラーインデックス: $colorIndex", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 背景色を設定しました。カラーインデックス: $colorIndex" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -548,7 +644,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0041", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0041", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -586,6 +682,13 @@ class PowerPointDriver
             $this.powerpoint_presentation.SaveAs($filePath)
             $this.is_saved = $true
             Write-Host "プレゼンテーションを保存しました: $filePath"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("プレゼンテーションを保存しました: $filePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プレゼンテーションを保存しました: $filePath" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -594,7 +697,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0060", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0060", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -634,6 +737,13 @@ class PowerPointDriver
             $this.powerpoint_slide = $this.powerpoint_presentation.Slides.Item(1)
             $this.file_path = $filePath
             Write-Host "プレゼンテーションを開きました: $filePath"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("プレゼンテーションを開きました: $filePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プレゼンテーションを開きました: $filePath" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -642,7 +752,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0061", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0061", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -687,6 +797,13 @@ class PowerPointDriver
             Write-Host "初期化失敗時のクリーンアップを開始します。"
             Write-Host "一時ディレクトリを削除しました: $($this.temp_directory)"
             Write-Host "クリーンアップが完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("初期化失敗時のクリーンアップを実行しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップを実行しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -695,7 +812,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -743,6 +860,13 @@ class PowerPointDriver
             [System.GC]::WaitForPendingFinalizers()
 
             Write-Host "PowerPointDriverのリソースを解放しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("PowerPointDriverのリソースを解放しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] PowerPointDriverのリソースを解放しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -751,7 +875,7 @@ class PowerPointDriver
             {
                 try
                 {
-                    $global:Common.HandleError("PowerPointDriverError_0091", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("PowerPointDriverError_0091", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
                 }
                 catch
                 {

@@ -16,6 +16,10 @@ class OracleDriver
     [string]$tns_admin_path
     [string]$tns_alias
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\OracleDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\OracleDriver_$($env:USERNAME)_Error.log"
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -32,8 +36,15 @@ class OracleDriver
             # 環境変数TNS_ADMINがNULLの場合は空文字列を設定
             $this.tns_admin_path = if ($null -eq $env:TNS_ADMIN) { "" } else { $env:TNS_ADMIN }
             $this.tns_alias = ""
-            
+
             Write-Host "OracleDriverの初期化が完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("OracleDriverの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] OracleDriverの初期化が完了しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -46,7 +57,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -70,6 +81,13 @@ class OracleDriver
             $this.tns_admin_path = $path
             $env:TNS_ADMIN = $path
             Write-Host "TNS_ADMINパスを設定しました: $path"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("TNS_ADMINパスを設定しました: $path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TNS_ADMINパスを設定しました: $path" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -78,7 +96,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0002", "TNS_ADMINパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0002", "TNS_ADMINパス設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -101,6 +119,13 @@ class OracleDriver
         {
             $this.sqlplus_path = $path
             Write-Host "SQLPLUSのパスを設定しました: $path"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("SQLPLUSのパスを設定しました: $path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSのパスを設定しました: $path" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -109,7 +134,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0003", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0003", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -142,6 +167,13 @@ class OracleDriver
             $this.ConnectionString = "Data Source=$tnsAlias;User Id=$username;Password=$password;"
 
             Write-Host "TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -150,7 +182,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0010", "TNS接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0010", "TNS接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -182,8 +214,15 @@ class OracleDriver
             
             # 接続文字列を構築
             $this.ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$server)(PORT=$port))(CONNECT_DATA=(SERVICE_NAME=$service_name)));User Id=$username;Password=$password;"
-            
+
             Write-Host "接続パラメータを設定しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("接続パラメータを設定しました。サーバー: $server, ポート: $port, サービス名: $service_name", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続パラメータを設定しました。サーバー: $server, ポート: $port, サービス名: $service_name" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -192,7 +231,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0011", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0011", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -257,6 +296,13 @@ class OracleDriver
             {
                 $this.is_connected = $true
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
             else
             {
@@ -271,7 +317,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0012", "SQLPLUS TNS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0012", "SQLPLUS TNS接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -335,6 +381,13 @@ class OracleDriver
             {
                 $this.is_connected = $true
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
             else
             {
@@ -349,7 +402,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0013", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0013", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -405,6 +458,13 @@ class OracleDriver
             {
                 $this.is_connected = $true
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました。接続文字列: $sqlPlusConnStr" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("SQLPLUSでORACLEデータベースに接続しました", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでORACLEデータベースに接続しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
             else
             {
@@ -419,7 +479,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0014", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0014", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -521,6 +581,14 @@ class OracleDriver
             }
 
             Write-Host "SQLPLUSでSQLを実行しました（TNS）。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("SQLPLUSでSQLを実行しました（TNS）。TNSエイリアス: $tnsAlias", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでSQLを実行しました（TNS）。TNSエイリアス: $tnsAlias" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $output.Trim()
         }
         catch
@@ -531,7 +599,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0020", "SQLPLUS TNS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0020", "SQLPLUS TNS実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -627,6 +695,14 @@ class OracleDriver
             }
 
             Write-Host "SQLPLUSでSQLを実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("SQLPLUSでSQLを実行しました。サービス名: $service_name", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでSQLを実行しました。サービス名: $service_name" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $output.Trim()
         }
         catch
@@ -637,7 +713,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0021", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0021", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -672,6 +748,13 @@ class OracleDriver
             $this.is_connected = $true
 
             Write-Host "ORACLEデータベースに接続しました（TNS: $tnsAlias）。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ORACLEデータベースに接続しました（TNS: $tnsAlias）", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ORACLEデータベースに接続しました（TNS: $tnsAlias）" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -681,7 +764,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0015", "TNSデータベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0015", "TNSデータベース接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -716,8 +799,15 @@ class OracleDriver
             $this.Connection = New-Object System.Data.OracleClient.OracleConnection($this.ConnectionString)
             $this.Connection.Open()
             $this.is_connected = $true
-            
+
             Write-Host "ORACLEデータベースに接続しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ORACLEデータベースに接続しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ORACLEデータベースに接続しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -727,7 +817,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0016", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0016", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -759,6 +849,13 @@ class OracleDriver
                 $this.Connection.Dispose()
                 $this.is_connected = $false
                 Write-Host "データベース接続を切断しました。" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("データベース接続を切断しました", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベース接続を切断しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
         }
         catch
@@ -768,7 +865,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0017", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0017", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -809,8 +906,16 @@ class OracleDriver
             $adapter = New-Object System.Data.OracleClient.OracleDataAdapter($command)
             $dataTable = New-Object System.Data.DataTable
             $adapter.Fill($dataTable)
-            
+
             Write-Host "SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $dataTable
         }
         catch
@@ -821,7 +926,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0030", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0030", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -856,8 +961,16 @@ class OracleDriver
             }
 
             $affectedRows = $command.ExecuteNonQuery()
-            
+
             Write-Host "INSERT文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("INSERT文を実行しました。影響を受けた行数: $affectedRows", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] INSERT文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $affectedRows
         }
         catch
@@ -868,7 +981,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0031", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0031", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -903,8 +1016,16 @@ class OracleDriver
             }
 
             $affectedRows = $command.ExecuteNonQuery()
-            
+
             Write-Host "UPDATE文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("UPDATE文を実行しました。影響を受けた行数: $affectedRows", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] UPDATE文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $affectedRows
         }
         catch
@@ -915,7 +1036,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0032", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0032", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -950,8 +1071,16 @@ class OracleDriver
             }
 
             $affectedRows = $command.ExecuteNonQuery()
-            
+
             Write-Host "DELETE文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("DELETE文を実行しました。影響を受けた行数: $affectedRows", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] DELETE文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $affectedRows
         }
         catch
@@ -962,7 +1091,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0033", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0033", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -997,8 +1126,16 @@ class OracleDriver
             }
 
             $affectedRows = $command.ExecuteNonQuery()
-            
+
             Write-Host "MERGE文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("MERGE文を実行しました。影響を受けた行数: $affectedRows", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] MERGE文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $affectedRows
         }
         catch
@@ -1009,7 +1146,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0034", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0034", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1047,6 +1184,13 @@ class OracleDriver
             $command.ExecuteNonQuery()
 
             Write-Host "CALL文を実行しました。プロシージャ: $procedureName" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ストアドプロシージャを実行しました: $procedureName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ストアドプロシージャを実行しました: $procedureName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1056,7 +1200,7 @@ class OracleDriver
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0035", "CALL実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0035", "CALL実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1111,6 +1255,14 @@ ORDER SIBLINGS BY ID
             $deleteCommand.ExecuteNonQuery()
 
             Write-Host "EXPLAIN PLANを実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("EXPLAIN PLANを実行しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] EXPLAIN PLANを実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $dataTable
         }
         catch
@@ -1121,7 +1273,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0036", "EXPLAIN PLAN実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0036", "EXPLAIN PLAN実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1159,6 +1311,13 @@ ORDER SIBLINGS BY ID
             $command.ExecuteNonQuery()
 
             Write-Host "LOCK TABLEを実行しました。テーブル: $tableName, モード: $lockMode" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブルをロックしました: $tableName (モード: $lockMode)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルをロックしました: $tableName (モード: $lockMode)" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1168,7 +1327,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0037", "LOCK TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0037", "LOCK TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1201,8 +1360,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "CREATE TABLE文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("CREATE TABLE文を実行しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] CREATE TABLE文を実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1212,7 +1378,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0040", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0040", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1240,8 +1406,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "ALTER TABLE文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ALTER TABLE文を実行しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ALTER TABLE文を実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1251,7 +1424,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0041", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0041", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1280,8 +1453,15 @@ ORDER SIBLINGS BY ID
             $sql = "DROP TABLE $tableName"
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "DROP TABLE文を実行しました。テーブル: $tableName" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブルを削除しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを削除しました: $tableName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1291,7 +1471,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0042", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0042", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1319,8 +1499,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "CREATE INDEX文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("インデックスを作成しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] インデックスを作成しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1330,7 +1517,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0043", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0043", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1358,8 +1545,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "CREATE VIEW文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ビューを作成しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ビューを作成しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1369,7 +1563,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0044", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0044", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1397,8 +1591,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "CREATE SEQUENCE文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("シーケンスを作成しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] シーケンスを作成しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1408,7 +1609,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0045", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0045", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1439,6 +1640,13 @@ ORDER SIBLINGS BY ID
             $command.ExecuteNonQuery()
 
             Write-Host "TRUNCATE TABLEを実行しました。テーブル: $tableName" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブルをトランケートしました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルをトランケートしました: $tableName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1448,7 +1656,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0046", "TRUNCATE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0046", "TRUNCATE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1479,6 +1687,13 @@ ORDER SIBLINGS BY ID
             $command.ExecuteNonQuery()
 
             Write-Host "RENAMEを実行しました。$oldName -> $newName" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("オブジェクト名を変更しました: $oldName -> $newName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] オブジェクト名を変更しました: $oldName -> $newName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1488,7 +1703,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0047", "RENAME実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0047", "RENAME実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1521,8 +1736,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "GRANT文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("権限を付与しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 権限を付与しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1532,7 +1754,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0048", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0048", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1560,8 +1782,15 @@ ORDER SIBLINGS BY ID
 
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "REVOKE文を実行しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("権限を取り消しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 権限を取り消しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1571,7 +1800,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0049", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0049", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1610,8 +1839,15 @@ ORDER SIBLINGS BY ID
 
             $this.Transaction = $this.Connection.BeginTransaction()
             $this.is_transaction_active = $true
-            
+
             Write-Host "トランザクションを開始しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("トランザクションを開始しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクションを開始しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1621,7 +1857,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0050", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0050", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1651,8 +1887,15 @@ ORDER SIBLINGS BY ID
             $this.Transaction.Commit()
             $this.Transaction.Dispose()
             $this.is_transaction_active = $false
-            
+
             Write-Host "トランザクションをコミットしました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("トランザクションをコミットしました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクションをコミットしました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1662,7 +1905,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0051", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0051", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1692,8 +1935,15 @@ ORDER SIBLINGS BY ID
             $this.Transaction.Rollback()
             $this.Transaction.Dispose()
             $this.is_transaction_active = $false
-            
+
             Write-Host "トランザクションをロールバックしました。" -ForegroundColor Yellow
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("トランザクションをロールバックしました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクションをロールバックしました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1703,7 +1953,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0052", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0052", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1732,8 +1982,15 @@ ORDER SIBLINGS BY ID
             $sql = "SAVEPOINT $savepointName"
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection, $this.Transaction)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "SAVEPOINTを作成しました: $savepointName" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("SAVEPOINTを作成しました: $savepointName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SAVEPOINTを作成しました: $savepointName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1743,7 +2000,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0053", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0053", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1772,8 +2029,15 @@ ORDER SIBLINGS BY ID
             $sql = "ROLLBACK TO SAVEPOINT $savepointName"
             $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection, $this.Transaction)
             $command.ExecuteNonQuery()
-            
+
             Write-Host "SAVEPOINTにロールバックしました: $savepointName" -ForegroundColor Yellow
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("SAVEPOINTにロールバックしました: $savepointName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SAVEPOINTにロールバックしました: $savepointName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1783,7 +2047,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0054", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0054", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1819,6 +2083,13 @@ ORDER SIBLINGS BY ID
             $command.ExecuteNonQuery()
 
             Write-Host "SET TRANSACTIONを実行しました。分離レベル: $isolationLevel" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("トランザクション分離レベルを設定しました: $isolationLevel", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクション分離レベルを設定しました: $isolationLevel" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1828,7 +2099,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0055", "SET TRANSACTION実行エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0055", "SET TRANSACTION実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1861,6 +2132,14 @@ ORDER SIBLINGS BY ID
             if (-not [string]::IsNullOrEmpty($tnsNamesPath) -and (Test-Path $tnsNamesPath))
             {
                 Write-Host "レジストリから tnsnames.ora を発見しました: $tnsNamesPath" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("tnsnames.oraファイルを発見しました: $tnsNamesPath", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] tnsnames.oraファイルを発見しました: $tnsNamesPath" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
+
                 return $tnsNamesPath
             }
 
@@ -1875,6 +2154,14 @@ ORDER SIBLINGS BY ID
             elseif ($foundFiles.Count -eq 1)
             {
                 Write-Host "tnsnames.ora を発見しました: $($foundFiles[0])" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("tnsnames.oraファイルを発見しました: $($foundFiles[0])", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] tnsnames.oraファイルを発見しました: $($foundFiles[0])" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
+
                 return $foundFiles[0]
             }
             else
@@ -1892,7 +2179,7 @@ ORDER SIBLINGS BY ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0082", "tnsnames.ora検索エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0082", "tnsnames.ora検索エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -2099,6 +2386,13 @@ ORDER SIBLINGS BY ID
             $selectedFile = $files[$index]
             Write-Host "`n選択されたファイル: $selectedFile" -ForegroundColor Green
 
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("tnsnames.oraファイルを選択しました: $selectedFile", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] tnsnames.oraファイルを選択しました: $selectedFile" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $selectedFile
         }
         catch
@@ -2130,7 +2424,16 @@ ORDER BY TABLE_NAME
                 ":schema" = if ([string]::IsNullOrEmpty($schema)) { $this.connection_parameters.Username } else { $schema }
             }
 
-            return $this.ExecuteSelect($sql, $parameters)
+            $result = $this.ExecuteSelect($sql, $parameters)
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブル一覧を取得しました。テーブル数: $($result.Rows.Count)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブル一覧を取得しました。テーブル数: $($result.Rows.Count)" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
+            return $result
         }
         catch
         {
@@ -2140,7 +2443,7 @@ ORDER BY TABLE_NAME
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0080", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0080", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -2178,7 +2481,16 @@ ORDER BY COLUMN_ID
                 ":schema" = if ([string]::IsNullOrEmpty($schema)) { $this.connection_parameters.Username } else { $schema }
             }
 
-            return $this.ExecuteSelect($sql, $parameters)
+            $result = $this.ExecuteSelect($sql, $parameters)
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブル構造を取得しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブル構造を取得しました: $tableName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
+            return $result
         }
         catch
         {
@@ -2188,7 +2500,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0081", "テーブル構造取得エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0081", "テーブル構造取徖エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -2222,12 +2534,58 @@ ORDER BY COLUMN_ID
         return $this.last_error_message
     }
 
+    # 初期化失敗時のクリーンアップ
+    [void] CleanupOnInitializationFailure()
+    {
+        try
+        {
+            if ($this.Connection)
+            {
+                if ($this.Connection.State -eq 'Open')
+                {
+                    $this.Connection.Close()
+                }
+                $this.Connection.Dispose()
+                $this.Connection = $null
+            }
+
+            if ($this.Transaction)
+            {
+                $this.Transaction.Dispose()
+                $this.Transaction = $null
+            }
+
+            $this.is_connected = $false
+            $this.is_transaction_active = $false
+
+            Write-Host "初期化失敗時のクリーンアップが完了しました。" -ForegroundColor Yellow
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("初期化失敗時のクリーンアップを実行しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップを実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+        }
+        catch
+        {
+            Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
+        }
+    }
+
     # デストラクタ
     [void] Dispose()
     {
         try
         {
             $this.Disconnect()
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("OracleDriverを破棄しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] OracleDriverを破棄しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -2236,7 +2594,7 @@ ORDER BY COLUMN_ID
             {
                 try
                 {
-                    $global:Common.HandleError("OracleDriverError_0090", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("OracleDriverError_0090", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
                 }
                 catch
                 {

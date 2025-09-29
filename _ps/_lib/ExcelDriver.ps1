@@ -12,6 +12,10 @@ class ExcelDriver
     [bool]$is_saved
     [string]$temp_directory
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\ExcelDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\ExcelDriver_$($env:USERNAME)_Error.log"
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -34,6 +38,13 @@ class ExcelDriver
             
             $this.is_initialized = $true
             Write-Host "ExcelDriverの初期化が完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ExcelDriverの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ExcelDriverの初期化が完了しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -46,7 +57,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0001", "ExcelDriver初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0001", "ExcelDriver初期化エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -83,6 +94,14 @@ class ExcelDriver
             }
             
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $temp_dir
         }
         catch
@@ -92,7 +111,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -118,6 +137,13 @@ class ExcelDriver
             $this.excel_app.DisplayAlerts = $false
             
             Write-Host "Excelアプリケーションを初期化しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("Excelアプリケーションを初期化しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Excelアプリケーションを初期化しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -126,7 +152,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0010", "Excelアプリケーション初期化エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0010", "Excelアプリケーション初期化エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -153,10 +179,17 @@ class ExcelDriver
             $this.file_path = Join-Path $this.temp_directory "Workbook_$timestamp.xlsx"
             
             Write-Host "新規ワークブックを作成しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新規ワークブックを作成しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規ワークブックを作成しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
-            $global:Common.HandleError("ExcelDriverError_0011", "新規ワークブック作成エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+            $global:Common.HandleError("ExcelDriverError_0011", "新規ワークブック作成エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
             throw "新規ワークブックの作成に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -182,6 +215,13 @@ class ExcelDriver
 
             $this.excel_worksheet.Range($cell).Value = $value
             Write-Host "セル $cell に値を設定しました: $value"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セル $cell に値を設定しました: $value", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セル $cell に値を設定しました: $value" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -190,7 +230,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0020", "セル値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0020", "セル値設定エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -223,6 +263,14 @@ class ExcelDriver
 
             $value = $this.excel_worksheet.Range($cell).Value
             Write-Host "セル $cell の値を取得しました: $value"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セル $cell の値を取得しました: $value", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セル $cell の値を取得しました: $value" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $value
         }
         catch
@@ -232,7 +280,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0021", "セル値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0021", "セル値取得エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -265,6 +313,13 @@ class ExcelDriver
 
             $this.excel_worksheet.Range($range).Value = $values
             Write-Host "範囲 $range に値を設定しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("範囲 $range に値を設定しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 範囲 $range に値を設定しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -273,7 +328,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0022", "範囲値設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0022", "範囲値設定エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -306,6 +361,14 @@ class ExcelDriver
 
             $values = $this.excel_worksheet.Range($range).Value
             Write-Host "範囲 $range の値を取得しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("範囲 $range の値を取得しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 範囲 $range の値を取得しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $values
         }
         catch
@@ -315,7 +378,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0023", "範囲値取得エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0023", "範囲値取得エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -355,6 +418,13 @@ class ExcelDriver
             $range.Font.Size = $fontSize
             
             Write-Host "セル $cell のフォントを設定しました: $fontName, $fontSize"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セル $cell のフォントを設定しました: $fontName, $fontSize", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セル $cell のフォントを設定しました: $fontName, $fontSize" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -363,7 +433,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0040", "フォント設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0040", "フォント設定エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -396,6 +466,13 @@ class ExcelDriver
 
             $this.excel_worksheet.Range($cell).Font.Bold = $isBold
             Write-Host "セル $cell の太字設定を変更しました: $isBold"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セル $cell の太字設定を変更しました: $isBold", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セル $cell の太字設定を変更しました: $isBold" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -404,7 +481,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0041", "太字設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0041", "太字設定エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -437,6 +514,13 @@ class ExcelDriver
 
             $this.excel_worksheet.Range($cell).Interior.ColorIndex = $colorIndex
             Write-Host "セル $cell の背景色を設定しました: $colorIndex"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セル $cell の背景色を設定しました: $colorIndex", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セル $cell の背景色を設定しました: $colorIndex" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -445,7 +529,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0042", "背景色設定エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0042", "背景色設定エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -483,6 +567,13 @@ class ExcelDriver
             $newSheet = $this.excel_workbook.Worksheets.Add()
             $newSheet.Name = $sheetName
             Write-Host "新しいワークシートを追加しました: $sheetName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新しいワークシートを追加しました: $sheetName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新しいワークシートを追加しました: $sheetName" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -491,7 +582,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0024", "ワークシート追加エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0024", "ワークシート追加エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -524,6 +615,13 @@ class ExcelDriver
 
             $this.excel_worksheet = $this.excel_workbook.Worksheets.Item($sheetName)
             Write-Host "ワークシートを選択しました: $sheetName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ワークシートを選択しました: $sheetName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ワークシートを選択しました: $sheetName" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -532,7 +630,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0025", "ワークシート選択エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0025", "ワークシート選択エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -570,6 +668,13 @@ class ExcelDriver
             $this.excel_workbook.SaveAs($filePath)
             $this.is_saved = $true
             Write-Host "ワークブックを保存しました: $filePath"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ワークブックを保存しました: $filePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ワークブックを保存しました: $filePath" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -578,7 +683,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0060", "ワークブック保存エラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0060", "ワークブック保存エラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -618,6 +723,13 @@ class ExcelDriver
             $this.excel_worksheet = $this.excel_workbook.Worksheets.Item(1)
             $this.file_path = $filePath
             Write-Host "ワークブックを開きました: $filePath"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ワークブックを開きました: $filePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ワークブックを開きました: $filePath" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -626,7 +738,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0061", "ワークブック開くエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0061", "ワークブック開くエラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -671,6 +783,13 @@ class ExcelDriver
             Write-Host "初期化失敗時のクリーンアップを開始します。"
             Write-Host "一時ディレクトリを削除しました: $($this.temp_directory)"
             Write-Host "クリーンアップが完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("初期化失敗時のクリーンアップが完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップが完了しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -679,7 +798,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -734,6 +853,13 @@ class ExcelDriver
             [System.GC]::WaitForPendingFinalizers()
 
             Write-Host "ExcelDriverのリソースを解放しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ExcelDriverのリソースを解放しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ExcelDriverのリソースを解放しました" | Out-File -Append -FilePath ([ExcelDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -742,7 +868,7 @@ class ExcelDriver
             {
                 try
                 {
-                    $global:Common.HandleError("ExcelDriverError_0091", "ExcelDriver Disposeエラー: $($_.Exception.Message)", "ExcelDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("ExcelDriverError_0091", "ExcelDriver Disposeエラー: $($_.Exception.Message)", "ExcelDriver", [ExcelDriver]::ErrorLogFile)
                 }
                 catch
                 {

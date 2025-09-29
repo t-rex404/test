@@ -12,6 +12,10 @@ class AccessDriver
     [string]$temp_directory
     [object]$current_recordset
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\AccessDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\AccessDriver_$($env:USERNAME)_Error.log"
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -34,6 +38,13 @@ class AccessDriver
 
             $this.is_initialized = $true
             Write-Host "AccessDriverの初期化が完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("AccessDriverの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] AccessDriverの初期化が完了しました" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -45,7 +56,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0001", "AccessDriver初期化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0001", "AccessDriver初期化エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -82,6 +93,14 @@ class AccessDriver
             }
 
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $temp_dir
         }
         catch
@@ -91,7 +110,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -131,6 +150,13 @@ class AccessDriver
             }
 
             Write-Host "Accessアプリケーションの初期化が完了しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("Accessアプリケーションの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Accessアプリケーションの初期化が完了しました" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -140,7 +166,7 @@ class AccessDriver
             if ($global:Common)
             {
                 try {
-                    $global:Common.HandleError("AccessDriverError_0010", "Accessアプリケーション初期化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0010", "Accessアプリケーション初期化エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 } catch {
                     Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
@@ -166,6 +192,13 @@ class AccessDriver
             $this.access_database = $this.access_app.NewCurrentDatabase($this.file_path)
 
             Write-Host "新規データベースを作成しました: $($this.file_path)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新規データベースを作成しました: $($this.file_path)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規データベースを作成しました: $($this.file_path)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -174,7 +207,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0011", "新規データベース作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0011", "新規データベース作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -229,6 +262,13 @@ class AccessDriver
             $this.access_app.CurrentDb().Execute($sql)
 
             Write-Host "テーブルを作成しました: $tableName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブルを作成しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを作成しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -237,7 +277,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0020", "テーブル作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0020", "テーブル作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -276,6 +316,14 @@ class AccessDriver
             }
 
             Write-Host "テーブル一覧を取得しました。テーブル数: $($tableList.Count)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブル一覧を取得しました。テーブル数: $($tableList.Count)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブル一覧を取得しました。テーブル数: $($tableList.Count)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $tableList
         }
         catch
@@ -285,7 +333,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0021", "テーブル一覧取得エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0021", "テーブル一覧取得エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -320,6 +368,13 @@ class AccessDriver
             $this.access_app.CurrentDb().Execute($sql)
 
             Write-Host "テーブルを削除しました: $tableName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブルを削除しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを削除しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -328,7 +383,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0022", "テーブル削除エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0022", "テーブル削除エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -399,6 +454,13 @@ class AccessDriver
             $this.access_app.CurrentDb().Execute($sql)
 
             Write-Host "データを挿入しました: $tableName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データを挿入しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを挿入しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -407,7 +469,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0030", "データ挿入エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0030", "データ挿入エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -482,6 +544,13 @@ class AccessDriver
             $this.access_app.CurrentDb().Execute($sql)
 
             Write-Host "データを更新しました: $tableName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データを更新しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを更新しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -490,7 +559,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0031", "データ更新エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0031", "データ更新エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -530,6 +599,13 @@ class AccessDriver
             $this.access_app.CurrentDb().Execute($sql)
 
             Write-Host "データを削除しました: $tableName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データを削除しました: $tableName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを削除しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -538,7 +614,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0032", "データ削除エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0032", "データ削除エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -594,6 +670,14 @@ class AccessDriver
             $recordset.Close()
 
             Write-Host "データを取得しました。件数: $($results.Count)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データを取得しました。件数: $($results.Count)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを取得しました。件数: $($results.Count)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $results
         }
         catch
@@ -603,7 +687,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0033", "データ検索エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0033", "データ検索エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -647,6 +731,13 @@ class AccessDriver
             $queryDef = $db.CreateQueryDef($queryName, $sql)
 
             Write-Host "クエリを作成しました: $queryName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("クエリを作成しました: $queryName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クエリを作成しました: $queryName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -655,7 +746,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0040", "クエリ作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0040", "クエリ作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -711,6 +802,14 @@ class AccessDriver
             $recordset.Close()
 
             Write-Host "クエリを実行しました: $queryName。件数: $($results.Count)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("クエリを実行しました: $queryName。件数: $($results.Count)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クエリを実行しました: $queryName。件数: $($results.Count)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
+
             return $results
         }
         catch
@@ -720,7 +819,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0041", "クエリ実行エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0041", "クエリ実行エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -768,6 +867,13 @@ class AccessDriver
             $this.access_app.DoCmd.Save([Microsoft.Office.Interop.Access.AcObjectType]::acForm, $formName)
 
             Write-Host "フォームを作成しました: $formName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("フォームを作成しました: $formName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォームを作成しました: $formName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -776,7 +882,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0050", "フォーム作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0050", "フォーム作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -820,6 +926,13 @@ class AccessDriver
             $this.access_app.DoCmd.OpenForm($formName, $viewMode)
 
             Write-Host "フォームを開きました: $formName (ビュー: $view)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("フォームを開きました: $formName (ビュー: $view)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォームを開きました: $formName (ビュー: $view)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -828,7 +941,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0051", "フォームを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0051", "フォームを開くエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -876,6 +989,13 @@ class AccessDriver
             $this.access_app.DoCmd.Save([Microsoft.Office.Interop.Access.AcObjectType]::acReport, $reportName)
 
             Write-Host "レポートを作成しました: $reportName"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("レポートを作成しました: $reportName", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] レポートを作成しました: $reportName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -884,7 +1004,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0052", "レポート作成エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0052", "レポート作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -928,6 +1048,13 @@ class AccessDriver
             $this.access_app.DoCmd.OpenReport($reportName, $viewMode)
 
             Write-Host "レポートを開きました: $reportName (ビュー: $view)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("レポートを開きました: $reportName (ビュー: $view)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] レポートを開きました: $reportName (ビュー: $view)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -936,7 +1063,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0053", "レポートを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0053", "レポートを開くエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -984,6 +1111,13 @@ class AccessDriver
             $this.is_saved = $true
 
             Write-Host "データベースを保存しました: $($this.file_path)"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データベースを保存しました: $($this.file_path)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベースを保存しました: $($this.file_path)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -992,7 +1126,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0060", "データベース保存エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0060", "データベース保存エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1038,6 +1172,13 @@ class AccessDriver
             $this.file_path = $file_path
 
             Write-Host "データベースを開きました: $file_path"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データベースを開きました: $file_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベースを開きました: $file_path" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1046,7 +1187,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0061", "データベースを開くエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0061", "データベースを開くエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1097,6 +1238,13 @@ class AccessDriver
             }
 
             Write-Host "データベースをコンパクト化しました: $source_path"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("データベースをコンパクト化しました: $source_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベースをコンパクト化しました: $source_path" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1105,7 +1253,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0080", "データベースコンパクト化エラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0080", "データベースコンパクト化エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1182,7 +1330,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1252,6 +1400,13 @@ class AccessDriver
 
             $this.is_initialized = $false
             Write-Host "AccessDriverのリソース解放が完了しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("AccessDriverのリソースを解放しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] AccessDriverのリソースを解放しました" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1260,7 +1415,7 @@ class AccessDriver
             {
                 try
                 {
-                    $global:Common.HandleError("AccessDriverError_0091", "AccessDriver Disposeエラー: $($_.Exception.Message)", "AccessDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("AccessDriverError_0091", "AccessDriver Disposeエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
                 }
                 catch
                 {

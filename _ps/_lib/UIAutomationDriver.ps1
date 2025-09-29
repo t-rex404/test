@@ -18,6 +18,10 @@ class UIAutomationDriver
     [bool]$is_initialized
     [string]$temp_directory
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\UIAutomationDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\UIAutomationDriver_$($env:USERNAME)_Error.log"
+
     # コンストラクタ
     UIAutomationDriver()
     {
@@ -29,6 +33,16 @@ class UIAutomationDriver
             $this.application_path = ""
             $this.window_title = ""
             $this.temp_directory = ""
+
+            $this.is_initialized = $true
+            Write-Host "UIAutomationDriverの初期化が完了しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("UIAutomationDriverの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] UIAutomationDriverの初期化が完了しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -37,7 +51,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0001", "UIAutomationDriver初期化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0001", "UIAutomationDriver初期化エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -103,6 +117,13 @@ class UIAutomationDriver
             Start-Sleep -Milliseconds 2000
 
             Write-Host "アプリケーションを起動しました: $app_path" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("アプリケーションを起動しました: $app_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを起動しました: $app_path" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -111,7 +132,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0010", "アプリケーション起動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0010", "アプリケーション起動エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -219,6 +240,13 @@ class UIAutomationDriver
                                 {
                                     $this.root_element = $window
                                     Write-Host "プロセスIDでウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
+
+                                    # 正常ログ出力
+                                    if ($global:Common)
+                                    {
+                                        $global:Common.WriteLog("プロセスIDでウィンドウを発見しました: $($window.Current.Name)", "INFO")
+                                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセスIDでウィンドウを発見しました: $($window.Current.Name)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                                    }
                                     return $window
                                 }
                             }
@@ -234,6 +262,13 @@ class UIAutomationDriver
                         {
                             $this.root_element = $window
                             Write-Host "ウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
+
+                            # 正常ログ出力
+                            if ($global:Common)
+                            {
+                                $global:Common.WriteLog("ウィンドウを発見しました: $($window.Current.Name)", "INFO")
+                                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを発見しました: $($window.Current.Name)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                            }
                             return $window
                         }
                     }
@@ -275,6 +310,13 @@ class UIAutomationDriver
                             {
                                 $this.root_element = $window
                                 Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
+
+                                # 正常ログ出力
+                                if ($global:Common)
+                                {
+                                    $global:Common.WriteLog("部分一致でウィンドウを発見しました: $windowName", "INFO")
+                                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 部分一致でウィンドウを発見しました: $windowName" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                                }
                                 return $window
                             }
                         }
@@ -313,6 +355,13 @@ class UIAutomationDriver
                             {
                                 $this.root_element = $window
                                 Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
+
+                                # 正常ログ出力
+                                if ($global:Common)
+                                {
+                                    $global:Common.WriteLog("プロセス名でウィンドウを発見しました: $($window.Current.Name)", "INFO")
+                                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名でウィンドウを発見しました: $($window.Current.Name)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                                }
                                 return $window
                             }
                         }
@@ -333,7 +382,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0020", "ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0020", "ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -385,6 +434,13 @@ class UIAutomationDriver
                         $this.root_element = $window
                         $this.window_title = $windowName
                         Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
+
+                        # 正常ログ出力
+                        if ($global:Common)
+                        {
+                            $global:Common.WriteLog("部分一致でウィンドウを発見しました: $windowName", "INFO")
+                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 部分一致でウィンドウを発見しました: $windowName" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                        }
                         return $window
                     }
                 }
@@ -399,7 +455,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0021", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0021", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -453,6 +509,13 @@ class UIAutomationDriver
                             $this.root_element = $window
                             $this.window_title = $window.Current.Name
                             Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))" -ForegroundColor Green
+
+                            # 正常ログ出力
+                            if ($global:Common)
+                            {
+                                $global:Common.WriteLog("プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))", "INFO")
+                                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                            }
                             return $window
                         }
                     }
@@ -473,7 +536,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0022", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0022", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -629,6 +692,13 @@ class UIAutomationDriver
                 $this.root_element = $bestMatch.Window
                 $this.window_title = $bestMatch.WindowName
                 Write-Host "プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
                 return $bestMatch.Window
             }
 
@@ -641,7 +711,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0023", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0023", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -780,6 +850,13 @@ class UIAutomationDriver
                     $this.root_element = $bestMatch.Window
                     $this.window_title = $bestMatch.WindowName
                     Write-Host "柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))" -ForegroundColor Green
+
+                    # 正常ログ出力
+                    if ($global:Common)
+                    {
+                        $global:Common.WriteLog("柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))", "INFO")
+                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                    }
                     return $bestMatch.Window
                 }
 
@@ -797,7 +874,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0024", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0024", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -838,6 +915,13 @@ class UIAutomationDriver
             }
 
             Write-Host "ウィンドウをアクティブ化しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ウィンドウをアクティブ化しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウをアクティブ化しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -846,7 +930,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0025", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0025", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -888,6 +972,13 @@ class UIAutomationDriver
             }
 
             Write-Host "要素を発見しました: $name" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("要素を発見しました: $name", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を発見しました: $name" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return $element
         }
         catch
@@ -897,7 +988,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0030", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0030", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -935,6 +1026,13 @@ class UIAutomationDriver
             }
 
             Write-Host "要素を発見しました: $controlType" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("要素を発見しました: $controlType", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を発見しました: $controlType" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return $element
         }
         catch
@@ -944,7 +1042,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0031", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0031", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -985,6 +1083,13 @@ class UIAutomationDriver
             }
 
             Write-Host "要素を発見しました" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("複合条件で要素を発見しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 複合条件で要素を発見しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return $element
         }
         catch
@@ -994,7 +1099,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0032", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0032", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1037,6 +1142,13 @@ class UIAutomationDriver
             }
 
             Write-Host "要素をクリックしました" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("要素をクリックしました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素をクリックしました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1045,7 +1157,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0040", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0040", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1087,6 +1199,13 @@ class UIAutomationDriver
             }
 
             Write-Host "要素にテキストを設定しました: $text" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("要素にテキストを設定しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素にテキストを設定しました: $text" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1095,7 +1214,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0041", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0041", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1128,6 +1247,13 @@ class UIAutomationDriver
             }
 
             Write-Host "要素のテキストを取得しました: $text" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("要素のテキストを取得しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素のテキストを取得しました: $text" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return $text
         }
         catch
@@ -1137,7 +1263,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0042", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0042", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1183,6 +1309,13 @@ class UIAutomationDriver
             $user32::mouse_event($mouseEventCode, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero)
 
             Write-Host "マウスクリックを実行しました: ($x, $y) $button" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウスクリックを実行しました: ($x, $y) $button", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスクリックを実行しました: ($x, $y) $button" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1191,7 +1324,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0050", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0050", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1228,6 +1361,13 @@ class UIAutomationDriver
             $user32::mouse_event(0x0002 -bor 0x0004, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero) # 2回目
 
             Write-Host "マウスダブルクリックを実行しました: ($x, $y)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウスダブルクリックを実行しました: ($x, $y)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスダブルクリックを実行しました: ($x, $y)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1236,7 +1376,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0051", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0051", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1270,6 +1410,13 @@ class UIAutomationDriver
             $user32::mouse_event(0x0008 -bor 0x0010, [uint32]$x, [uint32]$y, 0, [IntPtr]::Zero) # MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP
 
             Write-Host "マウス右クリックを実行しました: ($x, $y)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウス右クリックを実行しました: ($x, $y)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウス右クリックを実行しました: ($x, $y)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1278,7 +1425,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0052", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0052", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1303,6 +1450,13 @@ class UIAutomationDriver
             Start-Sleep -Milliseconds 100
 
             Write-Host "マウスを移動しました: ($x, $y)" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("マウスを移動しました: ($x, $y)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスを移動しました: ($x, $y)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1311,7 +1465,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0053", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0053", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1340,6 +1494,13 @@ class UIAutomationDriver
             [System.Windows.Forms.SendKeys]::SendWait($keys)
 
             Write-Host "キーボード入力を実行しました: $keys" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("キーボード入力を実行しました: $keys", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キーボード入力を実行しました: $keys" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1348,7 +1509,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0060", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0060", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1409,6 +1570,13 @@ class UIAutomationDriver
             }
 
             Write-Host "特殊キーを送信しました: $key" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("特殊キーを送信しました: $key", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 特殊キーを送信しました: $key" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1417,7 +1585,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0061", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0061", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1443,6 +1611,13 @@ class UIAutomationDriver
             [System.Windows.Forms.SendKeys]::SendWait($keyCombination)
 
             Write-Host "キー組み合わせを送信しました: $keyCombination" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("キー組み合わせを送信しました: $keyCombination", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キー組み合わせを送信しました: $keyCombination" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1451,7 +1626,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0062", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0062", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1476,6 +1651,13 @@ class UIAutomationDriver
             [System.Windows.Forms.SendKeys]::SendWait($text)
 
             Write-Host "テキストを入力しました: $text" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テキストを入力しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを入力しました: $text" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1484,7 +1666,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0063", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0063", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1526,6 +1708,13 @@ class UIAutomationDriver
             $bitmap.Dispose()
 
             Write-Host "スクリーンショットを保存しました: $file_path" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("スクリーンショットを保存しました: $file_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] スクリーンショットを保存しました: $file_path" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1534,7 +1723,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1579,6 +1768,13 @@ class UIAutomationDriver
             $bitmap.Dispose()
 
             Write-Host "ウィンドウスクリーンショットを保存しました: $file_path" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ウィンドウスクリーンショットを保存しました: $file_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウスクリーンショットを保存しました: $file_path" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1587,7 +1783,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0081", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0081", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1626,6 +1822,13 @@ class UIAutomationDriver
                 }
 
                 Write-Host "アプリケーションを終了しました。" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("アプリケーションを終了しました", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを終了しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
         }
         catch
@@ -1635,7 +1838,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0070", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0070", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1662,6 +1865,13 @@ class UIAutomationDriver
                 $this.process.WaitForExit(5000)
 
                 Write-Host "アプリケーションを強制終了しました。" -ForegroundColor Green
+
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("アプリケーションを強制終了しました", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを強制終了しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
         }
         catch
@@ -1671,7 +1881,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0071", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0071", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1705,7 +1915,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0072", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0072", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1728,6 +1938,13 @@ class UIAutomationDriver
         {
             Start-Sleep -Milliseconds $milliseconds
             Write-Host "待機しました: $milliseconds ms" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("待機しました: $milliseconds ms", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 待機しました: $milliseconds ms" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1736,7 +1953,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0082", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0082", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {
@@ -1771,6 +1988,13 @@ class UIAutomationDriver
             $this.is_initialized = $false
             $this.root_element = $null
             Write-Host "UIAutomationDriverを破棄しました。" -ForegroundColor Green
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("UIAutomationDriverを破棄しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] UIAutomationDriverを破棄しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1779,7 +2003,7 @@ class UIAutomationDriver
             {
                 try
                 {
-                    $global:Common.HandleError("UIAutomationDriverError_0090", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("UIAutomationDriverError_0090", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
                 }
                 catch
                 {

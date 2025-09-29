@@ -56,6 +56,10 @@ class WinSCPDriver
     [string]$WinSCPPath
     [bool]$IsConnected = $false
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\WinSCPDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\WinSCPDriver_$($env:USERNAME)_Error.log"
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -77,13 +81,13 @@ class WinSCPDriver
             # セッションを初期化
             $this.Session = New-Object WinSCP.Session
 
+            Write-Host "WinSCPDriverが正常に初期化されました。" -ForegroundColor Green
+
+            # 正常ログ出力
             if ($global:Common)
             {
-                $global:Common.WriteLog("WinSCPDriverが正常に初期化されました。", "INFO")
-            }
-            else
-            {
-                Write-Host "WinSCPDriverが正常に初期化されました。" -ForegroundColor Green
+                $global:Common.WriteLog("WinSCPDriver initialization completed", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WinSCPDriver initialization completed" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
         }
         catch
@@ -97,7 +101,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0001", "WinSCPDriver初期化エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0001", "WinSCPDriver初期化エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -149,9 +153,11 @@ class WinSCPDriver
             # タイムアウト設定
             $this.SessionOptions.Timeout = [TimeSpan]::FromSeconds(30)
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("接続パラメータが設定されました。ホスト: $hostName, ユーザー: $userName, プロトコル: $protocol", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続パラメータが設定されました。ホスト: $hostName, ユーザー: $userName, プロトコル: $protocol" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -165,7 +171,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0010", "接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0010", "接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -241,9 +247,11 @@ class WinSCPDriver
             # タイムアウト設定
             $this.SessionOptions.Timeout = [TimeSpan]::FromSeconds(30)
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("接続パラメータが設定されました（秘密鍵認証）。ホスト: $hostName, ユーザー: $userName, 鍵: $privateKeyPath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続パラメータが設定されました（秘密鍵認証）。ホスト: $hostName, ユーザー: $userName, 鍵: $privateKeyPath" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -257,7 +265,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0013", "秘密鍵接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0013", "秘密鍵接続パラメータ設定エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -300,9 +308,11 @@ class WinSCPDriver
             $this.Session.Open($this.SessionOptions)
             $this.IsConnected = $true
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("サーバーに正常に接続されました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] サーバーに正常に接続されました。" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -316,7 +326,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0011", "サーバー接続エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0011", "サーバー接続エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -355,9 +365,11 @@ class WinSCPDriver
                 $this.Session.Close()
                 $this.IsConnected = $false
 
+                # 正常ログ出力
                 if ($global:Common)
                 {
                     $global:Common.WriteLog("接続が正常に切断されました。", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続が正常に切断されました。" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
                 }
                 else
                 {
@@ -372,7 +384,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0012", "接続切断エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0012", "接続切断エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -413,9 +425,11 @@ class WinSCPDriver
             # 転送結果をチェック
             $transferResult.Check()
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("ファイルが正常にアップロードされました。ローカル: $localPath, リモート: $remotePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルが正常にアップロードされました。ローカル: $localPath, リモート: $remotePath" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -429,7 +443,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0020", "ファイルアップロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0020", "ファイルアップロードエラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -468,9 +482,11 @@ class WinSCPDriver
             # 転送結果をチェック
             $transferResult.Check()
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("ファイルが正常にダウンロードされました。リモート: $remotePath, ローカル: $localPath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルが正常にダウンロードされました。リモート: $remotePath, ローカル: $localPath" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -484,7 +500,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0021", "ファイルダウンロードエラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0021", "ファイルダウンロードエラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -513,9 +529,11 @@ class WinSCPDriver
             # ファイルを削除
             $this.Session.RemoveFiles($remotePath)
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("ファイルが正常に削除されました: $remotePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルが正常に削除されました: $remotePath" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -529,7 +547,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0022", "ファイル削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0022", "ファイル削除エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -561,9 +579,11 @@ class WinSCPDriver
                 $fileInfo = $this.Session.GetFileInfo($remotePath)
                 $exists = $null -ne $fileInfo
 
+                # 正常ログ出力
                 if ($global:Common)
                 {
                     $global:Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイル存在確認完了: $remotePath, 存在: $exists" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
                 }
 
                 return $exists
@@ -574,6 +594,7 @@ class WinSCPDriver
                 if ($global:Common)
                 {
                     $global:Common.WriteLog("ファイル存在確認完了: $remotePath, 存在: False", "DEBUG")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイル存在確認完了: $remotePath, 存在: False" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
                 }
 
                 return $false
@@ -586,7 +607,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0041", "ファイル存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0041", "ファイル存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -619,9 +640,11 @@ class WinSCPDriver
             # ディレクトリを作成
             $this.Session.CreateDirectory($remotePath)
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("ディレクトリが正常に作成されました: $remotePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ディレクトリが正常に作成されました: $remotePath" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -635,7 +658,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0030", "ディレクトリ作成エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0030", "ディレクトリ作成エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -664,9 +687,11 @@ class WinSCPDriver
             # ディレクトリを削除
             $this.Session.RemoveFiles($remotePath)
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("ディレクトリが正常に削除されました: $remotePath", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ディレクトリが正常に削除されました: $remotePath" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -680,7 +705,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0031", "ディレクトリ削除エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0031", "ディレクトリ削除エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -712,9 +737,11 @@ class WinSCPDriver
                 $fileInfo = $this.Session.GetFileInfo($remotePath)
                 $exists = ($null -ne $fileInfo) -and $fileInfo.IsDirectory
 
+                # 正常ログ出力
                 if ($global:Common)
                 {
                     $global:Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: $exists", "DEBUG")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ディレクトリ存在確認完了: $remotePath, 存在: $exists" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
                 }
 
                 return $exists
@@ -725,6 +752,7 @@ class WinSCPDriver
                 if ($global:Common)
                 {
                     $global:Common.WriteLog("ディレクトリ存在確認完了: $remotePath, 存在: False", "DEBUG")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ディレクトリ存在確認完了: $remotePath, 存在: False" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
                 }
 
                 return $false
@@ -737,7 +765,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0042", "ディレクトリ存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0042", "ディレクトリ存在確認エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -783,9 +811,11 @@ class WinSCPDriver
                 }
             }
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("ファイル一覧を取得しました。パス: $remotePath, 件数: $($fileList.Count)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイル一覧を取得しました。パス: $remotePath, 件数: $($fileList.Count)" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -801,7 +831,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0040", "ファイル一覧取得エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0040", "ファイル一覧取得エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -843,9 +873,11 @@ class WinSCPDriver
             # 上書き設定
             $this.TransferOptions.OverwriteMode = if ($overwrite) { [WinSCP.OverwriteMode]::Overwrite } else { [WinSCP.OverwriteMode]::Exception }
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("転送オプションが設定されました。モード: $transferMode, 上書き: $overwrite", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 転送オプションが設定されました。モード: $transferMode, 上書き: $overwrite" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -859,7 +891,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0080", "転送オプション設定エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0080", "転送オプション設定エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -957,9 +989,11 @@ class WinSCPDriver
             $this.SessionOptions = $null
             $this.TransferOptions = $null
 
+            # 正常ログ出力
             if ($global:Common)
             {
                 $global:Common.WriteLog("WinSCPDriverが正常に破棄されました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WinSCPDriverが正常に破棄されました。" | Out-File -Append -FilePath ([WinSCPDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
             }
             else
             {
@@ -973,7 +1007,7 @@ class WinSCPDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WinSCPDriverError_0090", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WinSCPDriverError_0090", "WinSCPDriver破棄エラー: $($_.Exception.Message)", "WinSCPDriver", "[WinSCPDriver]::ErrorLogFile")
                 }
                 catch
                 {

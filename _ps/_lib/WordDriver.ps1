@@ -11,6 +11,10 @@ class WordDriver
     [bool]$is_saved
     [string]$temp_directory
 
+    # ログファイルパス（共有可能）
+    static [string]$NormalLogFile = ".\WordDriver_$($env:USERNAME)_Normal.log"
+    static [string]$ErrorLogFile = ".\WordDriver_$($env:USERNAME)_Error.log"
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -36,6 +40,13 @@ class WordDriver
             
             $this.is_initialized = $true
             Write-Host "WordDriverの初期化が完了しました。"
+
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("WordDriver initialization completed", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WordDriver initialization completed" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -47,7 +58,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0001", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0001", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -84,6 +95,12 @@ class WordDriver
             }
             
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return $temp_dir
         }
         catch
@@ -93,7 +110,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -211,6 +228,12 @@ class WordDriver
             }
             
             Write-Host "Wordアプリケーションの初期化が完了しました。" -ForegroundColor Green
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("Wordアプリケーションの初期化が完了しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Wordアプリケーションの初期化が完了しました" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -220,7 +243,7 @@ class WordDriver
             if ($global:Common)
             {
                 try {
-                    $global:Common.HandleError("WordDriverError_0010", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0010", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 } catch {
                     Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
                 }
@@ -244,6 +267,12 @@ class WordDriver
             $this.file_path = Join-Path $this.temp_directory "Document_$timestamp.docx"
             #$this.word_document.SaveAs([ref]$this.file_path)
             Write-Host "新規ドキュメントを作成しました。"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新規ドキュメントを作成しました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規ドキュメントを作成しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -252,7 +281,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0011", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0011", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -443,6 +472,12 @@ class WordDriver
             Write-Host "フィールドの更新が完了しました。" -ForegroundColor Green
             
             Write-Host "フッターにページ番号を設定しました（中央揃え）。" -ForegroundColor Green
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("フッターにページ番号を設定しました（中央揃え）。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フッターにページ番号を設定しました（中央揃え）。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -453,7 +488,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0050", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0050", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -498,6 +533,12 @@ class WordDriver
             $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
 
             Write-Host "テキストを追加しました: $text"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テキストを追加しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを追加しました: $text" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -506,7 +547,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0020", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0020", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -570,6 +611,12 @@ class WordDriver
             $paragraph.Range.InsertParagraphAfter()
             
             Write-Host "見出しを追加しました: $text (レベル: $level)"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("見出しを追加しました: $text (レベル: $level)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 見出しを追加しました: $text (レベル: $level)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -580,7 +627,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0021", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0021", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -621,6 +668,12 @@ class WordDriver
             $range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd)
             
             Write-Host "段落を追加しました: $text"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("段落を追加しました: $text", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 段落を追加しました: $text" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -629,7 +682,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0022", "段落追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0022", "段落追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -701,6 +754,12 @@ class WordDriver
             $range.InsertParagraphAfter()
 
             Write-Host "テーブルを追加しました: $rows 行 x $cols 列"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("テーブルを追加しました: $rows 行 x $cols 列", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを追加しました: $rows 行 x $cols 列" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -709,7 +768,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0023", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0023", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -800,10 +859,22 @@ class WordDriver
             if ($width -gt 0 -or $height -gt 0)
             {
                 Write-Host "画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)"
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
             else
             {
                 Write-Host "画像を追加しました: $image_path (元のサイズ)"
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("画像を追加しました: $image_path (元のサイズ)", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 画像を追加しました: $image_path (元のサイズ)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
         }
         catch
@@ -813,7 +884,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0024", "画像追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0024", "画像追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -844,6 +915,12 @@ class WordDriver
             $range.InsertBreak([Microsoft.Office.Interop.Word.WdBreakType]::wdPageBreak)
             
             Write-Host "ページ区切りを追加しました。"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ページ区切りを追加しました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページ区切りを追加しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -852,7 +929,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0025", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0025", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -888,6 +965,12 @@ class WordDriver
             $range.InsertBreak([Microsoft.Office.Interop.Word.WdBreakType]::wdSectionBreakNextPage)
             
             Write-Host "新しいセクションを追加しました。"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("新しいセクションを追加しました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新しいセクションを追加しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -896,7 +979,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0026", "セクション追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0026", "セクション追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -947,6 +1030,12 @@ class WordDriver
             $range.InsertBreak($wd_break_type)
             
             Write-Host "指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -955,7 +1044,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0027", "セクション区切り挿入エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0027", "セクション区切り挿入エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -983,6 +1072,12 @@ class WordDriver
 
             $section_count = $this.word_document.Sections.Count
             Write-Host "セクション数: $section_count"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セクション数: $section_count", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セクション数: $section_count" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return $section_count
         }
         catch
@@ -992,7 +1087,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0028", "セクション数取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0028", "セクション数取得エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1028,12 +1123,24 @@ class WordDriver
                 if ($this.word_document.Sections.Item($i) -eq $current_section)
                 {
                     Write-Host "現在のセクションインデックス: $i"
+                    # 正常ログ出力
+                    if ($global:Common)
+                    {
+                        $global:Common.WriteLog("現在のセクションインデックス: $i", "INFO")
+                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 現在のセクションインデックス: $i" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                    }
                     return $i
                 }
             }
             
             # 見つからない場合は1を返す
             Write-Host "現在のセクションインデックス: 1 (デフォルト)"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("現在のセクションインデックス: 1 (デフォルト)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 現在のセクションインデックス: 1 (デフォルト)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
             return 1
         }
         catch
@@ -1043,7 +1150,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0029", "現在のセクションインデックス取得エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0029", "現在のセクションインデックス取得エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1140,6 +1247,12 @@ class WordDriver
             }
 
             Write-Host "セクション $section_index のページ設定を完了しました。"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セクション $section_index のページ設定を完了しました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セクション $section_index のページ設定を完了しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1148,7 +1261,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0051", "セクションページ設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0051", "セクションページ設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1188,6 +1301,12 @@ class WordDriver
 
             $section.Range.Select()
             Write-Host "セクション $section_index に移動しました。"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("セクション $section_index に移動しました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セクション $section_index に移動しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1196,7 +1315,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0030", "セクション移動エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0030", "セクション移動エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1247,6 +1366,12 @@ class WordDriver
             )
             
             Write-Host "目次を追加しました。"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("目次を追加しました。", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 目次を追加しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1255,7 +1380,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0031", "目次追加エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0031", "目次追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1300,6 +1425,12 @@ class WordDriver
             $this.word_document.Content.Font.Size = $font_size
             
             Write-Host "フォントを設定しました: $font_name, サイズ: $font_size"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("フォントを設定しました: $font_name, サイズ: $font_size", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォントを設定しました: $font_name, サイズ: $font_size" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1308,7 +1439,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0052", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0052", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1358,6 +1489,12 @@ class WordDriver
             }
 
             Write-Host "ページ向きを設定しました: $orientation"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ページ向きを設定しました: $orientation", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページ向きを設定しました: $orientation" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1366,7 +1503,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0053", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0053", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1413,6 +1550,12 @@ class WordDriver
             $this.is_saved = $true
             
             Write-Host "ドキュメントを保存しました: $($this.file_path)"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ドキュメントを保存しました: $($this.file_path)", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ドキュメントを保存しました: $($this.file_path)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1421,7 +1564,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0060", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0060", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1451,6 +1594,12 @@ class WordDriver
             {
                 $this.word_document.TablesOfContents.Item(1).Update()
                 Write-Host "目次を更新しました。"
+                # 正常ログ出力
+                if ($global:Common)
+                {
+                    $global:Common.WriteLog("目次を更新しました。", "INFO")
+                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 目次を更新しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+                }
             }
             else
             {
@@ -1464,7 +1613,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0032", "目次更新エラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0032", "目次更新エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1510,6 +1659,12 @@ class WordDriver
             $this.file_path = $file_path
             
             Write-Host "ドキュメントを開きました: $file_path"
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("ドキュメントを開きました: $file_path", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ドキュメントを開きました: $file_path" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1518,7 +1673,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0061", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0061", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1596,7 +1751,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
@@ -1668,6 +1823,12 @@ class WordDriver
             
             $this.is_initialized = $false
             Write-Host "WordDriverのリソース解放が完了しました。" -ForegroundColor Green
+            # 正常ログ出力
+            if ($global:Common)
+            {
+                $global:Common.WriteLog("WordDriverのリソースを解放しました", "INFO")
+                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WordDriverのリソースを解放しました" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            }
         }
         catch
         {
@@ -1676,7 +1837,7 @@ class WordDriver
             {
                 try
                 {
-                    $global:Common.HandleError("WordDriverError_0091", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", ".\AllDrivers_Error.log")
+                    $global:Common.HandleError("WordDriverError_0091", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
                 }
                 catch
                 {
