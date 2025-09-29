@@ -42,6 +42,8 @@ if (-not $script:WinSCPAssemblyLoaded)
     }
 }
 
+Add-Type -AssemblyName Microsoft.Office.Interop.Access
+
 
 # WinSCPDriverクラスの全メソッドテスト
 # 実行前に確認事項:
@@ -54,6 +56,7 @@ $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $libPath = Join-Path $scriptPath "_lib"
 
 # 必要なクラスを読み込み
-. (Join-Path $libPath "Common.ps1")
-. (Join-Path $libPath "TeraTermDriver.ps1")
-. (Join-Path $libPath "WinSCPDriver.ps1")
+# . (Join-Path $libPath "Common.ps1")
+. (Join-Path $libPath "AccessDriver.ps1")
+# . (Join-Path $libPath "TeraTermDriver.ps1")
+# . (Join-Path $libPath "WinSCPDriver.ps1")

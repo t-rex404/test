@@ -353,12 +353,19 @@ class AccessDriver
     {
         try
         {
+            if ($null -eq $tableName)
+            {
+                throw "tableNameパラメータは必須です。"
+            }
             if ([string]::IsNullOrEmpty($tableName))
             {
                 throw "テーブル名が指定されていません。"
             }
-
-            if ($null -eq $data -or $data.Count -eq 0)
+            if ($null -eq $data)
+            {
+                throw "dataパラメータは必須です。"
+            }
+            if ($data.Count -eq 0)
             {
                 throw "データが指定されていません。"
             }
@@ -421,16 +428,26 @@ class AccessDriver
     {
         try
         {
+            if ($null -eq $tableName)
+            {
+                throw "tableNameパラメータは必須です。"
+            }
             if ([string]::IsNullOrEmpty($tableName))
             {
                 throw "テーブル名が指定されていません。"
             }
-
-            if ($null -eq $data -or $data.Count -eq 0)
+            if ($null -eq $data)
+            {
+                throw "dataパラメータは必須です。"
+            }
+            if ($data.Count -eq 0)
             {
                 throw "更新データが指定されていません。"
             }
-
+            if ($null -eq $whereClause)
+            {
+                throw "whereClauseパラメータは必須です。"
+            }
             if ([string]::IsNullOrEmpty($whereClause))
             {
                 throw "WHERE句が指定されていません。"
