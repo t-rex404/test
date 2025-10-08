@@ -1,13 +1,30 @@
 # 共通ライブラリ
 # 各ドライバークラスで使用する共通機能を提供
 
-class Common
+class Common : IDisposable
 {
     [hashtable]$ErrorCodes = @{}
+    [string]$TempDir
+    [string]$LogFilePath
+    [string]$ErrorLogFilePath
+    [bool]$Disposed = $false
 
-    # コンストラクタでJSONファイルを読み込む
+    # コンストラクタ
     Common()
     {
+        # 一時ディレクトリとログの初期化
+        try
+        {
+            $this.SetupTempDirectory()
+            $this.InitializeLogFile()
+            $this.InitializeErrorLogFile()
+        }
+        catch
+        {
+            Write-Host "一時ディレクトリ/ログの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+
+        # エラーコードの読み込み
         try
         {
             $this.LoadErrorCodes()
@@ -34,9 +51,82 @@ class Common
             default { Write-Host $logMessage }
         }
         
-        # ログファイルに出力
-        $logFile = ".\Common_$($level.ToLower()).log"
+        # ログファイルに出力（インスタンス生成時に決定した一時ディレクトリ配下のファイル）
+        $logFile = $this.LogFilePath
+        if ([string]::IsNullOrEmpty($logFile))
+        {
+            $logFile = ".\Common_Info.log"
+        }
         $logMessage | Out-File -Append -FilePath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+    }
+
+    # リソース解放とログ退避
+    [void] Dispose()
+    {
+        if ($this.Disposed)
+        {
+            return
+        }
+
+        try
+        {
+            # ログファイルが存在する場合は実行ディレクトリの _log 配下へコピー
+            $executionDir = $PWD.Path
+            $destDir = Join-Path $executionDir "_log"
+            if (-not (Test-Path -LiteralPath $destDir))
+            {
+                New-Item -ItemType Directory -Path $destDir -Force -ErrorAction Stop | Out-Null
+            }
+
+            if ($this.LogFilePath -and (Test-Path -LiteralPath $this.LogFilePath))
+            {
+                try
+                {
+                    $logFileName = Split-Path -Path $this.LogFilePath -Leaf
+                    $destFile = Join-Path $destDir $logFileName
+                    Copy-Item -LiteralPath $this.LogFilePath -Destination $destFile -Force -ErrorAction Stop
+                    Write-Host "ログファイルを退避しました: $destFile" -ForegroundColor Green
+                }
+                catch
+                {
+                    Write-Host "ログファイルの退避に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+
+            # エラーログファイルが存在する場合も退避
+            if ($this.ErrorLogFilePath -and (Test-Path -LiteralPath $this.ErrorLogFilePath))
+            {
+                try
+                {
+                    $errFileName = Split-Path -Path $this.ErrorLogFilePath -Leaf
+                    $destErrFile = Join-Path $destDir $errFileName
+                    Copy-Item -LiteralPath $this.ErrorLogFilePath -Destination $destErrFile -Force -ErrorAction Stop
+                    Write-Host "エラーログファイルを退避しました: $destErrFile" -ForegroundColor Green
+                }
+                catch
+                {
+                    Write-Host "エラーログファイルの退避に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+
+            # 一時ディレクトリを削除
+            if ($this.TempDir -and (Test-Path -LiteralPath $this.TempDir))
+            {
+                try
+                {
+                    Remove-Item -Path $this.TempDir -Recurse -Force -ErrorAction Stop
+                    Write-Host "一時ディレクトリを削除しました: $($this.TempDir)" -ForegroundColor Yellow
+                }
+                catch
+                {
+                    Write-Host "一時ディレクトリの削除に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+        }
+        finally
+        {
+            $this.Disposed = $true
+        }
     }
     
     # 共通のエラーハンドリング関数（拡張版）
@@ -47,10 +137,18 @@ class Common
         # エラータイトルを取得
         $error_title = $this.GetErrorTitle($errorCode, $module)
         
-        # ログファイル名を決定
+        # ログファイル名を決定（一時ディレクトリ配下、インスタンス生成時の命名に従う）
         if ([string]::IsNullOrEmpty($logFile))
         {
-            $logFile = ".\Common_Error.log"
+            $logFile = $this.ErrorLogFilePath
+            if ([string]::IsNullOrEmpty($logFile))
+            {
+                $logFile = $this.LogFilePath
+                if ([string]::IsNullOrEmpty($logFile))
+                {
+                    $logFile = ".\Common_Error.log"
+                }
+            }
         }
         
         $errorMessage = "[$timestamp], ERROR_CODE:$errorCode, ERROR_TITLE:$error_title, MODULE:$module, ERROR_MESSAGE:$message"
@@ -74,6 +172,101 @@ class Common
 "@
         
         $debugInfo | Out-File -Append -FilePath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+    }
+
+    # 一時ディレクトリを初期化
+    [void] SetupTempDirectory()
+    {
+        # ベースディレクトリを決定（優先: C:\temp → 環境変数TEMP）
+        $base_dirs = @(
+            "C:\temp",
+            "$($env:TEMP)"
+        )
+        $base_dir = $base_dirs[0]
+        if (-not (Test-Path $base_dir))
+        {
+            $base_dir = $base_dirs[1]
+        }
+
+        $temp_dir = Join-Path $base_dir "Common_Temp"
+
+        # 既存のディレクトリがある場合は削除
+        if (Test-Path $temp_dir)
+        {
+            try
+            {
+                Remove-Item -Path $temp_dir -Recurse -Force -ErrorAction Stop
+                Write-Host "既存の一時ディレクトリを削除しました: $temp_dir" -ForegroundColor Yellow
+            }
+            catch
+            {
+                Write-Host "既存の一時ディレクトリの削除に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+
+        # 新しいディレクトリを作成
+        New-Item -ItemType Directory -Path $temp_dir -Force -ErrorAction Stop | Out-Null
+        $this.TempDir = $temp_dir
+        Write-Host "Common一時ディレクトリを作成しました: $temp_dir" -ForegroundColor Green
+    }
+
+    # ログファイル（ファイル名）を初期化
+    [void] InitializeLogFile()
+    {
+        $username = $env:USERNAME
+        $timestamp = Get-Date -Format 'yyyyMMddHHmmss'
+        $fileName = "${username}_${timestamp}.log"
+
+        if ([string]::IsNullOrEmpty($this.TempDir))
+        {
+            $this.SetupTempDirectory()
+        }
+
+        $this.LogFilePath = Join-Path $this.TempDir $fileName
+
+        # 空ファイルを作成（以後はAppendで書き込み）
+        try
+        {
+            New-Item -ItemType File -Path $this.LogFilePath -Force -ErrorAction SilentlyContinue | Out-Null
+            Write-Host "ログファイルを初期化しました: $($this.LogFilePath)" -ForegroundColor Green
+        }
+        catch
+        {
+            Write-Host "ログファイルの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+
+    # エラーログファイル（ファイル名）を初期化
+    [void] InitializeErrorLogFile()
+    {
+        if ([string]::IsNullOrEmpty($this.TempDir))
+        {
+            $this.SetupTempDirectory()
+        }
+
+        # 既存の通常ログ名があれば、それに基づきエラーログ名を決定
+        if ($this.LogFilePath -and ($this.LogFilePath.ToLower().EndsWith('.log')))
+        {
+            $baseName = [System.IO.Path]::GetFileNameWithoutExtension($this.LogFilePath)
+            $errorFileName = "$baseName`_error.log"
+            $this.ErrorLogFilePath = Join-Path $this.TempDir $errorFileName
+        }
+        else
+        {
+            $username = $env:USERNAME
+            $timestamp = Get-Date -Format 'yyyyMMddHHmmss'
+            $this.ErrorLogFilePath = Join-Path $this.TempDir "${username}_${timestamp}_error.log"
+        }
+
+        try
+        {
+            New-Item -ItemType File -Path $this.ErrorLogFilePath -Force -ErrorAction SilentlyContinue | Out-Null
+            Write-Host "エラーログファイルを初期化しました: $($this.ErrorLogFilePath)" -ForegroundColor Green
+        }
+        catch
+        {
+            Write-Host "エラーログファイルの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
     }
     
     # JSONファイルからエラーコードを読み込む
