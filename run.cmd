@@ -20,7 +20,6 @@ REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_WinSCPDriver_Al
 REM powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\aaa.ps1"
 powershell.exe -ExecutionPolicy Bypass -file "%~dp0\_ps\test_EdgeDriver_AllWebDriverMethods.ps1"
 
-
 POPD
 
 SET END_TIME=%TIME%
