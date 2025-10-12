@@ -1,4 +1,4 @@
-﻿class WebDriver
+class WebDriver
 {
     [int]$browser_exe_process_id
     [System.Net.WebSockets.ClientWebSocket]$web_socket
@@ -72,7 +72,7 @@
         catch
         {
             # Commonオブジェクトが利用可能な場合はエラーログに記録
-            # 初期化・接続関連エラー (1001)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1001", "WebDriver初期化エラー: $($_.Exception.Message)")
 
             throw "WebDriverの初期化に失敗しました: $($_.Exception.Message)"
@@ -154,7 +154,7 @@
         catch
         {
             # Commonオブジェクトが利用可能な場合はエラーログに記録
-            # 初期化・接続関連エラー (1002)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1002", "ブラウザ起動エラー: $($_.Exception.Message)")
 
             throw "ブラウザの起動に失敗しました: $($_.Exception.Message)"
@@ -258,7 +258,7 @@
         }
         catch
         {
-            # 初期化・接続関連エラー (1003)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1003", "タブ情報取得エラー: $($_.Exception.Message)")
             throw "タブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
@@ -351,7 +351,7 @@
         }
         catch
         {
-            # 初期化・接続関連エラー (1004)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1004", "WebSocket接続エラー: $($_.Exception.Message)")
             throw "WebSocket接続に失敗しました: $($_.Exception.Message)"
         }
@@ -400,7 +400,7 @@
         }
         catch
         {
-            # 初期化・接続関連エラー (1005)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1005", "WebSocket メッセージ送信エラー: $($_.Exception.Message)")
             throw "WebSocketメッセージ送信に失敗しました: $($_.Exception.Message)"
         }
@@ -524,7 +524,7 @@
         }
         catch
         {
-            # 初期化・接続関連エラー (1006)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1006", "WebSocket メッセージ受信エラー: $($_.Exception.Message)")
             throw "WebSocketメッセージの受信に失敗しました: $($_.Exception.Message)"
         }
@@ -657,7 +657,7 @@
         }
         catch
         {
-            # ナビゲーション関連エラー (1011)
+            # ナビゲーション関連エラー
             $this.LogError("WebDriverError_1101", "ページ遷移エラー: $($_.Exception.Message)")
             throw "ページ遷移に失敗しました: $($_.Exception.Message)"
         }
@@ -716,7 +716,7 @@
         }
         catch
         {
-            # ナビゲーション関連エラー (1016)
+            # ナビゲーション関連エラー
             $this.LogError("WebDriverError_1102", "広告読み込み待機エラー: $($_.Exception.Message)")
             throw "広告の読み込み待機に失敗しました: $($_.Exception.Message)"
         }
@@ -752,7 +752,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1077)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1201", "ウィンドウを閉じるエラー: $($_.Exception.Message)")
             Write-Host "ウィンドウを閉じる際にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -831,7 +831,7 @@
         }
         catch
         {
-            # 初期化・接続関連エラー (1007)
+            # 初期化・接続関連エラー
             $this.LogError("WebDriverError_1007", "Disposeエラー: $($_.Exception.Message)")
             Write-Host "リソースの解放中にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -867,7 +867,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1081)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1202", "ターゲット発見エラー: $($_.Exception.Message)")
             throw "ターゲットの発見に失敗しました: $($_.Exception.Message)"
         }
@@ -900,7 +900,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1082)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1203", "タブ情報取得エラー: $($_.Exception.Message)")
             throw "利用可能なタブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
@@ -934,7 +934,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1083)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1204", "タブアクティブ化エラー: $($_.Exception.Message)")
             throw "タブのアクティブ化に失敗しました: $($_.Exception.Message)"
         }
@@ -968,7 +968,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1084)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1205", "タブ切断エラー: $($_.Exception.Message)")
             throw "タブの切断に失敗しました: $($_.Exception.Message)"
         }
@@ -1010,7 +1010,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1086)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1206", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)")
             throw "ターゲットへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
         }
@@ -1036,7 +1036,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1086)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1207", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)")
             throw "現在タブへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
         }
@@ -1070,7 +1070,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1087)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1208", "セッションデタッチエラー: $($_.Exception.Message)")
             throw "セッションのデタッチに失敗しました: $($_.Exception.Message)"
         }
@@ -1099,7 +1099,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1085)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1209", "ページイベント有効化エラー: $($_.Exception.Message)")
             throw "ページイベントの有効化に失敗しました: $($_.Exception.Message)"
         }
@@ -1139,7 +1139,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1072)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1210", "ブラウザ表示倍率変更エラー: $($_.Exception.Message)")
             throw "ブラウザの表示倍率変更に失敗しました: $($_.Exception.Message)"
         }
@@ -1186,7 +1186,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1021)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1301", "要素検索エラー (CSS): $($_.Exception.Message)")
             throw "CSSセレクタでの要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1228,7 +1228,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1028)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1302", "複数要素検索エラー (CSS): $($_.Exception.Message)")
             throw "CSSセレクタでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1270,7 +1270,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1022)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1303", "要素検索エラー ($query_type): $($_.Exception.Message)")
             throw "$query_type による要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1312,7 +1312,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1029)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1304", "複数要素検索エラー ($query_type): $($_.Exception.Message)")
             throw "$query_type による複数要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1344,7 +1344,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1023)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1305", "XPath単体要素検索エラー: $($_.Exception.Message)")
             throw "XPathでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1375,7 +1375,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1024)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1306", "ClassName単体要素検索エラー: $($_.Exception.Message)")
             throw "ClassNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1406,7 +1406,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1025)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1307", "Name単体要素検索エラー: $($_.Exception.Message)")
             throw "Nameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1432,7 +1432,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1026)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1308", "Id単体要素検索エラー: $($_.Exception.Message)")
             throw "Idでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1463,7 +1463,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1027)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1309", "TagName単体要素検索エラー: $($_.Exception.Message)")
             throw "TagNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1507,7 +1507,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1030)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1310", "複数要素検索エラー (ClassName): $($_.Exception.Message)")
             throw "ClassNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1547,7 +1547,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1031)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1311", "複数要素検索エラー (Name): $($_.Exception.Message)")
             throw "Nameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1587,7 +1587,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1032)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1312", "複数要素検索エラー (TagName): $($_.Exception.Message)")
             throw "TagNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1630,7 +1630,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1033)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1313", "要素存在確認エラー ($query_type): $($_.Exception.Message)")
             throw "$query_type による要素存在確認に失敗しました: $($_.Exception.Message)"
         }
@@ -1651,7 +1651,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1034)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1314", "XPath要素存在確認エラー: $($_.Exception.Message)")
             throw "XPathでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
@@ -1677,7 +1677,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1035)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1315", "ClassName要素存在確認エラー: $($_.Exception.Message)")
             throw "ClassNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
@@ -1698,7 +1698,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1036)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1316", "Id要素存在確認エラー: $($_.Exception.Message)")
             throw "Idでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
@@ -1724,7 +1724,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1037)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1317", "Name要素存在確認エラー: $($_.Exception.Message)")
             throw "Nameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
@@ -1750,7 +1750,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1038)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1318", "TagName要素存在確認エラー: $($_.Exception.Message)")
             throw "TagNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
@@ -1809,7 +1809,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1042)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1319", "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)")
             throw "親オブジェクト内の子要素検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1893,7 +1893,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1043)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1320", "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)")
             throw "親オブジェクト内の子要素複数検索に失敗しました: $($_.Exception.Message)"
         }
@@ -1933,7 +1933,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1051)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1401", "要素テキスト取得エラー: $($_.Exception.Message)")
             throw "要素のテキスト取得に失敗しました: $($_.Exception.Message)"
         }
@@ -1967,7 +1967,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1052)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1402", "要素テキスト設定エラー: $($_.Exception.Message)")
             throw "要素へのテキスト入力に失敗しました: $($_.Exception.Message)"
         }
@@ -2001,7 +2001,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1054)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1403", "要素クリックエラー: $($_.Exception.Message)")
             throw "要素のクリックに失敗しました: $($_.Exception.Message)"
         }
@@ -2042,7 +2042,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1060)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1404", "要素属性取得エラー: $($_.Exception.Message)")
             throw "要素の属性取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2081,7 +2081,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1061)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1405", "要素属性設定エラー: $($_.Exception.Message)")
             throw "要素の属性設定に失敗しました: $($_.Exception.Message)"
         }
@@ -2118,7 +2118,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1064)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1406", "href取得エラー: $($_.Exception.Message)")
             throw "hrefの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2159,7 +2159,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1062)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1407", "CSSプロパティ取得エラー: $($_.Exception.Message)")
             throw "要素のCSSプロパティ取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2198,7 +2198,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1063)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1408", "CSSプロパティ設定エラー: $($_.Exception.Message)")
             throw "要素のCSSプロパティ設定に失敗しました: $($_.Exception.Message)"
         }
@@ -2241,7 +2241,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1065)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1409", "オプション選択エラー (インデックス): $($_.Exception.Message)")
             throw "インデックスによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
@@ -2280,7 +2280,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1066)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1410", "オプション選択エラー (テキスト): $($_.Exception.Message)")
             throw "テキストによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
@@ -2314,7 +2314,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1067)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1411", "オプション未選択エラー: $($_.Exception.Message)")
             throw "オプションの未選択に失敗しました: $($_.Exception.Message)"
         }
@@ -2348,7 +2348,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1053)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1412", "要素クリアエラー: $($_.Exception.Message)")
             throw "要素のクリアに失敗しました: $($_.Exception.Message)"
         }
@@ -2391,7 +2391,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1071)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1211", "ウィンドウリサイズエラー: $($_.Exception.Message)")
             throw "ウィンドウのリサイズに失敗しました: $($_.Exception.Message)"
         }
@@ -2425,7 +2425,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1072)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1212", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)")
             throw "ウィンドウの通常状態への変更に失敗しました: $($_.Exception.Message)"
         }
@@ -2459,7 +2459,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1073)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1213", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)")
             throw "ウィンドウの最大化に失敗しました: $($_.Exception.Message)"
         }
@@ -2493,7 +2493,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1074)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1214", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)")
             throw "ウィンドウの最小化に失敗しました: $($_.Exception.Message)"
         }
@@ -2527,7 +2527,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1075)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1215", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)")
             throw "ウィンドウのフルスクリーン化に失敗しました: $($_.Exception.Message)"
         }
@@ -2561,7 +2561,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1076)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1216", "ウィンドウ移動エラー: $($_.Exception.Message)")
             throw "ウィンドウの移動に失敗しました: $($_.Exception.Message)"
         }
@@ -2601,7 +2601,7 @@
         }
         catch
         {
-            # ナビゲーション関連エラー (1012)
+            # ナビゲーション関連エラー
             $this.LogError("WebDriverError_1103", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)")
             throw "ブラウザの履歴を戻る操作に失敗しました: $($_.Exception.Message)"
         }
@@ -2637,7 +2637,7 @@
         }
         catch
         {
-            # ナビゲーション関連エラー (1013)
+            # ナビゲーション関連エラー
             $this.LogError("WebDriverError_1104", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)")
             throw "ブラウザの履歴を進む操作に失敗しました: $($_.Exception.Message)"
         }
@@ -2666,7 +2666,7 @@
         }
         catch
         {
-            # ナビゲーション関連エラー (1014)
+            # ナビゲーション関連エラー
             $this.LogError("WebDriverError_1105", "ブラウザ更新エラー: $($_.Exception.Message)")
             throw "ブラウザの更新に失敗しました: $($_.Exception.Message)"
         }
@@ -2712,7 +2712,7 @@
         }
         catch
         {
-            # 情報取得関連エラー (1091)
+            # 情報取得関連エラー
             $this.LogError("WebDriverError_1501", "URL取得エラー: $($_.Exception.Message)")
             throw "URLの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2754,7 +2754,7 @@
         }
         catch
         {
-            # 情報取得関連エラー (1092)
+            # 情報取得関連エラー
             $this.LogError("WebDriverError_1502", "タイトル取得エラー: $($_.Exception.Message)")
             throw "タイトルの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2785,7 +2785,7 @@
         }
         catch
         {
-            # 情報取得関連エラー (1093)
+            # 情報取得関連エラー
             $this.LogError("WebDriverError_1503", "ソースコード取得エラー: $($_.Exception.Message)")
             throw "ソースコードの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2824,7 +2824,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1078)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1217", "ウィンドウハンドル取得エラー: $($_.Exception.Message)")
             throw "ウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2864,7 +2864,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1079)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1218", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)")
             throw "複数のウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2898,7 +2898,7 @@
         }
         catch
         {
-            # ウィンドウ・タブ操作関連エラー (1080)
+            # ウィンドウ・タブ操作関連エラー
             $this.LogError("WebDriverError_1219", "ウィンドウサイズ取得エラー: $($_.Exception.Message)")
             throw "ウィンドウサイズの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -3015,7 +3015,7 @@
         }
         catch
         {
-            # スクリーンショット関連エラー (1101)
+            # スクリーンショット関連エラー
             $this.LogError("WebDriverError_1601", "スクリーンショット取得エラー: $($_.Exception.Message)")
             throw "スクリーンショットの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -3115,7 +3115,7 @@
         }
         catch
         {
-            # スクリーンショット関連エラー (1102)
+            # スクリーンショット関連エラー
             $this.LogError("WebDriverError_1602", "要素スクリーンショット取得エラー: $($_.Exception.Message)")
             throw "要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
@@ -3212,7 +3212,7 @@
         }
         catch
         {
-            # スクリーンショット関連エラー (1103)
+            # スクリーンショット関連エラー
             $this.LogError("WebDriverError_1603", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)")
             throw "複数要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
@@ -3273,7 +3273,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1039)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1321", "要素表示待機エラー: $($_.Exception.Message)")
             throw "要素の表示待機に失敗しました: $($_.Exception.Message)"
         }
@@ -3340,7 +3340,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1040)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1322", "要素クリック可能性待機エラー: $($_.Exception.Message)")
             throw "要素のクリック可能性待機に失敗しました: $($_.Exception.Message)"
         }
@@ -3392,7 +3392,7 @@
         }
         catch
         {
-            # ナビゲーション関連エラー (1015)
+            # ナビゲーション関連エラー
             $this.LogError("WebDriverError_1106", "ページロード待機エラー: $($_.Exception.Message)")
             throw "ページロードの待機に失敗しました: $($_.Exception.Message)"
         }
@@ -3449,7 +3449,7 @@
         }
         catch
         {
-            # 要素検索関連エラー (1041)
+            # 要素検索関連エラー
             $this.LogError("WebDriverError_1323", "カスタム条件待機エラー: $($_.Exception.Message)")
             throw "カスタム条件の待機に失敗しました: $($_.Exception.Message)"
         }
@@ -3492,7 +3492,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1058)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1413", "キーボード入力エラー: $($_.Exception.Message)")
             throw "キーボード入力に失敗しました: $($_.Exception.Message)"
         }
@@ -3566,7 +3566,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1059)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1414", "特殊キー送信エラー: $($_.Exception.Message)")
             throw "特殊キーの送信に失敗しました: $($_.Exception.Message)"
         }
@@ -3604,7 +3604,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1057)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1415", "マウスホバーエラー: $($_.Exception.Message)")
             throw "マウスホバーに失敗しました: $($_.Exception.Message)"
         }
@@ -3638,7 +3638,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1055)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1416", "ダブルクリックエラー: $($_.Exception.Message)")
             throw "ダブルクリックに失敗しました: $($_.Exception.Message)"
         }
@@ -3672,7 +3672,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1056)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1417", "右クリックエラー: $($_.Exception.Message)")
             throw "右クリックに失敗しました: $($_.Exception.Message)"
         }
@@ -3710,7 +3710,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1068)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1418", "チェックボックス設定エラー: $($_.Exception.Message)")
             throw "チェックボックスの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -3744,7 +3744,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1069)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1419", "ラジオボタン選択エラー: $($_.Exception.Message)")
             throw "ラジオボタンの選択に失敗しました: $($_.Exception.Message)"
         }
@@ -3807,7 +3807,7 @@
         }
         catch
         {
-            # 要素操作関連エラー (1070)
+            # 要素操作関連エラー
             $this.LogError("WebDriverError_1420", "ファイルアップロードエラー: $($_.Exception.Message)")
             throw "ファイルアップロードに失敗しました: $($_.Exception.Message)"
         }
@@ -3847,7 +3847,7 @@
         }
         catch
         {
-            # JavaScript実行関連エラー (1111)
+            # JavaScript実行関連エラー
             $this.LogError("WebDriverError_1701", "JavaScript実行エラー: $($_.Exception.Message)")
             throw "JavaScriptの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -3881,7 +3881,7 @@
         }
         catch
         {
-            # JavaScript実行関連エラー (1112)
+            # JavaScript実行関連エラー
             $this.LogError("WebDriverError_1702", "JavaScript非同期実行エラー: $($_.Exception.Message)")
             throw "JavaScriptの非同期実行に失敗しました: $($_.Exception.Message)"
         }
@@ -3921,7 +3921,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1121)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1801", "クッキー取得エラー: $($_.Exception.Message)")
             throw "クッキーの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -3963,7 +3963,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1122)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1802", "クッキー設定エラー: $($_.Exception.Message)")
             throw "クッキーの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -3997,7 +3997,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1123)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1803", "クッキー削除エラー: $($_.Exception.Message)")
             throw "クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
@@ -4026,7 +4026,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1124)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1804", "全クッキー削除エラー: $($_.Exception.Message)")
             throw "全クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
@@ -4066,7 +4066,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1125)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1805", "ローカルストレージ取得エラー: $($_.Exception.Message)")
             throw "ローカルストレージの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -4100,7 +4100,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1126)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1806", "ローカルストレージ設定エラー: $($_.Exception.Message)")
             throw "ローカルストレージの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -4134,7 +4134,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1127)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1807", "ローカルストレージ削除エラー: $($_.Exception.Message)")
             throw "ローカルストレージの削除に失敗しました: $($_.Exception.Message)"
         }
@@ -4163,7 +4163,7 @@
         }
         catch
         {
-            # ストレージ操作関連エラー (1128)
+            # ストレージ操作関連エラー
             $this.LogError("WebDriverError_1808", "ローカルストレージクリアエラー: $($_.Exception.Message)")
             throw "ローカルストレージのクリアに失敗しました: $($_.Exception.Message)"
         }
