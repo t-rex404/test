@@ -370,6 +370,9 @@ finally {
     if ($driver) {
         Invoke-TestStep -Name 'Dispose()' -ScriptBlock { $driver.Dispose() }
     }
+    if ($global:Common) {
+        Invoke-TestStep -Name 'Dispose()' -ScriptBlock { $global:Common.Dispose() }
+    }
 }
 
 Write-Host "テスト完了: EdgeDriver (親WebDriverメソッド) の全機能を実行しました。" -ForegroundColor Green

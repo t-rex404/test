@@ -82,10 +82,19 @@ class Common : IDisposable
             {
                 try
                 {
-                    $logFileName = Split-Path -Path $this.LogFilePath -Leaf
-                    $destFile = Join-Path $destDir $logFileName
-                    Copy-Item -LiteralPath $this.LogFilePath -Destination $destFile -Force -ErrorAction Stop
-                    Write-Host "ログファイルを退避しました: $destFile" -ForegroundColor Green
+                    $logFile = Get-Item -LiteralPath $this.LogFilePath -ErrorAction Stop
+                    if ($logFile.Length -eq 0)
+                    {
+                        Remove-Item -LiteralPath $this.LogFilePath -Force -ErrorAction Stop
+                        Write-Host "空のログファイルを削除しました: $($logFile.FullName)" -ForegroundColor Yellow
+                    }
+                    else
+                    {
+                        $logFileName = $logFile.Name
+                        $destFile = Join-Path $destDir $logFileName
+                        Copy-Item -LiteralPath $this.LogFilePath -Destination $destFile -Force -ErrorAction Stop
+                        Write-Host "ログファイルを退避しました: $destFile" -ForegroundColor Green
+                    }
                 }
                 catch
                 {
@@ -98,10 +107,19 @@ class Common : IDisposable
             {
                 try
                 {
-                    $errFileName = Split-Path -Path $this.ErrorLogFilePath -Leaf
-                    $destErrFile = Join-Path $destDir $errFileName
-                    Copy-Item -LiteralPath $this.ErrorLogFilePath -Destination $destErrFile -Force -ErrorAction Stop
-                    Write-Host "エラーログファイルを退避しました: $destErrFile" -ForegroundColor Green
+                    $errorLog = Get-Item -LiteralPath $this.ErrorLogFilePath -ErrorAction Stop
+                    if ($errorLog.Length -eq 0)
+                    {
+                        Remove-Item -LiteralPath $this.ErrorLogFilePath -Force -ErrorAction Stop
+                        Write-Host "空のエラーログファイルを削除しました: $($errorLog.FullName)" -ForegroundColor Yellow
+                    }
+                    else
+                    {
+                        $errFileName = $errorLog.Name
+                        $destErrFile = Join-Path $destDir $errFileName
+                        Copy-Item -LiteralPath $this.ErrorLogFilePath -Destination $destErrFile -Force -ErrorAction Stop
+                        Write-Host "エラーログファイルを退避しました: $destErrFile" -ForegroundColor Green
+                    }
                 }
                 catch
                 {
@@ -213,9 +231,10 @@ class Common : IDisposable
     # ログファイル（ファイル名）を初期化
     [void] InitializeLogFile()
     {
+        $machineName = $env:COMPUTERNAME
         $username = $env:USERNAME
         $timestamp = Get-Date -Format 'yyyyMMddHHmmss'
-        $fileName = "${username}_${timestamp}.log"
+        $fileName = "${machineName}_${username}_${timestamp}.log"
 
         if ([string]::IsNullOrEmpty($this.TempDir))
         {
@@ -253,9 +272,10 @@ class Common : IDisposable
         }
         else
         {
+            $machineName = $env:COMPUTERNAME
             $username = $env:USERNAME
             $timestamp = Get-Date -Format 'yyyyMMddHHmmss'
-            $this.ErrorLogFilePath = Join-Path $this.TempDir "${username}_${timestamp}_error.log"
+            $this.ErrorLogFilePath = Join-Path $this.TempDir "${machineName}_${username}_${timestamp}_error.log"
         }
 
         try
