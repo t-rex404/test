@@ -21,6 +21,52 @@ class OracleDriver
     static [string]$ErrorLogFile = ".\OracleDriver_$($env:USERNAME)_Error.log"
 
     # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "OracleDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([OracleDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -40,11 +86,7 @@ class OracleDriver
             Write-Host "OracleDriverの初期化が完了しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("OracleDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] OracleDriverの初期化が完了しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("OracleDriverの初期化が完了しました")
         }
         catch
         {
@@ -52,22 +94,7 @@ class OracleDriver
             Write-Host "OracleDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0001", "OracleDriver初期化エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "OracleDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0001", "OracleDriver初期化エラー: $($_.Exception.Message)")
             
             throw "OracleDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -83,30 +110,11 @@ class OracleDriver
             Write-Host "TNS_ADMINパスを設定しました: $path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TNS_ADMINパスを設定しました: $path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TNS_ADMINパスを設定しました: $path" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TNS_ADMINパスを設定しました: $path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0002", "TNS_ADMINパス設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TNS_ADMINパスの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0002", "TNS_ADMINパス設定エラー: $($_.Exception.Message)")
 
             throw "TNS_ADMINパスの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -121,30 +129,11 @@ class OracleDriver
             Write-Host "SQLPLUSのパスを設定しました: $path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("SQLPLUSのパスを設定しました: $path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSのパスを設定しました: $path" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("SQLPLUSのパスを設定しました: $path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0003", "SQLPLUSパス設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SQLPLUSパスの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0003", "SQLPLUSパス設定エラー: $($_.Exception.Message)")
             
             throw "SQLPLUSパスの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -169,30 +158,11 @@ class OracleDriver
             Write-Host "TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TNS接続パラメータを設定しました。TNSエイリアス: $tnsAlias")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0010", "TNS接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TNS接続パラメータの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0010", "TNS接続パラメータ設定エラー: $($_.Exception.Message)")
 
             throw "TNS接続パラメータの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -218,30 +188,11 @@ class OracleDriver
             Write-Host "接続パラメータを設定しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("接続パラメータを設定しました。サーバー: $server, ポート: $port, サービス名: $service_name", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続パラメータを設定しました。サーバー: $server, ポート: $port, サービス名: $service_name" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("接続パラメータを設定しました。サーバー: $server, ポート: $port, サービス名: $service_name")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0011", "接続パラメータ設定エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "接続パラメータの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0011", "接続パラメータ設定エラー: $($_.Exception.Message)")
             
             throw "接続パラメータの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -298,11 +249,7 @@ class OracleDriver
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("SQLPLUSでORACLEデータベースに接続しました（TNS）。ユーザ: $username, TNSエイリアス: $tnsAlias")
             }
             else
             {
@@ -312,22 +259,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0012", "SQLPLUS TNS接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SQLPLUSでのTNS接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0012", "SQLPLUS TNS接続エラー: $($_.Exception.Message)")
 
             throw "SQLPLUSでのTNS接続に失敗しました: $($_.Exception.Message)"
         }
@@ -383,11 +315,7 @@ class OracleDriver
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("SQLPLUSでORACLEデータベースに接続しました。ユーザ: $username, サービス: $service_name")
             }
             else
             {
@@ -397,22 +325,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0013", "SQLPLUS接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0013", "SQLPLUS接続エラー: $($_.Exception.Message)")
             
             throw "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)"
         }
@@ -460,11 +373,7 @@ class OracleDriver
                 Write-Host "SQLPLUSでORACLEデータベースに接続しました。接続文字列: $sqlPlusConnStr" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("SQLPLUSでORACLEデータベースに接続しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでORACLEデータベースに接続しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("SQLPLUSでORACLEデータベースに接続しました")
             }
             else
             {
@@ -474,22 +383,7 @@ class OracleDriver
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0014", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0014", "SQLPLUS接続文字列接続エラー: $($_.Exception.Message)")
             
             throw "SQLPLUSでの接続に失敗しました: $($_.Exception.Message)"
         }
@@ -583,33 +477,14 @@ class OracleDriver
             Write-Host "SQLPLUSでSQLを実行しました（TNS）。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("SQLPLUSでSQLを実行しました（TNS）。TNSエイリアス: $tnsAlias", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでSQLを実行しました（TNS）。TNSエイリアス: $tnsAlias" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("SQLPLUSでSQLを実行しました（TNS）。TNSエイリアス: $tnsAlias")
 
             return $output.Trim()
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0020", "SQLPLUS TNS実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SQLPLUSでのSQL実行に失敗しました（TNS）: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0020", "SQLPLUS TNS実行エラー: $($_.Exception.Message)")
 
             throw "SQLPLUSでのSQL実行に失敗しました（TNS）: $($_.Exception.Message)"
         }
@@ -697,33 +572,14 @@ class OracleDriver
             Write-Host "SQLPLUSでSQLを実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("SQLPLUSでSQLを実行しました。サービス名: $service_name", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SQLPLUSでSQLを実行しました。サービス名: $service_name" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("SQLPLUSでSQLを実行しました。サービス名: $service_name")
 
             return $output.Trim()
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0021", "SQLPLUS実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SQLPLUSでのSQL実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0021", "SQLPLUS実行エラー: $($_.Exception.Message)")
             
             throw "SQLPLUSでのSQL実行に失敗しました: $($_.Exception.Message)"
         }
@@ -750,31 +606,12 @@ class OracleDriver
             Write-Host "ORACLEデータベースに接続しました（TNS: $tnsAlias）。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ORACLEデータベースに接続しました（TNS: $tnsAlias）", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ORACLEデータベースに接続しました（TNS: $tnsAlias）" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ORACLEデータベースに接続しました（TNS: $tnsAlias）")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0015", "TNSデータベース接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TNSを使用したデータベースへの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0015", "TNSデータベース接続エラー: $($_.Exception.Message)")
 
             throw "TNSを使用したデータベースへの接続に失敗しました: $($_.Exception.Message)"
         }
@@ -803,31 +640,12 @@ class OracleDriver
             Write-Host "ORACLEデータベースに接続しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ORACLEデータベースに接続しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ORACLEデータベースに接続しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ORACLEデータベースに接続しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0016", "データベース接続エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データベースへの接続に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0016", "データベース接続エラー: $($_.Exception.Message)")
             
             throw "データベースへの接続に失敗しました: $($_.Exception.Message)"
         }
@@ -851,31 +669,12 @@ class OracleDriver
                 Write-Host "データベース接続を切断しました。" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("データベース接続を切断しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベース接続を切断しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("データベース接続を切断しました")
             }
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0017", "接続切断エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "接続の切断に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0017", "接続切断エラー: $($_.Exception.Message)")
             
             throw "接続の切断に失敗しました: $($_.Exception.Message)"
         }
@@ -910,33 +709,14 @@ class OracleDriver
             Write-Host "SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("SELECT文を実行しました。結果行数: $($dataTable.Rows.Count)")
 
             return $dataTable
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0030", "SELECT実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SELECT文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0030", "SELECT実行エラー: $($_.Exception.Message)")
             
             throw "SELECT文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -965,33 +745,14 @@ class OracleDriver
             Write-Host "INSERT文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("INSERT文を実行しました。影響を受けた行数: $affectedRows", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] INSERT文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("INSERT文を実行しました。影響を受けた行数: $affectedRows")
 
             return $affectedRows
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0031", "INSERT実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "INSERT文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0031", "INSERT実行エラー: $($_.Exception.Message)")
             
             throw "INSERT文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1020,33 +781,14 @@ class OracleDriver
             Write-Host "UPDATE文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("UPDATE文を実行しました。影響を受けた行数: $affectedRows", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] UPDATE文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("UPDATE文を実行しました。影響を受けた行数: $affectedRows")
 
             return $affectedRows
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0032", "UPDATE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "UPDATE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0032", "UPDATE実行エラー: $($_.Exception.Message)")
             
             throw "UPDATE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1075,33 +817,14 @@ class OracleDriver
             Write-Host "DELETE文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("DELETE文を実行しました。影響を受けた行数: $affectedRows", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] DELETE文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("DELETE文を実行しました。影響を受けた行数: $affectedRows")
 
             return $affectedRows
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0033", "DELETE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "DELETE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0033", "DELETE実行エラー: $($_.Exception.Message)")
             
             throw "DELETE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1130,33 +853,14 @@ class OracleDriver
             Write-Host "MERGE文を実行しました。影響を受けた行数: $affectedRows" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("MERGE文を実行しました。影響を受けた行数: $affectedRows", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] MERGE文を実行しました。影響を受けた行数: $affectedRows" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("MERGE文を実行しました。影響を受けた行数: $affectedRows")
 
             return $affectedRows
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0034", "MERGE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "MERGE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0034", "MERGE実行エラー: $($_.Exception.Message)")
             
             throw "MERGE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1186,31 +890,12 @@ class OracleDriver
             Write-Host "CALL文を実行しました。プロシージャ: $procedureName" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ストアドプロシージャを実行しました: $procedureName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ストアドプロシージャを実行しました: $procedureName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ストアドプロシージャを実行しました: $procedureName")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0035", "CALL実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CALL文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0035", "CALL実行エラー: $($_.Exception.Message)")
 
             throw "CALL文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1257,33 +942,14 @@ ORDER SIBLINGS BY ID
             Write-Host "EXPLAIN PLANを実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("EXPLAIN PLANを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] EXPLAIN PLANを実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("EXPLAIN PLANを実行しました")
 
             return $dataTable
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0036", "EXPLAIN PLAN実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "EXPLAIN PLANの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0036", "EXPLAIN PLAN実行エラー: $($_.Exception.Message)")
 
             throw "EXPLAIN PLANの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1313,31 +979,12 @@ ORDER SIBLINGS BY ID
             Write-Host "LOCK TABLEを実行しました。テーブル: $tableName, モード: $lockMode" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブルをロックしました: $tableName (モード: $lockMode)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルをロックしました: $tableName (モード: $lockMode)" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブルをロックしました: $tableName (モード: $lockMode)")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0037", "LOCK TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "LOCK TABLEの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0037", "LOCK TABLE実行エラー: $($_.Exception.Message)")
 
             throw "LOCK TABLEの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1364,31 +1011,12 @@ ORDER SIBLINGS BY ID
             Write-Host "CREATE TABLE文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("CREATE TABLE文を実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] CREATE TABLE文を実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("CREATE TABLE文を実行しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0040", "CREATE TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CREATE TABLE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0040", "CREATE TABLE実行エラー: $($_.Exception.Message)")
             
             throw "CREATE TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1410,31 +1038,12 @@ ORDER SIBLINGS BY ID
             Write-Host "ALTER TABLE文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ALTER TABLE文を実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ALTER TABLE文を実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ALTER TABLE文を実行しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0041", "ALTER TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ALTER TABLE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0041", "ALTER TABLE実行エラー: $($_.Exception.Message)")
             
             throw "ALTER TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1457,31 +1066,12 @@ ORDER SIBLINGS BY ID
             Write-Host "DROP TABLE文を実行しました。テーブル: $tableName" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブルを削除しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを削除しました: $tableName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブルを削除しました: $tableName")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0042", "DROP TABLE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "DROP TABLE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0042", "DROP TABLE実行エラー: $($_.Exception.Message)")
             
             throw "DROP TABLE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1503,31 +1093,12 @@ ORDER SIBLINGS BY ID
             Write-Host "CREATE INDEX文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("インデックスを作成しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] インデックスを作成しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("インデックスを作成しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0043", "CREATE INDEX実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CREATE INDEX文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0043", "CREATE INDEX実行エラー: $($_.Exception.Message)")
             
             throw "CREATE INDEX文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1549,31 +1120,12 @@ ORDER SIBLINGS BY ID
             Write-Host "CREATE VIEW文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ビューを作成しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ビューを作成しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ビューを作成しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0044", "CREATE VIEW実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CREATE VIEW文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0044", "CREATE VIEW実行エラー: $($_.Exception.Message)")
             
             throw "CREATE VIEW文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1595,31 +1147,12 @@ ORDER SIBLINGS BY ID
             Write-Host "CREATE SEQUENCE文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("シーケンスを作成しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] シーケンスを作成しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("シーケンスを作成しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0045", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CREATE SEQUENCE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0045", "CREATE SEQUENCE実行エラー: $($_.Exception.Message)")
             
             throw "CREATE SEQUENCE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1642,31 +1175,12 @@ ORDER SIBLINGS BY ID
             Write-Host "TRUNCATE TABLEを実行しました。テーブル: $tableName" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブルをトランケートしました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルをトランケートしました: $tableName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブルをトランケートしました: $tableName")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0046", "TRUNCATE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TRUNCATE TABLEの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0046", "TRUNCATE実行エラー: $($_.Exception.Message)")
 
             throw "TRUNCATE TABLEの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1689,31 +1203,12 @@ ORDER SIBLINGS BY ID
             Write-Host "RENAMEを実行しました。$oldName -> $newName" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("オブジェクト名を変更しました: $oldName -> $newName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] オブジェクト名を変更しました: $oldName -> $newName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("オブジェクト名を変更しました: $oldName -> $newName")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0047", "RENAME実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "RENAMEの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0047", "RENAME実行エラー: $($_.Exception.Message)")
 
             throw "RENAMEの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1740,31 +1235,12 @@ ORDER SIBLINGS BY ID
             Write-Host "GRANT文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("権限を付与しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 権限を付与しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("権限を付与しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0048", "GRANT実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "GRANT文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0048", "GRANT実行エラー: $($_.Exception.Message)")
             
             throw "GRANT文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1786,31 +1262,12 @@ ORDER SIBLINGS BY ID
             Write-Host "REVOKE文を実行しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("権限を取り消しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 権限を取り消しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("権限を取り消しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0049", "REVOKE実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "REVOKE文の実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0049", "REVOKE実行エラー: $($_.Exception.Message)")
             
             throw "REVOKE文の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1843,31 +1300,12 @@ ORDER SIBLINGS BY ID
             Write-Host "トランザクションを開始しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("トランザクションを開始しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクションを開始しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("トランザクションを開始しました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0050", "トランザクション開始エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "トランザクションの開始に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0050", "トランザクション開始エラー: $($_.Exception.Message)")
             
             throw "トランザクションの開始に失敗しました: $($_.Exception.Message)"
         }
@@ -1891,31 +1329,12 @@ ORDER SIBLINGS BY ID
             Write-Host "トランザクションをコミットしました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("トランザクションをコミットしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクションをコミットしました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("トランザクションをコミットしました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0051", "トランザクションコミットエラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "トランザクションのコミットに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0051", "トランザクションコミットエラー: $($_.Exception.Message)")
             
             throw "トランザクションのコミットに失敗しました: $($_.Exception.Message)"
         }
@@ -1939,31 +1358,12 @@ ORDER SIBLINGS BY ID
             Write-Host "トランザクションをロールバックしました。" -ForegroundColor Yellow
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("トランザクションをロールバックしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクションをロールバックしました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("トランザクションをロールバックしました")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0052", "トランザクションロールバックエラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "トランザクションのロールバックに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0052", "トランザクションロールバックエラー: $($_.Exception.Message)")
             
             throw "トランザクションのロールバックに失敗しました: $($_.Exception.Message)"
         }
@@ -1986,31 +1386,12 @@ ORDER SIBLINGS BY ID
             Write-Host "SAVEPOINTを作成しました: $savepointName" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("SAVEPOINTを作成しました: $savepointName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SAVEPOINTを作成しました: $savepointName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("SAVEPOINTを作成しました: $savepointName")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0053", "SAVEPOINT作成エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SAVEPOINTの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0053", "SAVEPOINT作成エラー: $($_.Exception.Message)")
 
             throw "SAVEPOINTの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -2033,31 +1414,12 @@ ORDER SIBLINGS BY ID
             Write-Host "SAVEPOINTにロールバックしました: $savepointName" -ForegroundColor Yellow
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("SAVEPOINTにロールバックしました: $savepointName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] SAVEPOINTにロールバックしました: $savepointName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("SAVEPOINTにロールバックしました: $savepointName")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0054", "SAVEPOINTロールバックエラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SAVEPOINTへのロールバックに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0054", "SAVEPOINTロールバックエラー: $($_.Exception.Message)")
 
             throw "SAVEPOINTへのロールバックに失敗しました: $($_.Exception.Message)"
         }
@@ -2085,31 +1447,12 @@ ORDER SIBLINGS BY ID
             Write-Host "SET TRANSACTIONを実行しました。分離レベル: $isolationLevel" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("トランザクション分離レベルを設定しました: $isolationLevel", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] トランザクション分離レベルを設定しました: $isolationLevel" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("トランザクション分離レベルを設定しました: $isolationLevel")
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0055", "SET TRANSACTION実行エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "SET TRANSACTIONの実行に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0055", "SET TRANSACTION実行エラー: $($_.Exception.Message)")
 
             throw "SET TRANSACTIONの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -2134,11 +1477,7 @@ ORDER SIBLINGS BY ID
                 Write-Host "レジストリから tnsnames.ora を発見しました: $tnsNamesPath" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("tnsnames.oraファイルを発見しました: $tnsNamesPath", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] tnsnames.oraファイルを発見しました: $tnsNamesPath" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("tnsnames.oraファイルを発見しました: $tnsNamesPath")
 
                 return $tnsNamesPath
             }
@@ -2156,11 +1495,7 @@ ORDER SIBLINGS BY ID
                 Write-Host "tnsnames.ora を発見しました: $($foundFiles[0])" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("tnsnames.oraファイルを発見しました: $($foundFiles[0])", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] tnsnames.oraファイルを発見しました: $($foundFiles[0])" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("tnsnames.oraファイルを発見しました: $($foundFiles[0])")
 
                 return $foundFiles[0]
             }
@@ -2174,22 +1509,7 @@ ORDER SIBLINGS BY ID
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0082", "tnsnames.ora検索エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "tnsnames.oraの検索に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0082", "tnsnames.ora検索エラー: $($_.Exception.Message)")
 
             throw "tnsnames.oraの検索に失敗しました: $($_.Exception.Message)"
         }
@@ -2387,11 +1707,7 @@ ORDER SIBLINGS BY ID
             Write-Host "`n選択されたファイル: $selectedFile" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("tnsnames.oraファイルを選択しました: $selectedFile", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] tnsnames.oraファイルを選択しました: $selectedFile" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("tnsnames.oraファイルを選択しました: $selectedFile")
 
             return $selectedFile
         }
@@ -2427,33 +1743,14 @@ ORDER BY TABLE_NAME
             $result = $this.ExecuteSelect($sql, $parameters)
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブル一覧を取得しました。テーブル数: $($result.Rows.Count)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブル一覧を取得しました。テーブル数: $($result.Rows.Count)" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブル一覧を取得しました。テーブル数: $($result.Rows.Count)")
 
             return $result
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0080", "テーブル一覧取得エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テーブル一覧の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0080", "テーブル一覧取得エラー: $($_.Exception.Message)")
 
             throw "テーブル一覧の取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2484,33 +1781,14 @@ ORDER BY COLUMN_ID
             $result = $this.ExecuteSelect($sql, $parameters)
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブル構造を取得しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブル構造を取得しました: $tableName" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブル構造を取得しました: $tableName")
 
             return $result
         }
         catch
         {
             $this.last_error_message = $_.Exception.Message
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0081", "テーブル構造取徖エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テーブル構造の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0081", "テーブル構造取徖エラー: $($_.Exception.Message)")
 
             throw "テーブル構造の取得に失敗しました: $($_.Exception.Message)"
         }
@@ -2561,11 +1839,7 @@ ORDER BY COLUMN_ID
             Write-Host "初期化失敗時のクリーンアップが完了しました。" -ForegroundColor Yellow
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("初期化失敗時のクリーンアップを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップを実行しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("初期化失敗時のクリーンアップを実行しました")
         }
         catch
         {
@@ -2581,30 +1855,11 @@ ORDER BY COLUMN_ID
             $this.Disconnect()
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("OracleDriverを破棄しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] OracleDriverを破棄しました" | Out-File -Append -FilePath ([OracleDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("OracleDriverを破棄しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("OracleDriverError_0090", "OracleDriver破棄エラー: $($_.Exception.Message)", "OracleDriver", [OracleDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "OracleDriverの破棄中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("OracleDriverError_0090", "OracleDriver破棄エラー: $($_.Exception.Message)")
 
             throw "OracleDriverの破棄中にエラーが発生しました: $($_.Exception.Message)"
         }

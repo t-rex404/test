@@ -1,4 +1,4 @@
-﻿# PowerPointファイル操作クラス
+# PowerPointファイル操作クラス
 # 必要なアセンブリを読み込み
 Add-Type -AssemblyName Microsoft.Office.Interop.PowerPoint
 
@@ -15,6 +15,52 @@ class PowerPointDriver
     # ログファイルパス（共有可能）
     static [string]$NormalLogFile = ".\PowerPointDriver_$($env:USERNAME)_Normal.log"
     static [string]$ErrorLogFile = ".\PowerPointDriver_$($env:USERNAME)_Error.log"
+
+    # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "PowerPointDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([PowerPointDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
 
     # ========================================
     # 初期化・接続関連
@@ -40,11 +86,7 @@ class PowerPointDriver
             Write-Host "PowerPointDriverの初期化が完了しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("PowerPointDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] PowerPointDriverの初期化が完了しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("PowerPointDriverの初期化が完了しました")
         }
         catch
         {
@@ -52,22 +94,7 @@ class PowerPointDriver
             Write-Host "PowerPointDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0001", "PowerPointDriver初期化エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "PowerPointDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0001", "PowerPointDriver初期化エラー: $($_.Exception.Message)")
 
             throw "PowerPointDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -96,32 +123,13 @@ class PowerPointDriver
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("一時ディレクトリを作成しました: $temp_dir")
 
             return $temp_dir
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)")
 
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -139,30 +147,11 @@ class PowerPointDriver
             Write-Host "PowerPointアプリケーションを初期化しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("PowerPointアプリケーションを初期化しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] PowerPointアプリケーションを初期化しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("PowerPointアプリケーションを初期化しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0010", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "PowerPointアプリケーションの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0010", "PowerPointアプリケーション初期化エラー: $($_.Exception.Message)")
 
             throw "PowerPointアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -181,30 +170,11 @@ class PowerPointDriver
             Write-Host "新規プレゼンテーションを作成しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("新規プレゼンテーションを作成しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規プレゼンテーションを作成しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("新規プレゼンテーションを作成しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0011", "新規プレゼンテーション作成エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "新規プレゼンテーションの作成に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0011", "新規プレゼンテーション作成エラー: $($_.Exception.Message)")
 
             throw "新規プレゼンテーションの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -229,30 +199,11 @@ class PowerPointDriver
             Write-Host "新しいスライドを追加しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("新しいスライドを追加しました。レイアウトタイプ: $layoutType", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新しいスライドを追加しました。レイアウトタイプ: $layoutType" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("新しいスライドを追加しました。レイアウトタイプ: $layoutType")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0020", "スライド追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "スライドの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0020", "スライド追加エラー: $($_.Exception.Message)")
 
             throw "スライドの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -277,30 +228,11 @@ class PowerPointDriver
             Write-Host "スライドを選択しました: $slideIndex"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("スライドを選択しました: $slideIndex", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] スライドを選択しました: $slideIndex" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("スライドを選択しました: $slideIndex")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0021", "スライド選択エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "スライドの選択に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0021", "スライド選択エラー: $($_.Exception.Message)")
 
             throw "スライドの選択に失敗しました: $($_.Exception.Message)"
         }
@@ -329,30 +261,11 @@ class PowerPointDriver
             Write-Host "タイトルを設定しました: $title"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("タイトルを設定しました: $title", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] タイトルを設定しました: $title" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("タイトルを設定しました: $title")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0022", "タイトル設定エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タイトルの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0022", "タイトル設定エラー: $($_.Exception.Message)")
 
             throw "タイトルの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -378,30 +291,11 @@ class PowerPointDriver
             Write-Host "テキストボックスを追加しました: $text"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テキストボックスを追加しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストボックスを追加しました: $text" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テキストボックスを追加しました: $text")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0023", "テキストボックス追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テキストボックスの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0023", "テキストボックス追加エラー: $($_.Exception.Message)")
 
             throw "テキストボックスの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -427,30 +321,11 @@ class PowerPointDriver
             Write-Host "テキストを追加しました: $text"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テキストを追加しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを追加しました: $text" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テキストを追加しました: $text")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0024", "テキスト追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テキストの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0024", "テキスト追加エラー: $($_.Exception.Message)")
 
             throw "テキストの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -474,30 +349,11 @@ class PowerPointDriver
             Write-Host "図形を追加しました: タイプ $shapeType"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("図形を追加しました。タイプ: $shapeType", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 図形を追加しました。タイプ: $shapeType" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("図形を追加しました。タイプ: $shapeType")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0025", "図形追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "図形の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0025", "図形追加エラー: $($_.Exception.Message)")
 
             throw "図形の追加に失敗しました: $($_.Exception.Message)"
         }
@@ -527,30 +383,11 @@ class PowerPointDriver
             Write-Host "画像を追加しました: $imagePath"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("画像を追加しました: $imagePath", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 画像を追加しました: $imagePath" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("画像を追加しました: $imagePath")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0026", "画像追加エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "画像の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0026", "画像追加エラー: $($_.Exception.Message)")
 
             throw "画像の追加に失敗しました: $($_.Exception.Message)"
         }
@@ -588,30 +425,11 @@ class PowerPointDriver
             Write-Host "フォントを設定しました: $fontName, $fontSize"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("フォントを設定しました: $fontName, サイズ: $fontSize", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォントを設定しました: $fontName, サイズ: $fontSize" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("フォントを設定しました: $fontName, サイズ: $fontSize")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0040", "フォント設定エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "フォントの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0040", "フォント設定エラー: $($_.Exception.Message)")
 
             throw "フォントの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -631,30 +449,11 @@ class PowerPointDriver
             Write-Host "背景色を設定しました: $colorIndex"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("背景色を設定しました。カラーインデックス: $colorIndex", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 背景色を設定しました。カラーインデックス: $colorIndex" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("背景色を設定しました。カラーインデックス: $colorIndex")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0041", "背景色設定エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "背景色の設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0041", "背景色設定エラー: $($_.Exception.Message)")
 
             throw "背景色の設定に失敗しました: $($_.Exception.Message)"
         }
@@ -684,30 +483,11 @@ class PowerPointDriver
             Write-Host "プレゼンテーションを保存しました: $filePath"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("プレゼンテーションを保存しました: $filePath", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プレゼンテーションを保存しました: $filePath" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("プレゼンテーションを保存しました: $filePath")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0060", "プレゼンテーション保存エラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プレゼンテーションの保存に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0060", "プレゼンテーション保存エラー: $($_.Exception.Message)")
 
             throw "プレゼンテーションの保存に失敗しました: $($_.Exception.Message)"
         }
@@ -739,30 +519,11 @@ class PowerPointDriver
             Write-Host "プレゼンテーションを開きました: $filePath"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("プレゼンテーションを開きました: $filePath", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プレゼンテーションを開きました: $filePath" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("プレゼンテーションを開きました: $filePath")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0061", "プレゼンテーション開くエラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プレゼンテーションを開くのに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0061", "プレゼンテーション開くエラー: $($_.Exception.Message)")
 
             throw "プレゼンテーションを開くのに失敗しました: $($_.Exception.Message)"
         }
@@ -799,30 +560,11 @@ class PowerPointDriver
             Write-Host "クリーンアップが完了しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("初期化失敗時のクリーンアップを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップを実行しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("初期化失敗時のクリーンアップを実行しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)")
 
             throw "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -862,30 +604,11 @@ class PowerPointDriver
             Write-Host "PowerPointDriverのリソースを解放しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("PowerPointDriverのリソースを解放しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] PowerPointDriverのリソースを解放しました" | Out-File -Append -FilePath ([PowerPointDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("PowerPointDriverのリソースを解放しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("PowerPointDriverError_0091", "PowerPointDriver Disposeエラー: $($_.Exception.Message)", "PowerPointDriver", [PowerPointDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "リソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("PowerPointDriverError_0091", "PowerPointDriver Disposeエラー: $($_.Exception.Message)")
 
             throw "リソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }

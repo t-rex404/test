@@ -472,56 +472,47 @@ finally {
             <h2 class="section-title">
                 <span class="icon">🚨</span> WebDriver固有のエラーコード
             </h2>
-            
             <div class="error-range-card">
-                <p>WebDriverクラスでは、WebDriverError_0001からWebDriverError_0090までのエラーコードが使用されます（90個）。</p>
+                <p>WebDriverクラスでは、WebDriverError_1001からWebDriverError_1808までのエラーコードがカテゴリごとに連番で割り当てられています。</p>
                 <table class="error-table">
                     <tr>
-                        <td class="range">WebDriverError_0001</td>
-                        <td>WebDriver初期化エラー</td>
+                        <td class="range">WebDriverError_1001～1007</td>
+                        <td>初期化・接続・クリーンアップ</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0010</td>
-                        <td>ブラウザ起動エラー</td>
+                        <td class="range">WebDriverError_1101～1106</td>
+                        <td>ページ遷移と待機処理</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0011</td>
-                        <td>タブ情報取得エラー</td>
+                        <td class="range">WebDriverError_1201～1219</td>
+                        <td>ウィンドウ／タブの操作</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0012</td>
-                        <td>WebSocket接続エラー</td>
+                        <td class="range">WebDriverError_1301～1323</td>
+                        <td>要素検索と存在確認</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0013</td>
-                        <td>WebSocket メッセージ送信エラー</td>
+                        <td class="range">WebDriverError_1401～1420</td>
+                        <td>要素操作・入力アクション</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0014</td>
-                        <td>WebSocket メッセージ受信エラー</td>
+                        <td class="range">WebDriverError_1501～1503</td>
+                        <td>ページ情報の取得</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0090</td>
-                        <td>Disposeエラー</td>
+                        <td class="range">WebDriverError_1601～1603</td>
+                        <td>スクリーンショット取得</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0020</td>
-                        <td>ページ遷移エラー</td>
+                        <td class="range">WebDriverError_1701～1702</td>
+                        <td>JavaScript実行</td>
                     </tr>
                     <tr>
-                        <td class="range">WebDriverError_0021</td>
-                        <td>広告読み込み待機エラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">WebDriverError_0022</td>
-                        <td>ウィンドウを閉じるエラー</td>
-                    </tr>
-                    <tr>
-                        <td class="range">...</td>
-                        <td>その他のエラーコード（WebDriverError_0015～WebDriverError_0089）</td>
+                        <td class="range">WebDriverError_1801～1808</td>
+                        <td>クッキー／ストレージ操作</td>
                     </tr>
                 </table>
-                <p class="note">※ 全90個のエラーコードが定義されています。詳細はErrorCode.jsonファイルを参照してください。</p>
+                <p class="note">※ 詳細なメッセージはErrorCode.jsonファイルを参照してください。</p>
             </div>
         </section>
 

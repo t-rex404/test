@@ -1,19 +1,19 @@
-# Repository Guidelines
+# リポジトリ ガイドライン
 
-## Project Structure & Module Organization
-Automation scenarios live in `_ps`, grouped by purpose (for example `test_*.ps1` for regression). Shared drivers and helpers sit under `_ps\_lib` and should be imported via `. "$PSScriptRoot\_lib\Common.ps1"`. Static documentation outputs are published to `_docs`, while `_json/ErrorCode.json` stores centralized error metadata consumed at runtime. Logs such as `_log\ai_*.log` are produced during runs; keep them trimmed when sharing work. Root-level assets, including `run.cmd`, support local execution flows.
+## プロジェクト構成とモジュール構成
+自動化シナリオは `_ps` にあり、目的別にグループ化されています（例: 回帰用の `test_*.ps1`）。共通のドライバーとヘルパーは `_ps\_lib` に配置され、`. "$PSScriptRoot\_lib\Common.ps1"` を通じて読み込む必要があります。静的ドキュメント出力は `_docs` に公開され、`_json/ErrorCode.json` には実行時に利用される中央管理のエラー メタデータが保存されます。`_log\ai_*.log` などのログは実行中に生成されるため、作業を共有する際はサイズを抑えてください。リポジトリ直下の `run.cmd` などのアセットはローカル実行フローを支援します。
 
-## Build, Test, and Development Commands
-Use `run.cmd` from the repository root to launch the default smoke scenario (`_ps\aaa.ps1`). Execute a specific script directly with `powershell.exe -ExecutionPolicy Bypass -File _ps\<script>.ps1`; prefer the `test_*` suite for coverage. When authoring new scenarios, always load `_ps\_lib\Common.ps1` first to wire environment setup, configuration, and logging.
+## ビルド、テスト、および開発コマンド
+リポジトリのルートで `run.cmd` を使用して既定のスモーク シナリオ（`_ps\aaa.ps1`）を起動します。特定のスクリプトを直接実行する場合は `powershell.exe -ExecutionPolicy Bypass -File _ps\<script>.ps1` を使用し、カバレッジのために `test_*` スイートを優先します。新しいシナリオを作成する際は、環境設定・構成・ログ記録を準備するため、必ず最初に `_ps\_lib\Common.ps1` を読み込んでください。
 
-## Coding Style & Naming Conventions
-Stick to four-space indentation with braces on their own lines to align with existing class-style modules. Name classes and functions in PascalCase (`WebDriver`, `InitSession`), locals in camelCase (`sessionId`), and reserve ALL_CAPS for constants only. Scripts should follow `verb_TargetScenario.ps1` (e.g. `test_Login.ps1`). Keep comments concise, in English unless bilingual output is required.
+## コーディング スタイルと命名規則
+既存のクラス形式モジュールと揃えるため、インデントは 4 スペース、波括弧は独立した行に配置します。クラスや関数は PascalCase（`WebDriver`, `InitSession`）、ローカル変数は camelCase（`sessionId`）、定数は ALL_CAPS のみを使用します。スクリプトは `verb_TargetScenario.ps1`（例: `test_Login.ps1`）という形式に従ってください。コメントは簡潔にし、バイリンガル出力が必要な場合を除き英語で記述します。
 
-## Testing Guidelines
-Treat each `test_*` script as an executable spec: encapsulate setup/teardown inside `_ps\_lib` helpers and emit checkpoints with `$global:Common.WriteLog`. Validate new drivers with a smoke script plus at least one regression scenario. Capture illustrative artifacts under `_docs\pages` when the run surfaces UI or log insights worth sharing.
+## テスト ガイドライン
+各 `test_*` スクリプトを実行可能な仕様として扱い、セットアップとクリーンアップは `_ps\_lib` のヘルパー内にカプセル化し、`$global:Common.WriteLog` でチェックポイントを出力します。新しいドライバーを検証する際は、スモーク スクリプトと少なくとも 1 つの回帰シナリオで確認します。実行時に UI やログの洞察が得られた場合は、説明資料を `_docs\pages` に保存してください。
 
-## Commit & Pull Request Guidelines
-Mirror the short commit subjects seen historically (e.g. `mod file`, `fix loader`), keeping them under 72 characters and referencing issue IDs when applicable. Pull requests should describe scope, list touched scripts, and attach relevant console or log excerpts from the executed `test_*` runs. Document any `ErrorCode.json` changes so reviewers know to trigger `Common.LoadErrorCodes()` on deploy.
+## コミットとプルリクエストのガイドライン
+過去に見られる短いコミット サブジェクト（例: `mod file`, `fix loader`）を踏襲し、72 文字以内に収め、該当する場合は課題 ID を参照してください。プルリクエストでは範囲を説明し、変更したスクリプトを列挙し、実行した `test_*` のコンソールまたはログ抜粋を添付します。`ErrorCode.json` を更新した場合は、デプロイ時にレビュアーが `Common.LoadErrorCodes()` を実行する必要がある旨を記載してください。
 
-## Security & Configuration Tips
-Store sensitive endpoints or credentials outside the repo and expose them via parameters or secure local stores. Before committing, prune bulky traces from `_log` to keep diffs focused. When touching shared configuration, confirm the change propagates through `Common.ps1` and downstream consumers.
+## セキュリティと構成のヒント
+機密性の高いエンドポイントや資格情報はリポジトリの外部に保管し、パラメーターまたは安全なローカル ストアを通じて公開してください。コミット前には `_log` から大きなトレースを削除し、差分を明瞭に保ちます。共通設定を変更する場合は、`Common.ps1` とその先の利用者にまで変更が伝播することを確認してください。

@@ -17,6 +17,52 @@ class AccessDriver
     static [string]$ErrorLogFile = ".\AccessDriver_$($env:USERNAME)_Error.log"
 
     # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力（共通のエラー処理に委譲）
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "AccessDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([AccessDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -40,33 +86,14 @@ class AccessDriver
             Write-Host "AccessDriverの初期化が完了しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("AccessDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] AccessDriverの初期化が完了しました" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("AccessDriverの初期化が完了しました")
         }
         catch
         {
             Write-Host "AccessDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0001", "AccessDriver初期化エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "AccessDriver初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0001", "AccessDriver初期化エラー: $($_.Exception.Message)")
 
             throw "AccessDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -95,32 +122,13 @@ class AccessDriver
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("一時ディレクトリを作成しました: $temp_dir")
 
             return $temp_dir
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "一時ディレクトリ作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)")
 
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -152,29 +160,13 @@ class AccessDriver
             Write-Host "Accessアプリケーションの初期化が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("Accessアプリケーションの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Accessアプリケーションの初期化が完了しました" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("Accessアプリケーションの初期化が完了しました")
         }
         catch
         {
             Write-Host "Accessアプリケーション初期化で致命的なエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try {
-                    $global:Common.HandleError("AccessDriverError_0010", "Accessアプリケーション初期化エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                } catch {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Accessアプリケーション初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0010", "Accessアプリケーション初期化エラー: $($_.Exception.Message)")
 
             throw "Accessアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -194,30 +186,11 @@ class AccessDriver
             Write-Host "新規データベースを作成しました: $($this.file_path)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("新規データベースを作成しました: $($this.file_path)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規データベースを作成しました: $($this.file_path)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("新規データベースを作成しました: $($this.file_path)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0011", "新規データベース作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "新規データベース作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0011", "新規データベース作成エラー: $($_.Exception.Message)")
 
             throw "新規データベースの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -264,30 +237,11 @@ class AccessDriver
             Write-Host "テーブルを作成しました: $tableName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブルを作成しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを作成しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブルを作成しました: $tableName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0020", "テーブル作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テーブル作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0020", "テーブル作成エラー: $($_.Exception.Message)")
 
             throw "テーブルの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -318,32 +272,13 @@ class AccessDriver
             Write-Host "テーブル一覧を取得しました。テーブル数: $($tableList.Count)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブル一覧を取得しました。テーブル数: $($tableList.Count)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブル一覧を取得しました。テーブル数: $($tableList.Count)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブル一覧を取得しました。テーブル数: $($tableList.Count)")
 
             return $tableList
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0021", "テーブル一覧取得エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テーブル一覧取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0021", "テーブル一覧取得エラー: $($_.Exception.Message)")
 
             throw "テーブル一覧の取得に失敗しました: $($_.Exception.Message)"
         }
@@ -370,30 +305,11 @@ class AccessDriver
             Write-Host "テーブルを削除しました: $tableName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブルを削除しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを削除しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブルを削除しました: $tableName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0022", "テーブル削除エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テーブル削除エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0022", "テーブル削除エラー: $($_.Exception.Message)")
 
             throw "テーブルの削除に失敗しました: $($_.Exception.Message)"
         }
@@ -456,30 +372,11 @@ class AccessDriver
             Write-Host "データを挿入しました: $tableName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データを挿入しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを挿入しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データを挿入しました: $tableName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0030", "データ挿入エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データ挿入エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0030", "データ挿入エラー: $($_.Exception.Message)")
 
             throw "データの挿入に失敗しました: $($_.Exception.Message)"
         }
@@ -546,30 +443,11 @@ class AccessDriver
             Write-Host "データを更新しました: $tableName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データを更新しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを更新しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データを更新しました: $tableName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0031", "データ更新エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データ更新エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0031", "データ更新エラー: $($_.Exception.Message)")
 
             throw "データの更新に失敗しました: $($_.Exception.Message)"
         }
@@ -601,30 +479,11 @@ class AccessDriver
             Write-Host "データを削除しました: $tableName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データを削除しました: $tableName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを削除しました: $tableName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データを削除しました: $tableName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0032", "データ削除エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データ削除エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0032", "データ削除エラー: $($_.Exception.Message)")
 
             throw "データの削除に失敗しました: $($_.Exception.Message)"
         }
@@ -672,32 +531,13 @@ class AccessDriver
             Write-Host "データを取得しました。件数: $($results.Count)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データを取得しました。件数: $($results.Count)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データを取得しました。件数: $($results.Count)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データを取得しました。件数: $($results.Count)")
 
             return $results
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0033", "データ検索エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0033", "データ検索エラー: $($_.Exception.Message)")
 
             throw "データの検索に失敗しました: $($_.Exception.Message)"
         }
@@ -733,30 +573,11 @@ class AccessDriver
             Write-Host "クエリを作成しました: $queryName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("クエリを作成しました: $queryName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クエリを作成しました: $queryName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("クエリを作成しました: $queryName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0040", "クエリ作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クエリ作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0040", "クエリ作成エラー: $($_.Exception.Message)")
 
             throw "クエリの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -804,32 +625,13 @@ class AccessDriver
             Write-Host "クエリを実行しました: $queryName。件数: $($results.Count)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("クエリを実行しました: $queryName。件数: $($results.Count)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クエリを実行しました: $queryName。件数: $($results.Count)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("クエリを実行しました: $queryName。件数: $($results.Count)")
 
             return $results
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0041", "クエリ実行エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クエリ実行エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0041", "クエリ実行エラー: $($_.Exception.Message)")
 
             throw "クエリの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -869,30 +671,11 @@ class AccessDriver
             Write-Host "フォームを作成しました: $formName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("フォームを作成しました: $formName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォームを作成しました: $formName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("フォームを作成しました: $formName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0050", "フォーム作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "フォーム作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0050", "フォーム作成エラー: $($_.Exception.Message)")
 
             throw "フォームの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -928,30 +711,11 @@ class AccessDriver
             Write-Host "フォームを開きました: $formName (ビュー: $view)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("フォームを開きました: $formName (ビュー: $view)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォームを開きました: $formName (ビュー: $view)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("フォームを開きました: $formName (ビュー: $view)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0051", "フォームを開くエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "フォームを開くエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0051", "フォームを開くエラー: $($_.Exception.Message)")
 
             throw "フォームを開くのに失敗しました: $($_.Exception.Message)"
         }
@@ -991,30 +755,11 @@ class AccessDriver
             Write-Host "レポートを作成しました: $reportName"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("レポートを作成しました: $reportName", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] レポートを作成しました: $reportName" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("レポートを作成しました: $reportName")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0052", "レポート作成エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "レポート作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0052", "レポート作成エラー: $($_.Exception.Message)")
 
             throw "レポートの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -1050,30 +795,11 @@ class AccessDriver
             Write-Host "レポートを開きました: $reportName (ビュー: $view)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("レポートを開きました: $reportName (ビュー: $view)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] レポートを開きました: $reportName (ビュー: $view)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("レポートを開きました: $reportName (ビュー: $view)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0053", "レポートを開くエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "レポートを開くエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0053", "レポートを開くエラー: $($_.Exception.Message)")
 
             throw "レポートを開くのに失敗しました: $($_.Exception.Message)"
         }
@@ -1113,30 +839,11 @@ class AccessDriver
             Write-Host "データベースを保存しました: $($this.file_path)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データベースを保存しました: $($this.file_path)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベースを保存しました: $($this.file_path)" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データベースを保存しました: $($this.file_path)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0060", "データベース保存エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データベース保存エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0060", "データベース保存エラー: $($_.Exception.Message)")
 
             throw "データベースの保存に失敗しました: $($_.Exception.Message)"
         }
@@ -1174,30 +881,11 @@ class AccessDriver
             Write-Host "データベースを開きました: $file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データベースを開きました: $file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベースを開きました: $file_path" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データベースを開きました: $file_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0061", "データベースを開くエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データベースを開くエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0061", "データベースを開くエラー: $($_.Exception.Message)")
 
             throw "データベースを開くのに失敗しました: $($_.Exception.Message)"
         }
@@ -1240,30 +928,11 @@ class AccessDriver
             Write-Host "データベースをコンパクト化しました: $source_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("データベースをコンパクト化しました: $source_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] データベースをコンパクト化しました: $source_path" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("データベースをコンパクト化しました: $source_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0080", "データベースコンパクト化エラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "データベースコンパクト化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0080", "データベースコンパクト化エラー: $($_.Exception.Message)")
 
             throw "データベースのコンパクト化に失敗しました: $($_.Exception.Message)"
         }
@@ -1325,22 +994,7 @@ class AccessDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)")
 
             throw "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -1402,30 +1056,11 @@ class AccessDriver
             Write-Host "AccessDriverのリソース解放が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("AccessDriverのリソースを解放しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] AccessDriverのリソースを解放しました" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("AccessDriverのリソースを解放しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("AccessDriverError_0091", "AccessDriver Disposeエラー: $($_.Exception.Message)", "AccessDriver", "[AccessDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "AccessDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("AccessDriverError_0091", "AccessDriver Disposeエラー: $($_.Exception.Message)")
 
             Write-Host "AccessDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }

@@ -22,6 +22,52 @@ class UIAutomationDriver
     static [string]$NormalLogFile = ".\UIAutomationDriver_$($env:USERNAME)_Normal.log"
     static [string]$ErrorLogFile = ".\UIAutomationDriver_$($env:USERNAME)_Error.log"
 
+    # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "UIAutomationDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([UIAutomationDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
     # コンストラクタ
     UIAutomationDriver()
     {
@@ -38,30 +84,11 @@ class UIAutomationDriver
             Write-Host "UIAutomationDriverの初期化が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("UIAutomationDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] UIAutomationDriverの初期化が完了しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("UIAutomationDriverの初期化が完了しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0001", "UIAutomationDriver初期化エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "UIAutomationDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0001", "UIAutomationDriver初期化エラー: $($_.Exception.Message)")
             
             throw "UIAutomationDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -119,30 +146,11 @@ class UIAutomationDriver
             Write-Host "アプリケーションを起動しました: $app_path" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("アプリケーションを起動しました: $app_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを起動しました: $app_path" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("アプリケーションを起動しました: $app_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0010", "アプリケーション起動エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "アプリケーション起動エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0010", "アプリケーション起動エラー: $($_.Exception.Message)")
             
             throw "アプリケーションの起動に失敗しました: $($_.Exception.Message)"
         }
@@ -242,11 +250,7 @@ class UIAutomationDriver
                                     Write-Host "プロセスIDでウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
 
                                     # 正常ログ出力
-                                    if ($global:Common)
-                                    {
-                                        $global:Common.WriteLog("プロセスIDでウィンドウを発見しました: $($window.Current.Name)", "INFO")
-                                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセスIDでウィンドウを発見しました: $($window.Current.Name)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                                    }
+                                    $this.LogInfo("プロセスIDでウィンドウを発見しました: $($window.Current.Name)")
                                     return $window
                                 }
                             }
@@ -264,11 +268,7 @@ class UIAutomationDriver
                             Write-Host "ウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
 
                             # 正常ログ出力
-                            if ($global:Common)
-                            {
-                                $global:Common.WriteLog("ウィンドウを発見しました: $($window.Current.Name)", "INFO")
-                                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを発見しました: $($window.Current.Name)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                            }
+                            $this.LogInfo("ウィンドウを発見しました: $($window.Current.Name)")
                             return $window
                         }
                     }
@@ -312,11 +312,7 @@ class UIAutomationDriver
                                 Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
 
                                 # 正常ログ出力
-                                if ($global:Common)
-                                {
-                                    $global:Common.WriteLog("部分一致でウィンドウを発見しました: $windowName", "INFO")
-                                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 部分一致でウィンドウを発見しました: $windowName" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                                }
+                                $this.LogInfo("部分一致でウィンドウを発見しました: $windowName")
                                 return $window
                             }
                         }
@@ -357,11 +353,7 @@ class UIAutomationDriver
                                 Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name)" -ForegroundColor Green
 
                                 # 正常ログ出力
-                                if ($global:Common)
-                                {
-                                    $global:Common.WriteLog("プロセス名でウィンドウを発見しました: $($window.Current.Name)", "INFO")
-                                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名でウィンドウを発見しました: $($window.Current.Name)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                                }
+                                $this.LogInfo("プロセス名でウィンドウを発見しました: $($window.Current.Name)")
                                 return $window
                             }
                         }
@@ -377,22 +369,7 @@ class UIAutomationDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0020", "ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0020", "ウィンドウ検索エラー: $($_.Exception.Message)")
             
             throw "指定されたウィンドウが見つかりませんでした: $($_.Exception.Message)"
         }
@@ -436,11 +413,7 @@ class UIAutomationDriver
                         Write-Host "部分一致でウィンドウを発見しました: $windowName" -ForegroundColor Green
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("部分一致でウィンドウを発見しました: $windowName", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 部分一致でウィンドウを発見しました: $windowName" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("部分一致でウィンドウを発見しました: $windowName")
                         return $window
                     }
                 }
@@ -450,22 +423,7 @@ class UIAutomationDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0021", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "部分一致ウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0021", "部分一致ウィンドウ検索エラー: $($_.Exception.Message)")
             
             throw "部分一致するウィンドウが見つかりませんでした: $($_.Exception.Message)"
         }
@@ -511,11 +469,7 @@ class UIAutomationDriver
                             Write-Host "プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))" -ForegroundColor Green
 
                             # 正常ログ出力
-                            if ($global:Common)
-                            {
-                                $global:Common.WriteLog("プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))", "INFO")
-                                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                            }
+                            $this.LogInfo("プロセス名でウィンドウを発見しました: $($window.Current.Name) (プロセス: $($windowProcess.ProcessName))")
                             return $window
                         }
                     }
@@ -531,22 +485,7 @@ class UIAutomationDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0022", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0022", "プロセス名ウィンドウ検索エラー: $($_.Exception.Message)")
             
             throw "指定されたプロセス名のウィンドウが見つかりませんでした: $($_.Exception.Message)"
         }
@@ -694,11 +633,7 @@ class UIAutomationDriver
                 Write-Host "プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("プロセス名とウィンドウタイトルでウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName), スコア: $highestScore)")
                 return $bestMatch.Window
             }
 
@@ -706,22 +641,7 @@ class UIAutomationDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0023", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0023", "プロセス名とウィンドウタイトル検索エラー: $($_.Exception.Message)")
             
             throw "プロセス名とウィンドウタイトルでウィンドウを検索できませんでした: $($_.Exception.Message)"
         }
@@ -852,11 +772,7 @@ class UIAutomationDriver
                     Write-Host "柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))" -ForegroundColor Green
 
                     # 正常ログ出力
-                    if ($global:Common)
-                    {
-                        $global:Common.WriteLog("柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))", "INFO")
-                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                    }
+                    $this.LogInfo("柔軟な検索でウィンドウを発見しました: '$($bestMatch.WindowName)' (プロセス: $($bestMatch.ProcessName))")
                     return $bestMatch.Window
                 }
 
@@ -869,22 +785,7 @@ class UIAutomationDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0024", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "柔軟なウィンドウ検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0024", "柔軟なウィンドウ検索エラー: $($_.Exception.Message)")
             
             throw "柔軟なウィンドウ検索に失敗しました: $($_.Exception.Message)"
         }
@@ -917,30 +818,11 @@ class UIAutomationDriver
             Write-Host "ウィンドウをアクティブ化しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウをアクティブ化しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウをアクティブ化しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウをアクティブ化しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0025", "ウィンドウアクティブ化エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウアクティブ化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0025", "ウィンドウアクティブ化エラー: $($_.Exception.Message)")
             
             throw "ウィンドウのアクティブ化に失敗しました: $($_.Exception.Message)"
         }
@@ -974,31 +856,12 @@ class UIAutomationDriver
             Write-Host "要素を発見しました: $name" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素を発見しました: $name", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を発見しました: $name" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素を発見しました: $name")
             return $element
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0030", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0030", "要素検索エラー: $($_.Exception.Message)")
             
             throw "指定された要素が見つかりませんでした: $($_.Exception.Message)"
         }
@@ -1028,31 +891,12 @@ class UIAutomationDriver
             Write-Host "要素を発見しました: $controlType" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素を発見しました: $controlType", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を発見しました: $controlType" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素を発見しました: $controlType")
             return $element
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0031", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0031", "要素検索エラー: $($_.Exception.Message)")
             
             throw "指定されたコントロールタイプの要素が見つかりませんでした: $controlType"
         }
@@ -1085,31 +929,12 @@ class UIAutomationDriver
             Write-Host "要素を発見しました" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("複合条件で要素を発見しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 複合条件で要素を発見しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("複合条件で要素を発見しました")
             return $element
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0032", "要素検索エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0032", "要素検索エラー: $($_.Exception.Message)")
             
             throw "指定された条件の要素が見つかりませんでした: $($_.Exception.Message)"
         }
@@ -1144,30 +969,11 @@ class UIAutomationDriver
             Write-Host "要素をクリックしました" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素をクリックしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素をクリックしました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素をクリックしました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0040", "要素クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素クリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0040", "要素クリックエラー: $($_.Exception.Message)")
             
             throw "要素のクリックに失敗しました: $($_.Exception.Message)"
         }
@@ -1201,30 +1007,11 @@ class UIAutomationDriver
             Write-Host "要素にテキストを設定しました: $text" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素にテキストを設定しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素にテキストを設定しました: $text" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素にテキストを設定しました: $text")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0041", "テキスト設定エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テキスト設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0041", "テキスト設定エラー: $($_.Exception.Message)")
             
             throw "要素へのテキスト設定に失敗しました: $($_.Exception.Message)"
         }
@@ -1249,31 +1036,12 @@ class UIAutomationDriver
             Write-Host "要素のテキストを取得しました: $text" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素のテキストを取得しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素のテキストを取得しました: $text" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素のテキストを取得しました: $text")
             return $text
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0042", "テキスト取得エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テキスト取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0042", "テキスト取得エラー: $($_.Exception.Message)")
             
             return ""
         }
@@ -1311,30 +1079,11 @@ class UIAutomationDriver
             Write-Host "マウスクリックを実行しました: ($x, $y) $button" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("マウスクリックを実行しました: ($x, $y) $button", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスクリックを実行しました: ($x, $y) $button" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("マウスクリックを実行しました: ($x, $y) $button")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0050", "マウスクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "マウスクリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0050", "マウスクリックエラー: $($_.Exception.Message)")
             
             throw "マウスクリックの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1363,30 +1112,11 @@ class UIAutomationDriver
             Write-Host "マウスダブルクリックを実行しました: ($x, $y)" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("マウスダブルクリックを実行しました: ($x, $y)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスダブルクリックを実行しました: ($x, $y)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("マウスダブルクリックを実行しました: ($x, $y)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0051", "マウスダブルクリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "マウスダブルクリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0051", "マウスダブルクリックエラー: $($_.Exception.Message)")
             
             throw "マウスダブルクリックの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1412,30 +1142,11 @@ class UIAutomationDriver
             Write-Host "マウス右クリックを実行しました: ($x, $y)" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("マウス右クリックを実行しました: ($x, $y)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウス右クリックを実行しました: ($x, $y)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("マウス右クリックを実行しました: ($x, $y)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0052", "マウス右クリックエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "マウス右クリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0052", "マウス右クリックエラー: $($_.Exception.Message)")
             
             throw "マウス右クリックの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1452,30 +1163,11 @@ class UIAutomationDriver
             Write-Host "マウスを移動しました: ($x, $y)" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("マウスを移動しました: ($x, $y)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスを移動しました: ($x, $y)" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("マウスを移動しました: ($x, $y)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0053", "マウス移動エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "マウス移動エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0053", "マウス移動エラー: $($_.Exception.Message)")
             
             throw "マウスの移動に失敗しました: $($_.Exception.Message)"
         }
@@ -1496,30 +1188,11 @@ class UIAutomationDriver
             Write-Host "キーボード入力を実行しました: $keys" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("キーボード入力を実行しました: $keys", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キーボード入力を実行しました: $keys" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("キーボード入力を実行しました: $keys")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0060", "キーボード入力エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "キーボード入力エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0060", "キーボード入力エラー: $($_.Exception.Message)")
             
             throw "キーボード入力の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1572,30 +1245,11 @@ class UIAutomationDriver
             Write-Host "特殊キーを送信しました: $key" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("特殊キーを送信しました: $key", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 特殊キーを送信しました: $key" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("特殊キーを送信しました: $key")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0061", "特殊キー送信エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "特殊キー送信エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0061", "特殊キー送信エラー: $($_.Exception.Message)")
             
             throw "特殊キーの送信に失敗しました: $($_.Exception.Message)"
         }
@@ -1613,30 +1267,11 @@ class UIAutomationDriver
             Write-Host "キー組み合わせを送信しました: $keyCombination" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("キー組み合わせを送信しました: $keyCombination", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キー組み合わせを送信しました: $keyCombination" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("キー組み合わせを送信しました: $keyCombination")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0062", "キー組み合わせ送信エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "キー組み合わせ送信エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0062", "キー組み合わせ送信エラー: $($_.Exception.Message)")
             
             throw "キー組み合わせの送信に失敗しました: $($_.Exception.Message)"
         }
@@ -1653,30 +1288,11 @@ class UIAutomationDriver
             Write-Host "テキストを入力しました: $text" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テキストを入力しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを入力しました: $text" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テキストを入力しました: $text")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0063", "テキスト入力エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テキスト入力エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0063", "テキスト入力エラー: $($_.Exception.Message)")
             
             throw "テキスト入力の実行に失敗しました: $($_.Exception.Message)"
         }
@@ -1710,30 +1326,11 @@ class UIAutomationDriver
             Write-Host "スクリーンショットを保存しました: $file_path" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("スクリーンショットを保存しました: $file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] スクリーンショットを保存しました: $file_path" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("スクリーンショットを保存しました: $file_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)")
             
             throw "スクリーンショットの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -1770,30 +1367,11 @@ class UIAutomationDriver
             Write-Host "ウィンドウスクリーンショットを保存しました: $file_path" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウスクリーンショットを保存しました: $file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウスクリーンショットを保存しました: $file_path" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウスクリーンショットを保存しました: $file_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0081", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0081", "ウィンドウスクリーンショット取得エラー: $($_.Exception.Message)")
             
             throw "ウィンドウスクリーンショットの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -1824,31 +1402,12 @@ class UIAutomationDriver
                 Write-Host "アプリケーションを終了しました。" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("アプリケーションを終了しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを終了しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("アプリケーションを終了しました")
             }
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0070", "プロセス終了エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プロセス終了エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0070", "プロセス終了エラー: $($_.Exception.Message)")
             
             throw "プロセスの終了に失敗しました: $($_.Exception.Message)"
         }
@@ -1867,31 +1426,12 @@ class UIAutomationDriver
                 Write-Host "アプリケーションを強制終了しました。" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("アプリケーションを強制終了しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アプリケーションを強制終了しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("アプリケーションを強制終了しました")
             }
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0071", "プロセス強制終了エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プロセス強制終了エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0071", "プロセス強制終了エラー: $($_.Exception.Message)")
             
             throw "プロセスの強制終了に失敗しました: $($_.Exception.Message)"
         }
@@ -1910,22 +1450,7 @@ class UIAutomationDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0072", "プロセス状態確認エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "プロセス状態確認エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0072", "プロセス状態確認エラー: $($_.Exception.Message)")
             
             return $false
         }
@@ -1940,30 +1465,11 @@ class UIAutomationDriver
             Write-Host "待機しました: $milliseconds ms" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("待機しました: $milliseconds ms", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 待機しました: $milliseconds ms" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("待機しました: $milliseconds ms")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0082", "タイムアウトエラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タイムアウトエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0082", "タイムアウトエラー: $($_.Exception.Message)")
             
             throw "待機処理に失敗しました: $($_.Exception.Message)"
         }
@@ -1990,30 +1496,11 @@ class UIAutomationDriver
             Write-Host "UIAutomationDriverを破棄しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("UIAutomationDriverを破棄しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] UIAutomationDriverを破棄しました" | Out-File -Append -FilePath ([UIAutomationDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("UIAutomationDriverを破棄しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("UIAutomationDriverError_0090", "UIAutomationDriver破棄エラー: $($_.Exception.Message)", "UIAutomationDriver", [UIAutomationDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "UIAutomationDriver破棄エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("UIAutomationDriverError_0090", "UIAutomationDriver破棄エラー: $($_.Exception.Message)")
         }
     }
 }

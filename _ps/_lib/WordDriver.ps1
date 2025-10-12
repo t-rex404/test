@@ -16,6 +16,52 @@ class WordDriver
     static [string]$ErrorLogFile = ".\WordDriver_$($env:USERNAME)_Error.log"
 
     # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "WordDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([WordDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -42,33 +88,14 @@ class WordDriver
             Write-Host "WordDriverの初期化が完了しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("WordDriver initialization completed", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WordDriver initialization completed" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("WordDriver initialization completed")
         }
         catch
         {
             Write-Host "WordDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
             
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0001", "WordDriver初期化エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WordDriver初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0001", "WordDriver初期化エラー: $($_.Exception.Message)")
             
             throw "WordDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -96,31 +123,12 @@ class WordDriver
             
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("一時ディレクトリを作成しました: $temp_dir")
             return $temp_dir
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "一時ディレクトリ作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0002", "一時ディレクトリ作成エラー: $($_.Exception.Message)")
             
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -229,29 +237,13 @@ class WordDriver
             
             Write-Host "Wordアプリケーションの初期化が完了しました。" -ForegroundColor Green
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("Wordアプリケーションの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Wordアプリケーションの初期化が完了しました" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("Wordアプリケーションの初期化が完了しました")
         }
         catch
         {
             Write-Host "Wordアプリケーション初期化で致命的なエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
             
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try {
-                    $global:Common.HandleError("WordDriverError_0010", "Wordアプリケーション初期化エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                } catch {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Wordアプリケーション初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0010", "Wordアプリケーション初期化エラー: $($_.Exception.Message)")
             
             throw "Wordアプリケーションの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -268,30 +260,11 @@ class WordDriver
             #$this.word_document.SaveAs([ref]$this.file_path)
             Write-Host "新規ドキュメントを作成しました。"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("新規ドキュメントを作成しました。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新規ドキュメントを作成しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("新規ドキュメントを作成しました。")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0011", "新規ドキュメント作成エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "新規ドキュメント作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0011", "新規ドキュメント作成エラー: $($_.Exception.Message)")
             
             throw "新規ドキュメントの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -473,32 +446,13 @@ class WordDriver
             
             Write-Host "フッターにページ番号を設定しました（中央揃え）。" -ForegroundColor Green
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("フッターにページ番号を設定しました（中央揃え）。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フッターにページ番号を設定しました（中央揃え）。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("フッターにページ番号を設定しました（中央揃え）。")
         }
         catch
         {
             Write-Host "フッターのページ番号設定でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
             
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0050", "フッターページ番号設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "フッターのページ番号設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0050", "フッターページ番号設定エラー: $($_.Exception.Message)")
             
             throw "フッターのページ番号設定に失敗しました: $($_.Exception.Message)"
         }
@@ -534,30 +488,11 @@ class WordDriver
 
             Write-Host "テキストを追加しました: $text"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テキストを追加しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストを追加しました: $text" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テキストを追加しました: $text")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0020", "テキスト追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テキストの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0020", "テキスト追加エラー: $($_.Exception.Message)")
             
             throw "テキストの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -612,32 +547,13 @@ class WordDriver
             
             Write-Host "見出しを追加しました: $text (レベル: $level)"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("見出しを追加しました: $text (レベル: $level)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 見出しを追加しました: $text (レベル: $level)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("見出しを追加しました: $text (レベル: $level)")
         }
         catch
         {
             Write-Host "見出しの追加でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
             
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0021", "見出し追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "見出しの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0021", "見出し追加エラー: $($_.Exception.Message)")
             
             throw "見出しの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -669,30 +585,11 @@ class WordDriver
             
             Write-Host "段落を追加しました: $text"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("段落を追加しました: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 段落を追加しました: $text" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("段落を追加しました: $text")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0022", "段落追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "段落の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0022", "段落追加エラー: $($_.Exception.Message)")
 
             throw "段落の追加に失敗しました: $($_.Exception.Message)"
         }
@@ -755,30 +652,11 @@ class WordDriver
 
             Write-Host "テーブルを追加しました: $rows 行 x $cols 列"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テーブルを追加しました: $rows 行 x $cols 列", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テーブルを追加しました: $rows 行 x $cols 列" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テーブルを追加しました: $rows 行 x $cols 列")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0023", "テーブル追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "テーブルの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0023", "テーブル追加エラー: $($_.Exception.Message)")
             
             throw "テーブルの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -860,41 +738,18 @@ class WordDriver
             {
                 Write-Host "画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)"
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("画像を追加しました: $image_path (サイズ指定: 幅=$width, 高さ=$height)")
             }
             else
             {
                 Write-Host "画像を追加しました: $image_path (元のサイズ)"
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("画像を追加しました: $image_path (元のサイズ)", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 画像を追加しました: $image_path (元のサイズ)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("画像を追加しました: $image_path (元のサイズ)")
             }
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0024", "画像追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "画像の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0024", "画像追加エラー: $($_.Exception.Message)")
             
             throw "画像の追加に失敗しました: $($_.Exception.Message)"
         }
@@ -916,30 +771,11 @@ class WordDriver
             
             Write-Host "ページ区切りを追加しました。"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページ区切りを追加しました。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページ区切りを追加しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページ区切りを追加しました。")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0025", "ページ区切り追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ページ区切りの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0025", "ページ区切り追加エラー: $($_.Exception.Message)")
             
             throw "ページ区切りの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -966,30 +802,11 @@ class WordDriver
             
             Write-Host "新しいセクションを追加しました。"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("新しいセクションを追加しました。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 新しいセクションを追加しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("新しいセクションを追加しました。")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0026", "セクション追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "セクションの追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0026", "セクション追加エラー: $($_.Exception.Message)")
             
             throw "セクションの追加に失敗しました: $($_.Exception.Message)"
         }
@@ -1031,30 +848,11 @@ class WordDriver
             
             Write-Host "指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("指定した位置にセクション区切りを挿入しました: 位置 $position, タイプ $break_type")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0027", "セクション区切り挿入エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "セクション区切りの挿入に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0027", "セクション区切り挿入エラー: $($_.Exception.Message)")
             
             throw "セクション区切りの挿入に失敗しました: $($_.Exception.Message)"
         }
@@ -1073,31 +871,12 @@ class WordDriver
             $section_count = $this.word_document.Sections.Count
             Write-Host "セクション数: $section_count"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("セクション数: $section_count", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セクション数: $section_count" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("セクション数: $section_count")
             return $section_count
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0028", "セクション数取得エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "セクション数の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0028", "セクション数取得エラー: $($_.Exception.Message)")
             
             throw "セクション数の取得に失敗しました: $($_.Exception.Message)"
         }
@@ -1124,11 +903,7 @@ class WordDriver
                 {
                     Write-Host "現在のセクションインデックス: $i"
                     # 正常ログ出力
-                    if ($global:Common)
-                    {
-                        $global:Common.WriteLog("現在のセクションインデックス: $i", "INFO")
-                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 現在のセクションインデックス: $i" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                    }
+                    $this.LogInfo("現在のセクションインデックス: $i")
                     return $i
                 }
             }
@@ -1136,31 +911,12 @@ class WordDriver
             # 見つからない場合は1を返す
             Write-Host "現在のセクションインデックス: 1 (デフォルト)"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("現在のセクションインデックス: 1 (デフォルト)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 現在のセクションインデックス: 1 (デフォルト)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("現在のセクションインデックス: 1 (デフォルト)")
             return 1
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0029", "現在のセクションインデックス取得エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "現在のセクションインデックスの取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0029", "現在のセクションインデックス取得エラー: $($_.Exception.Message)")
             
             throw "現在のセクションインデックスの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -1248,30 +1004,11 @@ class WordDriver
 
             Write-Host "セクション $section_index のページ設定を完了しました。"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("セクション $section_index のページ設定を完了しました。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セクション $section_index のページ設定を完了しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("セクション $section_index のページ設定を完了しました。")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0051", "セクションページ設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "セクションのページ設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0051", "セクションページ設定エラー: $($_.Exception.Message)")
             
             throw "セクションのページ設定に失敗しました: $($_.Exception.Message)"
         }
@@ -1302,30 +1039,11 @@ class WordDriver
             $section.Range.Select()
             Write-Host "セクション $section_index に移動しました。"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("セクション $section_index に移動しました。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セクション $section_index に移動しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("セクション $section_index に移動しました。")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0030", "セクション移動エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "セクションへの移動に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0030", "セクション移動エラー: $($_.Exception.Message)")
             
             throw "セクションへの移動に失敗しました: $($_.Exception.Message)"
         }
@@ -1367,30 +1085,11 @@ class WordDriver
             
             Write-Host "目次を追加しました。"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("目次を追加しました。", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 目次を追加しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("目次を追加しました。")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0031", "目次追加エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "目次の追加に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0031", "目次追加エラー: $($_.Exception.Message)")
             
             throw "目次の追加に失敗しました: $($_.Exception.Message)"
         }
@@ -1426,30 +1125,11 @@ class WordDriver
             
             Write-Host "フォントを設定しました: $font_name, サイズ: $font_size"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("フォントを設定しました: $font_name, サイズ: $font_size", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フォントを設定しました: $font_name, サイズ: $font_size" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("フォントを設定しました: $font_name, サイズ: $font_size")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0052", "フォント設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "フォントの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0052", "フォント設定エラー: $($_.Exception.Message)")
             
             throw "フォントの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -1490,30 +1170,11 @@ class WordDriver
 
             Write-Host "ページ向きを設定しました: $orientation"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページ向きを設定しました: $orientation", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページ向きを設定しました: $orientation" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページ向きを設定しました: $orientation")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0053", "ページ向き設定エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ページ向きの設定に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0053", "ページ向き設定エラー: $($_.Exception.Message)")
             
             throw "ページ向きの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -1551,30 +1212,11 @@ class WordDriver
             
             Write-Host "ドキュメントを保存しました: $($this.file_path)"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ドキュメントを保存しました: $($this.file_path)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ドキュメントを保存しました: $($this.file_path)" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ドキュメントを保存しました: $($this.file_path)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0060", "ドキュメント保存エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ドキュメントの保存に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0060", "ドキュメント保存エラー: $($_.Exception.Message)")
             
             throw "ドキュメントの保存に失敗しました: $($_.Exception.Message)"
         }
@@ -1595,11 +1237,7 @@ class WordDriver
                 $this.word_document.TablesOfContents.Item(1).Update()
                 Write-Host "目次を更新しました。"
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("目次を更新しました。", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 目次を更新しました。" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("目次を更新しました。")
             }
             else
             {
@@ -1608,22 +1246,7 @@ class WordDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0032", "目次更新エラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "目次の更新に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0032", "目次更新エラー: $($_.Exception.Message)")
             
             throw "目次の更新に失敗しました: $($_.Exception.Message)"
         }
@@ -1660,30 +1283,11 @@ class WordDriver
             
             Write-Host "ドキュメントを開きました: $file_path"
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ドキュメントを開きました: $file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ドキュメントを開きました: $file_path" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ドキュメントを開きました: $file_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0061", "ドキュメント開くエラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ドキュメントを開くのに失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0061", "ドキュメント開くエラー: $($_.Exception.Message)")
             
             throw "ドキュメントを開くのに失敗しました: $($_.Exception.Message)"
         }
@@ -1746,22 +1350,7 @@ class WordDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)")
             
             throw "初期化失敗時のクリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -1824,36 +1413,16 @@ class WordDriver
             $this.is_initialized = $false
             Write-Host "WordDriverのリソース解放が完了しました。" -ForegroundColor Green
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("WordDriverのリソースを解放しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WordDriverのリソースを解放しました" | Out-File -Append -FilePath ([WordDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("WordDriverのリソースを解放しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WordDriverError_0091", "WordDriver Disposeエラー: $($_.Exception.Message)", "WordDriver", "[WordDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WordDriverError_0091", "WordDriver Disposeエラー: $($_.Exception.Message)")
             
             Write-Host "WordDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 } 
-
 
 
 

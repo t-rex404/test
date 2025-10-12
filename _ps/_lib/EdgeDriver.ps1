@@ -9,6 +9,52 @@ class EdgeDriver : WebDriver
     static [string]$ErrorLogFile = ".\EdgeDriver_$($env:USERNAME)_Error.log"
 
     # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "EdgeDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([EdgeDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -81,11 +127,7 @@ class EdgeDriver : WebDriver
             Write-Host "EdgeDriverの初期化が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("EdgeDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] EdgeDriverの初期化が完了しました" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("EdgeDriverの初期化が完了しました")
         }
         catch
         {
@@ -93,22 +135,8 @@ class EdgeDriver : WebDriver
             Write-Host "EdgeDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("EdgeDriverError_0001", "EdgeDriver初期化エラー: $($_.Exception.Message)", "EdgeDriver", [EdgeDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("EdgeDriverError_0001", "EdgeDriver初期化エラー: $($_.Exception.Message)")
             
             throw "EdgeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -136,11 +164,7 @@ class EdgeDriver : WebDriver
                         Write-Host "Edge実行ファイルが見つかりました: $this.browser_exe_path"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("Edge実行ファイルが見つかりました: $($this.browser_exe_path)", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Edge実行ファイルが見つかりました: $($this.browser_exe_path)" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("Edge実行ファイルが見つかりました: $($this.browser_exe_path)")
 
                         return $this.browser_exe_path
                     }
@@ -166,11 +190,7 @@ class EdgeDriver : WebDriver
                     Write-Host "Edge実行ファイルが見つかりました: $common_path"
 
                     # 正常ログ出力
-                    if ($global:Common)
-                    {
-                        $global:Common.WriteLog("Edge実行ファイルが見つかりました: $common_path", "INFO")
-                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Edge実行ファイルが見つかりました: $common_path" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                    }
+                    $this.LogInfo("Edge実行ファイルが見つかりました: $common_path")
 
                     return $common_path
                 }
@@ -180,22 +200,8 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("EdgeDriverError_0010", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)", "EdgeDriver", [EdgeDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("EdgeDriverError_0010", "Edge実行ファイルパス取得エラー: $($_.Exception.Message)")
 
             throw "Edge実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
@@ -240,11 +246,7 @@ class EdgeDriver : WebDriver
                 Write-Host "Edgeユーザーデータディレクトリを作成しました: $user_data_dir" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("Edgeユーザーデータディレクトリを作成しました: $user_data_dir", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Edgeユーザーデータディレクトリを作成しました: $user_data_dir" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("Edgeユーザーデータディレクトリを作成しました: $user_data_dir")
             }
             catch
             {
@@ -255,22 +257,8 @@ class EdgeDriver : WebDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("EdgeDriverError_0011", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "EdgeDriver", [EdgeDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("EdgeDriverError_0011", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)")
             
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -296,30 +284,12 @@ class EdgeDriver : WebDriver
             Write-Host "Edgeデバッグモードが有効化されました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("Edgeデバッグモードが有効化されました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Edgeデバッグモードが有効化されました" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("Edgeデバッグモードが有効化されました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("EdgeDriverError_0012", "デバッグモード有効化エラー: $($_.Exception.Message)", "EdgeDriver", [EdgeDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "デバッグモードの有効化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("EdgeDriverError_0012", "デバッグモード有効化エラー: $($_.Exception.Message)")
             
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
@@ -384,30 +354,12 @@ class EdgeDriver : WebDriver
             Write-Host "クリーンアップが完了しました。" -ForegroundColor Yellow
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("初期化失敗時のクリーンアップが完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップが完了しました" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("初期化失敗時のクリーンアップが完了しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("EdgeDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "EdgeDriver", [EdgeDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("EdgeDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)")
 
             throw "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -435,30 +387,12 @@ class EdgeDriver : WebDriver
             Write-Host "EdgeDriverのリソース解放が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("EdgeDriverのリソースを解放しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] EdgeDriverのリソースを解放しました" | Out-File -Append -FilePath ([EdgeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("EdgeDriverのリソースを解放しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("EdgeDriverError_0091", "EdgeDriver Disposeエラー: $($_.Exception.Message)", "EdgeDriver", [EdgeDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("EdgeDriverError_0091", "EdgeDriver Disposeエラー: $($_.Exception.Message)")
             
             throw "EdgeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }

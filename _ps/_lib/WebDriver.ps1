@@ -9,6 +9,52 @@
     static [string]$NormalLogFile = ".\WebDriver_$($env:USERNAME)_Normal.log"
     static [string]$ErrorLogFile = ".\WebDriver_$($env:USERNAME)_Error.log"
 
+    # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "WebDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([WebDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
     WebDriver()
     {
         try
@@ -21,31 +67,13 @@
             Write-Host "WebDriverの初期化が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("WebDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WebDriverの初期化が完了しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("WebDriverの初期化が完了しました")
         }
         catch
         {
             # Commonオブジェクトが利用可能な場合はエラーログに記録
             # 初期化・接続関連エラー (1001)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0001", "WebDriver初期化エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WebDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1001", "WebDriver初期化エラー: $($_.Exception.Message)")
 
             throw "WebDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -121,31 +149,13 @@
             Write-Host "ブラウザが正常に起動しました。プロセスID: $($this.browser_exe_process_id)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ブラウザが正常に起動しました。プロセスID: $($this.browser_exe_process_id)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ブラウザが正常に起動しました。プロセスID: $($this.browser_exe_process_id)" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ブラウザが正常に起動しました。プロセスID: $($this.browser_exe_process_id)")
         }
         catch
         {
             # Commonオブジェクトが利用可能な場合はエラーログに記録
             # 初期化・接続関連エラー (1002)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0010", "ブラウザ起動エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ブラウザの起動に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1002", "ブラウザ起動エラー: $($_.Exception.Message)")
 
             throw "ブラウザの起動に失敗しました: $($_.Exception.Message)"
         }
@@ -214,11 +224,7 @@
                         }
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("タブ情報を取得しました: type=$($tab.type), title=$($tab.title), id=$($tab.id)", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] タブ情報を取得しました: type=$($tab.type), title=$($tab.title), id=$($tab.id)" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("タブ情報を取得しました: type=$($tab.type), title=$($tab.title), id=$($tab.id)")
 
                         return $tab 
                     }
@@ -253,21 +259,7 @@
         catch
         {
             # 初期化・接続関連エラー (1003)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0011", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タブ情報の取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1003", "タブ情報取得エラー: $($_.Exception.Message)")
             throw "タブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -311,11 +303,7 @@
                         Write-Host "WebSocket接続が確立されました。" -ForegroundColor Green
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("WebSocket接続が確立されました: $web_socket_debugger_url", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WebSocket接続が確立されました: $web_socket_debugger_url" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("WebSocket接続が確立されました: $web_socket_debugger_url")
 
                         return
                     }
@@ -364,21 +352,7 @@
         catch
         {
             # 初期化・接続関連エラー (1004)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0012", "WebSocket接続エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WebSocket接続エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1004", "WebSocket接続エラー: $($_.Exception.Message)")
             throw "WebSocket接続に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -422,30 +396,12 @@
             $this.web_socket.SendAsync($buffer, [System.Net.WebSockets.WebSocketMessageType]::Text, $true, $cancellationTokenSource.Token).Wait()
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("WebSocketメッセージを送信しました: $method", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WebSocketメッセージを送信しました: $method" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("WebSocketメッセージを送信しました: $method")
         }
         catch
         {
             # 初期化・接続関連エラー (1005)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0013", "WebSocket メッセージ送信エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WebSocket メッセージ送信エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1005", "WebSocket メッセージ送信エラー: $($_.Exception.Message)")
             throw "WebSocketメッセージ送信に失敗しました: $($_.Exception.Message)"
         }
         finally
@@ -532,11 +488,7 @@
                         if ($response_json_object.id -eq $this.message_id)
                         {
                             # 正常ログ出力
-                            if ($global:Common)
-                            {
-                                $global:Common.WriteLog("WebSocketメッセージを受信しました: id=$($response_json_object.id)", "INFO")
-                                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WebSocketメッセージを受信しました: id=$($response_json_object.id)" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                            }
+                            $this.LogInfo("WebSocketメッセージを受信しました: id=$($response_json_object.id)")
                             return $response_json
                         }
                     }
@@ -573,21 +525,7 @@
         catch
         {
             # 初期化・接続関連エラー (1006)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0014", "WebSocket メッセージ受信エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "WebSocket メッセージ受信エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1006", "WebSocket メッセージ受信エラー: $($_.Exception.Message)")
             throw "WebSocketメッセージの受信に失敗しました: $($_.Exception.Message)"
         }
         return $response_json
@@ -715,30 +653,12 @@
             Write-Host "ページ遷移が完了しました: $url"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページ遷移が完了しました: $url", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページ遷移が完了しました: $url" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページ遷移が完了しました: $url")
         }
         catch
         {
             # ナビゲーション関連エラー (1011)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0020", "ページ遷移エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ページ遷移エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1101", "ページ遷移エラー: $($_.Exception.Message)")
             throw "ページ遷移に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -775,11 +695,7 @@
                         Write-Host "広告が読み込まれました。"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("広告が正常に読み込まれました", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 広告が正常に読み込まれました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("広告が正常に読み込まれました")
 
                         return
                     }
@@ -801,21 +717,7 @@
         catch
         {
             # ナビゲーション関連エラー (1016)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0021", "広告読み込み待機エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "広告読み込み待機エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1102", "広告読み込み待機エラー: $($_.Exception.Message)")
             throw "広告の読み込み待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -845,31 +747,13 @@
                 Write-Host "ウィンドウを正常に閉じました。"
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("ウィンドウを正常に閉じました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを正常に閉じました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("ウィンドウを正常に閉じました")
             }
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1077)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0022", "ウィンドウを閉じるエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウを閉じるエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1201", "ウィンドウを閉じるエラー: $($_.Exception.Message)")
             Write-Host "ウィンドウを閉じる際にエラーが発生しました: $($_.Exception.Message)"
         }
     }
@@ -892,11 +776,7 @@
                     Write-Host "WebSocket接続を正常に閉じました。" -ForegroundColor Green
 
                     # 正常ログ出力
-                    if ($global:Common)
-                    {
-                        $global:Common.WriteLog("WebSocket接続を正常に閉じました", "INFO")
-                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WebSocket接続を正常に閉じました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                    }
+                    $this.LogInfo("WebSocket接続を正常に閉じました")
                 }
                 catch
                 {
@@ -926,11 +806,7 @@
                         Write-Host "ブラウザプロセスを正常に終了しました。プロセスID: $($this.browser_exe_process_id)"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("ブラウザプロセスを正常に終了しました。プロセスID: $($this.browser_exe_process_id)", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ブラウザプロセスを正常に終了しました。プロセスID: $($this.browser_exe_process_id)" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("ブラウザプロセスを正常に終了しました。プロセスID: $($this.browser_exe_process_id)")
                     }
                     else
                     {
@@ -951,30 +827,12 @@
             Write-Host "WebDriverのリソースを正常に解放しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("WebDriverのリソースを正常に解放しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] WebDriverのリソースを正常に解放しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("WebDriverのリソースを正常に解放しました")
         }
         catch
         {
             # 初期化・接続関連エラー (1007)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0090", "Disposeエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Disposeエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1007", "Disposeエラー: $($_.Exception.Message)")
             Write-Host "リソースの解放中にエラーが発生しました: $($_.Exception.Message)"
         }
     }
@@ -1003,32 +861,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ターゲット検出を有効化しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ターゲット検出を有効化しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ターゲット検出を有効化しました")
 
             return $response.result.targetId
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1081)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0015", "ターゲット発見エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ターゲット発見エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1202", "ターゲット発見エラー: $($_.Exception.Message)")
             throw "ターゲットの発見に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1053,11 +893,7 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("利用可能なタブ情報を取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 利用可能なタブ情報を取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("利用可能なタブ情報を取得しました")
 
             # PSCustomObject をそのまま返す（変換しない）
             return [pscustomobject]$response_json.result
@@ -1065,21 +901,7 @@
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1082)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0016", "タブ情報取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タブ情報取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1203", "タブ情報取得エラー: $($_.Exception.Message)")
             throw "利用可能なタブ情報の取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1108,30 +930,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("タブをアクティブにしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] タブをアクティブにしました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("タブをアクティブにしました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1083)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0017", "タブアクティブ化エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タブアクティブ化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1204", "タブアクティブ化エラー: $($_.Exception.Message)")
             throw "タブのアクティブ化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1160,30 +964,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("タブを閉じました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] タブを閉じました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("タブを閉じました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1084)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0018", "タブ切断エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タブ切断エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1205", "タブ切断エラー: $($_.Exception.Message)")
             throw "タブの切断に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1218,32 +1004,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ターゲットにアタッチしてセッションIDを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ターゲットにアタッチしてセッションIDを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ターゲットにアタッチしてセッションIDを取得しました")
 
             return [string]$response.result.sessionId
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1086)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0019", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1206", "ターゲットアタッチ（sessionId取得）エラー: $($_.Exception.Message)")
             throw "ターゲットへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1262,32 +1030,14 @@
             $result = $this.AttachToTargetAndGetSessionId($tab.id, $flatten)
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("現在のタブにアタッチしてセッションIDを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 現在のタブにアタッチしてセッションIDを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("現在のタブにアタッチしてセッションIDを取得しました")
 
             return $result
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1086)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0015", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1207", "現在タブアタッチ（sessionId取得）エラー: $($_.Exception.Message)")
             throw "現在タブへのアタッチ（sessionId取得）に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1316,30 +1066,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("セッションをデタッチしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] セッションをデタッチしました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("セッションをデタッチしました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1087)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0016", "セッションデタッチエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "セッションデタッチエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1208", "セッションデタッチエラー: $($_.Exception.Message)")
             throw "セッションのデタッチに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1363,30 +1095,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページイベントを有効化しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページイベントを有効化しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページイベントを有効化しました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1085)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0017", "ページイベント有効化エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ページイベント有効化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1209", "ページイベント有効化エラー: $($_.Exception.Message)")
             throw "ページイベントの有効化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1421,30 +1135,12 @@
             Write-Host "ブラウザの表示倍率を $zoom_percentage% に設定しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ブラウザの表示倍率を $zoom_percentage% に正常に設定しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ブラウザの表示倍率を $zoom_percentage% に正常に設定しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ブラウザの表示倍率を $zoom_percentage% に正常に設定しました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1072)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0018", "ブラウザ表示倍率変更エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ブラウザ表示倍率変更エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1210", "ブラウザ表示倍率変更エラー: $($_.Exception.Message)")
             throw "ブラウザの表示倍率変更に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1479,11 +1175,7 @@
             if ($null -ne $response_json.result.result.objectId)
             {
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("要素を正常に検索しました。セレクタ: $selector", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を正常に検索しました。セレクタ: $selector" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("要素を正常に検索しました。セレクタ: $selector")
 
                 return @{ nodeId = $response_json.result.result.objectId; selector = $selector }
             }
@@ -1495,21 +1187,7 @@
         catch
         {
             # 要素検索関連エラー (1021)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0040", "要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素検索エラー (CSS): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1301", "要素検索エラー (CSS): $($_.Exception.Message)")
             throw "CSSセレクタでの要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1540,11 +1218,7 @@
             if ($response_json.result.result.objectIds.Count -eq 0)
             {
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("複数要素検索結果を返します (CSS)。セレクタ: $selector", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 複数要素検索結果を返します (CSS)。セレクタ: $selector" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("複数要素検索結果を返します (CSS)。セレクタ: $selector")
                 return @{ nodeId = $response_json.result.result.objectIds; selector = $selector }
             }
             else
@@ -1555,21 +1229,7 @@
         catch
         {
             # 要素検索関連エラー (1028)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0041", "複数要素検索エラー (CSS): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数要素検索エラー (CSS): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1302", "複数要素検索エラー (CSS): $($_.Exception.Message)")
             throw "CSSセレクタでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1600,11 +1260,7 @@
             if ($response_json.result.result.objectId)
             {
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("要素を検索しました ($query_type): $element", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を検索しました ($query_type): $element" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("要素を検索しました ($query_type): $element")
                 return @{ nodeId = $response_json.result.result.objectId; query_type = $query_type; element = $element } 
             }
             else
@@ -1615,21 +1271,7 @@
         catch
         {
             # 要素検索関連エラー (1022)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0042", "要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素検索エラー ($query_type): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1303", "要素検索エラー ($query_type): $($_.Exception.Message)")
             throw "$query_type による要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1660,11 +1302,7 @@
             if ($response_json.result.result.value -gt 0)
             {
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("複数要素数を取得しました ($query_type): $element, 件数: $($response_json.result.result.value)", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 複数要素数を取得しました ($query_type): $element, 件数: $($response_json.result.result.value)" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("複数要素数を取得しました ($query_type): $element, 件数: $($response_json.result.result.value)")
                 return @{ count = $response_json.result.result.value; query_type = $query_type; element = $element }
             }
             else
@@ -1675,21 +1313,7 @@
         catch
         {
             # 要素検索関連エラー (1029)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0043", "複数要素検索エラー ($query_type): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数要素検索エラー ($query_type): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1304", "複数要素検索エラー ($query_type): $($_.Exception.Message)")
             throw "$query_type による複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1721,21 +1345,7 @@
         catch
         {
             # 要素検索関連エラー (1023)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0044", "XPath単体要素検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "XPath単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1305", "XPath単体要素検索エラー: $($_.Exception.Message)")
             throw "XPathでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1766,21 +1376,7 @@
         catch
         {
             # 要素検索関連エラー (1024)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0045", "ClassName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ClassName単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1306", "ClassName単体要素検索エラー: $($_.Exception.Message)")
             throw "ClassNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1811,21 +1407,7 @@
         catch
         {
             # 要素検索関連エラー (1025)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0046", "Name単体要素検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Name単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1307", "Name単体要素検索エラー: $($_.Exception.Message)")
             throw "Nameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1851,21 +1433,7 @@
         catch
         {
             # 要素検索関連エラー (1026)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0047", "Id単体要素検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Id単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1308", "Id単体要素検索エラー: $($_.Exception.Message)")
             throw "Idでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1896,21 +1464,7 @@
         catch
         {
             # 要素検索関連エラー (1027)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0048", "TagName単体要素検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TagName単体要素検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1309", "TagName単体要素検索エラー: $($_.Exception.Message)")
             throw "TagNameでの単体要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -1954,21 +1508,7 @@
         catch
         {
             # 要素検索関連エラー (1030)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0049", "複数要素検索エラー (ClassName): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数要素検索エラー (ClassName): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1310", "複数要素検索エラー (ClassName): $($_.Exception.Message)")
             throw "ClassNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2008,21 +1548,7 @@
         catch
         {
             # 要素検索関連エラー (1031)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0050", "複数要素検索エラー (Name): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数要素検索エラー (Name): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1311", "複数要素検索エラー (Name): $($_.Exception.Message)")
             throw "Nameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2062,21 +1588,7 @@
         catch
         {
             # 要素検索関連エラー (1032)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0051", "複数要素検索エラー (TagName): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数要素検索エラー (TagName): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1312", "複数要素検索エラー (TagName): $($_.Exception.Message)")
             throw "TagNameでの複数要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2107,11 +1619,7 @@
             if ($response_json.result.result.objectId)
             {
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("要素の存在を確認しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素の存在を確認しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("要素の存在を確認しました")
 
                 return $true
             }
@@ -2123,21 +1631,7 @@
         catch
         {
             # 要素検索関連エラー (1033)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0052", "要素存在確認エラー ($query_type): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素存在確認エラー ($query_type): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1313", "要素存在確認エラー ($query_type): $($_.Exception.Message)")
             throw "$query_type による要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2158,21 +1652,7 @@
         catch
         {
             # 要素検索関連エラー (1034)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0053", "XPath要素存在確認エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "XPath要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1314", "XPath要素存在確認エラー: $($_.Exception.Message)")
             throw "XPathでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2198,21 +1678,7 @@
         catch
         {
             # 要素検索関連エラー (1035)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0054", "ClassName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ClassName要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1315", "ClassName要素存在確認エラー: $($_.Exception.Message)")
             throw "ClassNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2233,21 +1699,7 @@
         catch
         {
             # 要素検索関連エラー (1036)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0055", "Id要素存在確認エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Id要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1316", "Id要素存在確認エラー: $($_.Exception.Message)")
             throw "Idでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2273,21 +1725,7 @@
         catch
         {
             # 要素検索関連エラー (1037)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0056", "Name要素存在確認エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Name要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1317", "Name要素存在確認エラー: $($_.Exception.Message)")
             throw "Nameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2313,21 +1751,7 @@
         catch
         {
             # 要素検索関連エラー (1038)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0057", "TagName要素存在確認エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TagName要素存在確認エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1318", "TagName要素存在確認エラー: $($_.Exception.Message)")
             throw "TagNameでの要素存在確認に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2374,11 +1798,7 @@
             if ($null -ne $response_json.result.result.value)
             {
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("子要素を検索しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 子要素を検索しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("子要素を検索しました")
 
                 return @{ nodeId = $response_json.result.result.objectId; selector = $child_selector; parentId = $parent_object_id }
             }
@@ -2390,21 +1810,7 @@
         catch
         {
             # 要素検索関連エラー (1042)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0058", "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1319", "親オブジェクト内子要素単数検索エラー: $($_.Exception.Message)")
             throw "親オブジェクト内の子要素検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2476,11 +1882,7 @@
                 }
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("子要素を複数検索しました", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 子要素を複数検索しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("子要素を複数検索しました")
 
                 return $element_list
             }
@@ -2492,21 +1894,7 @@
         catch
         {
             # 要素検索関連エラー (1043)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0059", "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1320", "親オブジェクト内子要素複数検索エラー: $($_.Exception.Message)")
             throw "親オブジェクト内の子要素複数検索に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2539,32 +1927,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素からテキストを正常に取得しました。オブジェクトID: $object_id", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素からテキストを正常に取得しました。オブジェクトID: $object_id" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素からテキストを正常に取得しました。オブジェクトID: $object_id")
 
             return $response_json.result.result.value
         }
         catch
         {
             # 要素操作関連エラー (1051)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0060", "要素テキスト取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素テキスト取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1401", "要素テキスト取得エラー: $($_.Exception.Message)")
             throw "要素のテキスト取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2593,30 +1963,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素にテキストを正常に設定しました。オブジェクトID: $object_id, テキスト: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素にテキストを正常に設定しました。オブジェクトID: $object_id, テキスト: $text" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素にテキストを正常に設定しました。オブジェクトID: $object_id, テキスト: $text")
         }
         catch
         {
             # 要素操作関連エラー (1052)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0061", "要素テキスト設定エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素テキスト設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1402", "要素テキスト設定エラー: $($_.Exception.Message)")
             throw "要素へのテキスト入力に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2645,30 +1997,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素を正常にクリックしました。オブジェクトID: $object_id", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素を正常にクリックしました。オブジェクトID: $object_id" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素を正常にクリックしました。オブジェクトID: $object_id")
         }
         catch
         {
             # 要素操作関連エラー (1054)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0062", "要素クリックエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素クリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1403", "要素クリックエラー: $($_.Exception.Message)")
             throw "要素のクリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2702,32 +2036,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素の属性を正常に取得しました。オブジェクトID: $object_id, 属性: $attribute", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素の属性を正常に取得しました。オブジェクトID: $object_id, 属性: $attribute" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素の属性を正常に取得しました。オブジェクトID: $object_id, 属性: $attribute")
 
             return $response_json.result.result.value
         }
         catch
         {
             # 要素操作関連エラー (1060)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0063", "要素属性取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素属性取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1404", "要素属性取得エラー: $($_.Exception.Message)")
             throw "要素の属性取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2761,30 +2077,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素の属性を正常に設定しました。オブジェクトID: $object_id, 属性: $attribute, 値: $value", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素の属性を正常に設定しました。オブジェクトID: $object_id, 属性: $attribute, 値: $value" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素の属性を正常に設定しました。オブジェクトID: $object_id, 属性: $attribute, 値: $value")
         }
         catch
         {
             # 要素操作関連エラー (1061)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0064", "要素属性設定エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素属性設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1405", "要素属性設定エラー: $($_.Exception.Message)")
             throw "要素の属性設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2814,32 +2112,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("アンカータグのhrefを正常に取得しました。オブジェクトID: $object_id", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] アンカータグのhrefを正常に取得しました。オブジェクトID: $object_id" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("アンカータグのhrefを正常に取得しました。オブジェクトID: $object_id")
 
             return $response.result.result.value
         }
         catch
         {
             # 要素操作関連エラー (1064)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0065", "href取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "href取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1406", "href取得エラー: $($_.Exception.Message)")
             throw "hrefの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2873,32 +2153,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素のCSSプロパティを正常に取得しました。オブジェクトID: $object_id, プロパティ: $property", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素のCSSプロパティを正常に取得しました。オブジェクトID: $object_id, プロパティ: $property" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素のCSSプロパティを正常に取得しました。オブジェクトID: $object_id, プロパティ: $property")
 
             return $response_json.result.result.value
         }
         catch
         {
             # 要素操作関連エラー (1062)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0066", "CSSプロパティ取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CSSプロパティ取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1407", "CSSプロパティ取得エラー: $($_.Exception.Message)")
             throw "要素のCSSプロパティ取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2932,30 +2194,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素のCSSプロパティを正常に設定しました。オブジェクトID: $object_id, プロパティ: $property, 値: $value", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素のCSSプロパティを正常に設定しました。オブジェクトID: $object_id, プロパティ: $property, 値: $value" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素のCSSプロパティを正常に設定しました。オブジェクトID: $object_id, プロパティ: $property, 値: $value")
         }
         catch
         {
             # 要素操作関連エラー (1063)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0067", "CSSプロパティ設定エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "CSSプロパティ設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1408", "CSSプロパティ設定エラー: $($_.Exception.Message)")
             throw "要素のCSSプロパティ設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -2993,30 +2237,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("インデックスによるオプション選択が正常に完了しました。オブジェクトID: $object_id, インデックス: $index", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] インデックスによるオプション選択が正常に完了しました。オブジェクトID: $object_id, インデックス: $index" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("インデックスによるオプション選択が正常に完了しました。オブジェクトID: $object_id, インデックス: $index")
         }
         catch
         {
             # 要素操作関連エラー (1065)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0068", "オプション選択エラー (インデックス): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "オプション選択エラー (インデックス): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1409", "オプション選択エラー (インデックス): $($_.Exception.Message)")
             throw "インデックスによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3050,30 +2276,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("テキストによるオプション選択が正常に完了しました。オブジェクトID: $object_id, テキスト: $text", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] テキストによるオプション選択が正常に完了しました。オブジェクトID: $object_id, テキスト: $text" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("テキストによるオプション選択が正常に完了しました。オブジェクトID: $object_id, テキスト: $text")
         }
         catch
         {
             # 要素操作関連エラー (1066)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0069", "オプション選択エラー (テキスト): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "オプション選択エラー (テキスト): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1410", "オプション選択エラー (テキスト): $($_.Exception.Message)")
             throw "テキストによるオプション選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3102,30 +2310,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("全オプションの選択解除が正常に完了しました。オブジェクトID: $object_id", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 全オプションの選択解除が正常に完了しました。オブジェクトID: $object_id" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("全オプションの選択解除が正常に完了しました。オブジェクトID: $object_id")
         }
         catch
         {
             # 要素操作関連エラー (1067)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0070", "オプション未選択エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "オプション未選択エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1411", "オプション未選択エラー: $($_.Exception.Message)")
             throw "オプションの未選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3154,30 +2344,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素の値を正常にクリアしました。オブジェクトID: $object_id", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素の値を正常にクリアしました。オブジェクトID: $object_id" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素の値を正常にクリアしました。オブジェクトID: $object_id")
         }
         catch
         {
             # 要素操作関連エラー (1053)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0071", "要素クリアエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素クリアエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1412", "要素クリアエラー: $($_.Exception.Message)")
             throw "要素のクリアに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3215,30 +2387,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウサイズを正常に変更しました。ハンドル: $windowHandle, 幅: $width, 高さ: $height", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウサイズを正常に変更しました。ハンドル: $windowHandle, 幅: $width, 高さ: $height" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウサイズを正常に変更しました。ハンドル: $windowHandle, 幅: $width, 高さ: $height")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1071)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0072", "ウィンドウリサイズエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウリサイズエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1211", "ウィンドウリサイズエラー: $($_.Exception.Message)")
             throw "ウィンドウのリサイズに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3267,30 +2421,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウを正常状態に変更しました。ハンドル: $windowHandle", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを正常状態に変更しました。ハンドル: $windowHandle" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウを正常状態に変更しました。ハンドル: $windowHandle")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1072)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0073", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1212", "ウィンドウ状態変更エラー (通常): $($_.Exception.Message)")
             throw "ウィンドウの通常状態への変更に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3319,30 +2455,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウを最大化しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを最大化しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウを最大化しました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1073)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0074", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1213", "ウィンドウ状態変更エラー (最大化): $($_.Exception.Message)")
             throw "ウィンドウの最大化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3371,30 +2489,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウを最小化しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを最小化しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウを最小化しました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1074)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0075", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1214", "ウィンドウ状態変更エラー (最小化): $($_.Exception.Message)")
             throw "ウィンドウの最小化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3423,30 +2523,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウをフルスクリーンにしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウをフルスクリーンにしました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウをフルスクリーンにしました")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1075)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0076", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1215", "ウィンドウ状態変更エラー (フルスクリーン): $($_.Exception.Message)")
             throw "ウィンドウのフルスクリーン化に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3475,30 +2557,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウを正常に移動しました。ハンドル: $windowHandle, X: $x, Y: $y", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウを正常に移動しました。ハンドル: $windowHandle, X: $x, Y: $y" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウを正常に移動しました。ハンドル: $windowHandle, X: $x, Y: $y")
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1076)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0023", "ウィンドウ移動エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウ移動エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1216", "ウィンドウ移動エラー: $($_.Exception.Message)")
             throw "ウィンドウの移動に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3533,30 +2597,12 @@
             if ($response.error) { throw "ブラウザ履歴移動エラー: $($response.error.message)" }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ブラウザ履歴を前のページに戻しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ブラウザ履歴を前のページに戻しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ブラウザ履歴を前のページに戻しました")
         }
         catch
         {
             # ナビゲーション関連エラー (1012)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0024", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1103", "ブラウザ履歴移動エラー (戻る): $($_.Exception.Message)")
             throw "ブラウザの履歴を戻る操作に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3587,30 +2633,12 @@
             if ($response.error) { throw "ブラウザ履歴移動エラー: $($response.error.message)" }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ブラウザ履歴を次のページに進みました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ブラウザ履歴を次のページに進みました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ブラウザ履歴を次のページに進みました")
         }
         catch
         {
             # ナビゲーション関連エラー (1013)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0025", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1104", "ブラウザ履歴移動エラー (進む): $($_.Exception.Message)")
             throw "ブラウザの履歴を進む操作に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3634,30 +2662,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページを更新しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページを更新しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページを更新しました")
         }
         catch
         {
             # ナビゲーション関連エラー (1014)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0026", "ブラウザ更新エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ブラウザ更新エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1105", "ブラウザ更新エラー: $($_.Exception.Message)")
             throw "ブラウザの更新に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3695,11 +2705,7 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("現在のURLを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 現在のURLを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("現在のURLを取得しました")
 
             #return $response_json.result.entries[0].url
             return $response_json.result.result.value
@@ -3707,21 +2713,7 @@
         catch
         {
             # 情報取得関連エラー (1091)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0027", "URL取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "URL取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1501", "URL取得エラー: $($_.Exception.Message)")
             throw "URLの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3755,11 +2747,7 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページタイトルを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページタイトルを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページタイトルを取得しました")
 
             #return $response_json.result.entries[0].title
             return $response_json.result.result.value
@@ -3767,21 +2755,7 @@
         catch
         {
             # 情報取得関連エラー (1092)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0028", "タイトル取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "タイトル取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1502", "タイトル取得エラー: $($_.Exception.Message)")
             throw "タイトルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3805,32 +2779,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ページのソースコードを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページのソースコードを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ページのソースコードを取得しました")
 
             return $response_json.result.result.value
         }
         catch
         {
             # 情報取得関連エラー (1093)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0029", "ソースコード取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ソースコード取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1503", "ソースコード取得エラー: $($_.Exception.Message)")
             throw "ソースコードの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3856,11 +2812,7 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウハンドルを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウハンドルを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウハンドルを取得しました")
 
             #if (-not $response_json.result.entries -or $response_json.result.entries.Count -eq 0)
             #{
@@ -3873,21 +2825,7 @@
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1078)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0079", "ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウハンドル取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1217", "ウィンドウハンドル取得エラー: $($_.Exception.Message)")
             throw "ウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3920,32 +2858,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("全ウィンドウハンドルを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 全ウィンドウハンドルを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("全ウィンドウハンドルを取得しました")
 
             return $window_handles
         }
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1079)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0075", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1218", "複数ウィンドウハンドル取得エラー: $($_.Exception.Message)")
             throw "複数のウィンドウハンドルの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -3969,11 +2889,7 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ウィンドウサイズを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ウィンドウサイズを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ウィンドウサイズを取得しました")
 
             return @{
                 width = $response_json.result.result.value.width
@@ -3983,21 +2899,7 @@
         catch
         {
             # ウィンドウ・タブ操作関連エラー (1080)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0076", "ウィンドウサイズ取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ウィンドウサイズ取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1219", "ウィンドウサイズ取得エラー: $($_.Exception.Message)")
             throw "ウィンドウサイズの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4067,11 +2969,7 @@
                         Write-Host "フルページスクリーンショットを保存しました: $save_path"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("フルページスクリーンショットを正常に保存しました: $save_path", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] フルページスクリーンショットを正常に保存しました: $save_path" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("フルページスクリーンショットを正常に保存しました: $save_path")
                     }
                     catch
                     {
@@ -4102,11 +3000,7 @@
                         Write-Host "ビューポートスクリーンショットを保存しました: $save_path"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("ビューポートスクリーンショットを正常に保存しました: $save_path", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ビューポートスクリーンショットを正常に保存しました: $save_path" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("ビューポートスクリーンショットを正常に保存しました: $save_path")
                     }
                     catch
                     {
@@ -4122,21 +3016,7 @@
         catch
         {
             # スクリーンショット関連エラー (1101)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0080", "スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1601", "スクリーンショット取得エラー: $($_.Exception.Message)")
             throw "スクリーンショットの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4231,30 +3111,12 @@
             Write-Host "要素スクリーンショットを保存しました: $save_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("要素スクリーンショットを正常に保存しました: $save_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素スクリーンショットを正常に保存しました: $save_path" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("要素スクリーンショットを正常に保存しました: $save_path")
         }
         catch
         {
             # スクリーンショット関連エラー (1102)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0081", "要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1602", "要素スクリーンショット取得エラー: $($_.Exception.Message)")
             throw "要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
 
@@ -4346,30 +3208,12 @@
             Write-Host "複数要素スクリーンショットを保存しました: $save_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("複数要素スクリーンショットを正常に保存しました: $save_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 複数要素スクリーンショットを正常に保存しました: $save_path" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("複数要素スクリーンショットを正常に保存しました: $save_path")
         }
         catch
         {
             # スクリーンショット関連エラー (1103)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0082", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "複数要素スクリーンショット取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1603", "複数要素スクリーンショット取得エラー: $($_.Exception.Message)")
             throw "複数要素のスクリーンショット取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4412,11 +3256,7 @@
                         Write-Host "要素が表示されました: $selector"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("要素が正常に表示されました: $selector", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素が正常に表示されました: $selector" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("要素が正常に表示されました: $selector")
 
                         return
                     }
@@ -4434,21 +3274,7 @@
         catch
         {
             # 要素検索関連エラー (1039)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0031", "要素表示待機エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素表示待機エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1321", "要素表示待機エラー: $($_.Exception.Message)")
             throw "要素の表示待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4497,11 +3323,7 @@
                         Write-Host "要素がクリック可能になりました: $selector"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("要素が正常にクリック可能になりました: $selector", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 要素が正常にクリック可能になりました: $selector" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("要素が正常にクリック可能になりました: $selector")
 
                         return
                     }
@@ -4519,21 +3341,7 @@
         catch
         {
             # 要素検索関連エラー (1040)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0032", "要素クリック可能性待機エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "要素クリック可能性待機エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1322", "要素クリック可能性待機エラー: $($_.Exception.Message)")
             throw "要素のクリック可能性待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4567,11 +3375,7 @@
                         Write-Host "ページロードが完了しました"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("ページロードが正常に完了しました", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ページロードが正常に完了しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("ページロードが正常に完了しました")
 
                         return
                     }
@@ -4589,21 +3393,7 @@
         catch
         {
             # ナビゲーション関連エラー (1015)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0030", "ページロード待機エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ページロード待機エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1106", "ページロード待機エラー: $($_.Exception.Message)")
             throw "ページロードの待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4642,11 +3432,7 @@
                         Write-Host "カスタム条件が満たされました: $javascript_condition"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("カスタム条件が正常に満たされました: $javascript_condition", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] カスタム条件が正常に満たされました: $javascript_condition" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("カスタム条件が正常に満たされました: $javascript_condition")
 
                         return
                     }
@@ -4664,21 +3450,7 @@
         catch
         {
             # 要素検索関連エラー (1041)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0033", "カスタム条件待機エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "カスタム条件待機エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1323", "カスタム条件待機エラー: $($_.Exception.Message)")
             throw "カスタム条件の待機に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4716,30 +3488,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("キーボード入力を送信しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] キーボード入力を送信しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("キーボード入力を送信しました")
         }
         catch
         {
             # 要素操作関連エラー (1058)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0037", "キーボード入力エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "キーボード入力エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1413", "キーボード入力エラー: $($_.Exception.Message)")
             throw "キーボード入力に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4808,30 +3562,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("特殊キーを送信しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 特殊キーを送信しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("特殊キーを送信しました")
         }
         catch
         {
             # 要素操作関連エラー (1059)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0038", "特殊キー送信エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "特殊キー送信エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1414", "特殊キー送信エラー: $($_.Exception.Message)")
             throw "特殊キーの送信に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4864,30 +3600,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("マウスホバーを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マウスホバーを実行しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("マウスホバーを実行しました")
         }
         catch
         {
             # 要素操作関連エラー (1057)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0036", "マウスホバーエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "マウスホバーエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1415", "マウスホバーエラー: $($_.Exception.Message)")
             throw "マウスホバーに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4916,30 +3634,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ダブルクリックを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ダブルクリックを実行しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ダブルクリックを実行しました")
         }
         catch
         {
             # 要素操作関連エラー (1055)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0034", "ダブルクリックエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ダブルクリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1416", "ダブルクリックエラー: $($_.Exception.Message)")
             throw "ダブルクリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -4968,30 +3668,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("右クリックを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 右クリックを実行しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("右クリックを実行しました")
         }
         catch
         {
             # 要素操作関連エラー (1056)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0035", "右クリックエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "右クリックエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1417", "右クリックエラー: $($_.Exception.Message)")
             throw "右クリックに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5024,30 +3706,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("チェックボックスを設定しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] チェックボックスを設定しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("チェックボックスを設定しました")
         }
         catch
         {
             # 要素操作関連エラー (1068)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0039", "チェックボックス設定エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "チェックボックス設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1418", "チェックボックス設定エラー: $($_.Exception.Message)")
             throw "チェックボックスの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5076,30 +3740,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ラジオボタンを選択しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ラジオボタンを選択しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ラジオボタンを選択しました")
         }
         catch
         {
             # 要素操作関連エラー (1069)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0077", "ラジオボタン選択エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ラジオボタン選択エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1419", "ラジオボタン選択エラー: $($_.Exception.Message)")
             throw "ラジオボタンの選択に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5157,30 +3803,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ファイルをアップロードしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルをアップロードしました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ファイルをアップロードしました")
         }
         catch
         {
             # 要素操作関連エラー (1070)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0078", "ファイルアップロードエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ファイルアップロードエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1420", "ファイルアップロードエラー: $($_.Exception.Message)")
             throw "ファイルアップロードに失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5213,32 +3841,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("JavaScriptスクリプトを正常に実行しました。スクリプト: $script", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] JavaScriptスクリプトを正常に実行しました。スクリプト: $script" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("JavaScriptスクリプトを正常に実行しました。スクリプト: $script")
 
             return $response_json.result.result.value
         }
         catch
         {
             # JavaScript実行関連エラー (1111)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0083", "JavaScript実行エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "JavaScript実行エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1701", "JavaScript実行エラー: $($_.Exception.Message)")
             throw "JavaScriptの実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5267,30 +3877,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("JavaScriptスクリプトを非同期で実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] JavaScriptスクリプトを非同期で実行しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("JavaScriptスクリプトを非同期で実行しました")
         }
         catch
         {
             # JavaScript実行関連エラー (1112)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0084", "JavaScript非同期実行エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "JavaScript非同期実行エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1702", "JavaScript非同期実行エラー: $($_.Exception.Message)")
             throw "JavaScriptの非同期実行に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5323,32 +3915,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("クッキーを取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クッキーを取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("クッキーを取得しました")
 
             return $response_json.result.result.value
         }
         catch
         {
             # ストレージ操作関連エラー (1121)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0085", "クッキー取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クッキー取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1801", "クッキー取得エラー: $($_.Exception.Message)")
             throw "クッキーの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5385,30 +3959,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("クッキーを設定しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クッキーを設定しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("クッキーを設定しました")
         }
         catch
         {
             # ストレージ操作関連エラー (1122)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0086", "クッキー設定エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クッキー設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1802", "クッキー設定エラー: $($_.Exception.Message)")
             throw "クッキーの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5437,30 +3993,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("クッキーを削除しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] クッキーを削除しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("クッキーを削除しました")
         }
         catch
         {
             # ストレージ操作関連エラー (1123)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0087", "クッキー削除エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クッキー削除エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1803", "クッキー削除エラー: $($_.Exception.Message)")
             throw "クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5484,30 +4022,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("全てのクッキーを削除しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 全てのクッキーを削除しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("全てのクッキーを削除しました")
         }
         catch
         {
             # ストレージ操作関連エラー (1124)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0088", "全クッキー削除エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "全クッキー削除エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1804", "全クッキー削除エラー: $($_.Exception.Message)")
             throw "全クッキーの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5540,32 +4060,14 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ローカルストレージから値を取得しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ローカルストレージから値を取得しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ローカルストレージから値を取得しました")
 
             return $response_json.result.result.value
         }
         catch
         {
             # ストレージ操作関連エラー (1125)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0087", "ローカルストレージ取得エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ローカルストレージ取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1805", "ローカルストレージ取得エラー: $($_.Exception.Message)")
             throw "ローカルストレージの取得に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5594,30 +4096,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ローカルストレージに値を設定しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ローカルストレージに値を設定しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ローカルストレージに値を設定しました")
         }
         catch
         {
             # ストレージ操作関連エラー (1126)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0088", "ローカルストレージ設定エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ローカルストレージ設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1806", "ローカルストレージ設定エラー: $($_.Exception.Message)")
             throw "ローカルストレージの設定に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5646,30 +4130,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ローカルストレージから値を削除しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ローカルストレージから値を削除しました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ローカルストレージから値を削除しました")
         }
         catch
         {
             # ストレージ操作関連エラー (1127)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0089", "ローカルストレージ削除エラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ローカルストレージ削除エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1807", "ローカルストレージ削除エラー: $($_.Exception.Message)")
             throw "ローカルストレージの削除に失敗しました: $($_.Exception.Message)"
         }
     }
@@ -5693,30 +4159,12 @@
             }
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ローカルストレージをクリアしました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ローカルストレージをクリアしました" | Out-File -Append -FilePath ([WebDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ローカルストレージをクリアしました")
         }
         catch
         {
             # ストレージ操作関連エラー (1128)
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("WebDriverError_0089", "ローカルストレージクリアエラー: $($_.Exception.Message)", "WebDriver", [WebDriver]::ErrorLogFile) | Out-Null
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ローカルストレージクリアエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("WebDriverError_1808", "ローカルストレージクリアエラー: $($_.Exception.Message)")
             throw "ローカルストレージのクリアに失敗しました: $($_.Exception.Message)"
         }
     }

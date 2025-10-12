@@ -9,6 +9,52 @@ class ChromeDriver : WebDriver
     static [string]$ErrorLogFile = ".\ChromeDriver_$($env:USERNAME)_Error.log"
 
     # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "ChromeDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([ChromeDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -81,11 +127,7 @@ class ChromeDriver : WebDriver
             Write-Host "ChromeDriverの初期化が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ChromeDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ChromeDriverの初期化が完了しました" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ChromeDriverの初期化が完了しました")
         }
         catch
         {
@@ -93,22 +135,8 @@ class ChromeDriver : WebDriver
             Write-Host "ChromeDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("ChromeDriverError_0001", "ChromeDriver初期化エラー: $($_.Exception.Message)", "ChromeDriver", "[ChromeDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ChromeDriverの初期化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("ChromeDriverError_0001", "ChromeDriver初期化エラー: $($_.Exception.Message)")
             
             throw "ChromeDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -136,11 +164,7 @@ class ChromeDriver : WebDriver
                         Write-Host "Chrome実行ファイルが見つかりました: $this.browser_exe_path"
 
                         # 正常ログ出力
-                        if ($global:Common)
-                        {
-                            $global:Common.WriteLog("Chrome実行ファイルが見つかりました: $($this.browser_exe_path)", "INFO")
-                            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Chrome実行ファイルが見つかりました: $($this.browser_exe_path)" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                        }
+                        $this.LogInfo("Chrome実行ファイルが見つかりました: $($this.browser_exe_path)")
 
                         return $this.browser_exe_path
                     }
@@ -170,11 +194,7 @@ class ChromeDriver : WebDriver
                     Write-Host "Chrome実行ファイルが見つかりました: $common_path"
 
                     # 正常ログ出力
-                    if ($global:Common)
-                    {
-                        $global:Common.WriteLog("Chrome実行ファイルが見つかりました: $common_path", "INFO")
-                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Chrome実行ファイルが見つかりました: $common_path" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                    }
+                    $this.LogInfo("Chrome実行ファイルが見つかりました: $common_path")
 
                     return $common_path
                 }
@@ -184,22 +204,8 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("ChromeDriverError_0010", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)", "ChromeDriver", "[ChromeDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "Chrome実行ファイルのパス取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("ChromeDriverError_0010", "Chrome実行ファイルパス取得エラー: $($_.Exception.Message)")
 
             throw "Chrome実行ファイルのパス取得に失敗しました: $($_.Exception.Message)"
         }
@@ -244,11 +250,7 @@ class ChromeDriver : WebDriver
                 Write-Host "Chromeユーザーデータディレクトリを作成しました: $user_data_dir" -ForegroundColor Green
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("Chromeユーザーデータディレクトリを作成しました: $user_data_dir", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Chromeユーザーデータディレクトリを作成しました: $user_data_dir" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("Chromeユーザーデータディレクトリを作成しました: $user_data_dir")
             }
             catch
             {
@@ -259,22 +261,8 @@ class ChromeDriver : WebDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("ChromeDriverError_0011", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)", "ChromeDriver", "[ChromeDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("ChromeDriverError_0011", "ユーザーデータディレクトリ取得エラー: $($_.Exception.Message)")
             
             throw "ユーザーデータディレクトリの取得に失敗しました: $($_.Exception.Message)"
         }
@@ -300,30 +288,12 @@ class ChromeDriver : WebDriver
             Write-Host "Chromeデバッグモードが有効化されました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("Chromeデバッグモードが有効化されました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] Chromeデバッグモードが有効化されました" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("Chromeデバッグモードが有効化されました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("ChromeDriverError_0012", "デバッグモード有効化エラー: $($_.Exception.Message)", "ChromeDriver", "[ChromeDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "デバッグモードの有効化に失敗しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("ChromeDriverError_0012", "デバッグモード有効化エラー: $($_.Exception.Message)")
             
             throw "デバッグモードの有効化に失敗しました: $($_.Exception.Message)"
         }
@@ -388,30 +358,12 @@ class ChromeDriver : WebDriver
             Write-Host "クリーンアップが完了しました。" -ForegroundColor Yellow
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("初期化失敗時のクリーンアップが完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップが完了しました" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("初期化失敗時のクリーンアップが完了しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("ChromeDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)", "ChromeDriver", "[ChromeDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("ChromeDriverError_0090", "初期化失敗時のクリーンアップエラー: $($_.Exception.Message)")
 
             throw "クリーンアップ中にエラーが発生しました: $($_.Exception.Message)"
         }
@@ -439,30 +391,12 @@ class ChromeDriver : WebDriver
             Write-Host "ChromeDriverのリソース解放が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ChromeDriverのリソースを解放しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ChromeDriverのリソースを解放しました" | Out-File -Append -FilePath ([ChromeDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ChromeDriverのリソースを解放しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("ChromeDriverError_0091", "ChromeDriver Disposeエラー: $($_.Exception.Message)", "ChromeDriver", "[ChromeDriver]::ErrorLogFile")
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            # エラーログ出力
+            $this.LogError("ChromeDriverError_0091", "ChromeDriver Disposeエラー: $($_.Exception.Message)")
             
             throw "ChromeDriverのリソース解放中にエラーが発生しました: $($_.Exception.Message)"
         }

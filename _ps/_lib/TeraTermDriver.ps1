@@ -21,6 +21,52 @@ class TeraTermDriver
     static [string]$ErrorLogFile = ".\TeraTermDriver_$($env:USERNAME)_Error.log"
 
     # ========================================
+    # ログユーティリティ
+    # ========================================
+
+    # 情報ログを出力
+    [void] LogInfo([string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.WriteLog($message, "INFO")
+            }
+            catch
+            {
+                Write-Host "正常ログ出力に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Green
+    }
+
+    # エラーログを出力
+    [void] LogError([string]$errorCode, [string]$message)
+    {
+        if ($global:Common)
+        {
+            try
+            {
+                $global:Common.HandleError($errorCode, $message, "TeraTermDriver")
+            }
+            catch
+            {
+                Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        else
+        {
+            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([TeraTermDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+        }
+        Write-Host $message -ForegroundColor Red
+    }
+
+    # ========================================
     # 初期化・接続関連
     # ========================================
 
@@ -52,11 +98,7 @@ class TeraTermDriver
             Write-Host "TeraTermDriverの初期化が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TeraTermDriverの初期化が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermDriverの初期化が完了しました" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TeraTermDriverの初期化が完了しました")
         }
         catch
         {
@@ -64,22 +106,7 @@ class TeraTermDriver
             Write-Host "TeraTermDriver初期化に失敗した場合のクリーンアップを開始します。" -ForegroundColor Yellow
             $this.CleanupOnInitializationFailure()
 
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0001", "TeraTermDriver初期化エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TeraTermDriver初期化エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0001", "TeraTermDriver初期化エラー: $($_.Exception.Message)")
 
             throw "TeraTermDriverの初期化に失敗しました: $($_.Exception.Message)"
         }
@@ -109,11 +136,7 @@ class TeraTermDriver
                     Write-Host "TeraTermのパスを検出しました: $path"
 
                     # 正常ログ出力
-                    if ($global:Common)
-                    {
-                        $global:Common.WriteLog("TeraTermの実行ファイルパスを検出しました: $path", "INFO")
-                        "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermの実行ファイルパスを検出しました: $path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                    }
+                    $this.LogInfo("TeraTermの実行ファイルパスを検出しました: $path")
 
                     return $path
                 }
@@ -126,11 +149,7 @@ class TeraTermDriver
                 Write-Host "TeraTermのパスを検出しました: $($command.Source)"
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("TeraTermの実行ファイルパスを検出しました: $($command.Source)", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermの実行ファイルパスを検出しました: $($command.Source)" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("TeraTermの実行ファイルパスを検出しました: $($command.Source)")
 
                 return $command.Source
             }
@@ -139,22 +158,7 @@ class TeraTermDriver
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0002", "TeraTerm実行ファイルパス取得エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TeraTerm実行ファイルパス取得エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0002", "TeraTerm実行ファイルパス取得エラー: $($_.Exception.Message)")
 
             throw "TeraTermの実行ファイルパス取得に失敗しました: $($_.Exception.Message)"
         }
@@ -183,32 +187,13 @@ class TeraTermDriver
             Write-Host "一時ディレクトリを作成しました: $temp_dir"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("一時ディレクトリを作成しました: $temp_dir", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ディレクトリを作成しました: $temp_dir" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("一時ディレクトリを作成しました: $temp_dir")
 
             return $temp_dir
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0003", "一時ディレクトリ作成エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "一時ディレクトリ作成エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0003", "一時ディレクトリ作成エラー: $($_.Exception.Message)")
 
             throw "一時ディレクトリの作成に失敗しました: $($_.Exception.Message)"
         }
@@ -232,11 +217,7 @@ class TeraTermDriver
             Write-Host "作業ディレクトリを作成しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("作業ディレクトリを作成しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 作業ディレクトリを作成しました" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("作業ディレクトリを作成しました")
         }
         catch
         {
@@ -282,11 +263,7 @@ class TeraTermDriver
             Write-Host "初期化失敗時のクリーンアップが完了しました。" -ForegroundColor Yellow
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("初期化失敗時のクリーンアップを実行しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 初期化失敗時のクリーンアップを実行しました" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("初期化失敗時のクリーンアップを実行しました")
         }
         catch
         {
@@ -324,30 +301,11 @@ class TeraTermDriver
             Write-Host "接続パラメータを設定しました: $hostname`:$port ($protocol)"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("接続パラメータを設定しました: $hostname`:$port ($protocol)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続パラメータを設定しました: $hostname`:$port ($protocol)" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("接続パラメータを設定しました: $hostname`:$port ($protocol)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0010", "接続パラメータ設定エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "接続パラメータ設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0010", "接続パラメータ設定エラー: $($_.Exception.Message)")
 
             throw "接続パラメータの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -385,30 +343,11 @@ class TeraTermDriver
             Write-Host "  PEMファイル: $pem_file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("接続パラメータを設定しました（PEM認証）: $hostname`:$port", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続パラメータを設定しました（PEM認証）: $hostname`:$port" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("接続パラメータを設定しました（PEM認証）: $hostname`:$port")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0013", "PEM接続パラメータ設定エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "PEM接続パラメータ設定エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0013", "PEM接続パラメータ設定エラー: $($_.Exception.Message)")
 
             throw "PEM接続パラメータの設定に失敗しました: $($_.Exception.Message)"
         }
@@ -445,30 +384,11 @@ class TeraTermDriver
             Write-Host "TeraTermでサーバーに接続しました: $($this.current_hostname):$($this.current_port)" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TeraTermでサーバーに接続しました: $($this.current_hostname):$($this.current_port)", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermでサーバーに接続しました: $($this.current_hostname):$($this.current_port)" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TeraTermでサーバーに接続しました: $($this.current_hostname):$($this.current_port)")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0011", "サーバー接続エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "サーバー接続エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0011", "サーバー接続エラー: $($_.Exception.Message)")
 
             throw "サーバーへの接続に失敗しました: $($_.Exception.Message)"
         }
@@ -495,30 +415,11 @@ class TeraTermDriver
             Write-Host "TeraTermの接続を切断しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TeraTermの接続を切断しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermの接続を切断しました" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TeraTermの接続を切断しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0012", "接続切断エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "接続切断エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0012", "接続切断エラー: $($_.Exception.Message)")
 
             throw "接続の切断に失敗しました: $($_.Exception.Message)"
         }
@@ -669,11 +570,7 @@ endif
             Write-Host "接続マクロファイルを作成しました: $macro_file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("接続マクロファイルを作成しました: $macro_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 接続マクロファイルを作成しました: $macro_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("接続マクロファイルを作成しました: $macro_file_path")
 
             return $macro_file_path
         }
@@ -714,11 +611,7 @@ logclose
             Write-Host "切断マクロファイルを作成しました: $macro_file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("切断マクロファイルを作成しました: $macro_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 切断マクロファイルを作成しました: $macro_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("切断マクロファイルを作成しました: $macro_file_path")
 
             return $macro_file_path
         }
@@ -750,11 +643,7 @@ logclose
             Write-Host "TeraTermプロセスを起動しました (PID: $($this.teraterm_process.Id))"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TeraTermプロセスを起動しました (PID: $($this.teraterm_process.Id))", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermプロセスを起動しました (PID: $($this.teraterm_process.Id))" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TeraTermプロセスを起動しました (PID: $($this.teraterm_process.Id))")
         }
         catch
         {
@@ -791,11 +680,7 @@ logclose
                 Write-Host "マクロを実行しました: $macro_file_path"
 
                 # 正常ログ出力
-                if ($global:Common)
-                {
-                    $global:Common.WriteLog("マクロを実行しました: $macro_file_path", "INFO")
-                    "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] マクロを実行しました: $macro_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-                }
+                $this.LogInfo("マクロを実行しました: $macro_file_path")
             }
             else
             {
@@ -834,32 +719,13 @@ logclose
             Write-Host "コマンドを実行しました: $command"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("コマンドを実行しました: $command", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] コマンドを実行しました: $command" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("コマンドを実行しました: $command")
 
             return $result
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0020", "コマンド実行エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "コマンド実行エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0020", "コマンド実行エラー: $($_.Exception.Message)")
 
             throw "コマンドの実行に失敗しました: $($_.Exception.Message)"
         }
@@ -894,11 +760,7 @@ wait '$expected_prompt' $timeout_seconds
             Write-Host "コマンド実行マクロファイルを作成しました: $macro_file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("コマンド実行マクロファイルを作成しました: $macro_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] コマンド実行マクロファイルを作成しました: $macro_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("コマンド実行マクロファイルを作成しました: $macro_file_path")
 
             return $macro_file_path
         }
@@ -989,30 +851,11 @@ wait '$expected_prompt' $timeout_seconds
             Write-Host "ファイルをアップロードしました: $local_file_path -> $remote_file_path" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ファイルをアップロードしました: $local_file_path -> $remote_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルをアップロードしました: $local_file_path -> $remote_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ファイルをアップロードしました: $local_file_path -> $remote_file_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0030", "ファイルアップロードエラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ファイルアップロードエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0030", "ファイルアップロードエラー: $($_.Exception.Message)")
 
             throw "ファイルのアップロードに失敗しました: $($_.Exception.Message)"
         }
@@ -1044,30 +887,11 @@ wait '$expected_prompt' $timeout_seconds
             Write-Host "ファイルをダウンロードしました: $remote_file_path -> $local_file_path" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ファイルをダウンロードしました: $remote_file_path -> $local_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルをダウンロードしました: $remote_file_path -> $local_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ファイルをダウンロードしました: $remote_file_path -> $local_file_path")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0031", "ファイルダウンロードエラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "ファイルダウンロードエラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0031", "ファイルダウンロードエラー: $($_.Exception.Message)")
 
             throw "ファイルのダウンロードに失敗しました: $($_.Exception.Message)"
         }
@@ -1113,11 +937,7 @@ wait '$' 5
             Write-Host "ファイルアップロードマクロファイルを作成しました: $macro_file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ファイルアップロードマクロファイルを作成しました: $macro_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルアップロードマクロファイルを作成しました: $macro_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ファイルアップロードマクロファイルを作成しました: $macro_file_path")
 
             return $macro_file_path
         }
@@ -1162,11 +982,7 @@ wait '$' 30
             Write-Host "ファイルダウンロードマクロファイルを作成しました: $macro_file_path"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("ファイルダウンロードマクロファイルを作成しました: $macro_file_path", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] ファイルダウンロードマクロファイルを作成しました: $macro_file_path" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("ファイルダウンロードマクロファイルを作成しました: $macro_file_path")
 
             return $macro_file_path
         }
@@ -1245,11 +1061,7 @@ wait '$' 30
             Write-Host "一時ファイルのクリーンアップが完了しました。"
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("一時ファイルのクリーンアップが完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] 一時ファイルのクリーンアップが完了しました" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("一時ファイルのクリーンアップが完了しました")
         }
         catch
         {
@@ -1308,30 +1120,11 @@ wait '$' 30
             Write-Host "TeraTermDriverの破棄が完了しました。" -ForegroundColor Green
 
             # 正常ログ出力
-            if ($global:Common)
-            {
-                $global:Common.WriteLog("TeraTermDriverの破棄が完了しました", "INFO")
-                "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] TeraTermDriverの破棄が完了しました" | Out-File -Append -FilePath ([TeraTermDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
-            }
+            $this.LogInfo("TeraTermDriverの破棄が完了しました")
         }
         catch
         {
-            # Commonオブジェクトが利用可能な場合はエラーログに記録
-            if ($global:Common)
-            {
-                try
-                {
-                    $global:Common.HandleError("TeraTermDriverError_0090", "TeraTermDriver破棄エラー: $($_.Exception.Message)", "TeraTermDriver", [TeraTermDriver]::ErrorLogFile)
-                }
-                catch
-                {
-                    Write-Host "エラーログの記録に失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                }
-            }
-            else
-            {
-                Write-Host "TeraTermDriver破棄エラー: $($_.Exception.Message)" -ForegroundColor Red
-            }
+            $this.LogError("TeraTermDriverError_0090", "TeraTermDriver破棄エラー: $($_.Exception.Message)")
         }
     }
 }
