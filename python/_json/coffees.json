@@ -1,0 +1,35 @@
+[
+    {
+      "id": "br-bourbon-peaberry",
+      "slug": "bourbon-peaberry",
+      "country_id": "br",
+      "name": "ブルボンピーベリー",
+      "name_localized": { "en": "Bourbon Peaberry" },
+      "description": "豆の特徴を記入。例：チョコ系の甘さ、ナッツの香り、丸い口当たり。",
+      "taste": { "acidity": 2, "bitterness": 3, "aroma": 4, "body": 4 },
+      "roast_level": "medium",
+      "process": "natural",
+      "farm": "例：サンタ・イザベル農園",
+      "altitude_m": 1100,
+      "varietal": ["Bourbon"],
+      "crop_year": "2024-2025",
+      "availability": { "status": "in_stock", "grams": [200] },
+      "price_jpy": { "200": 1190 },
+      "images": [{ "type": "bag", "src": "/img/coffee/br-bourbon-peaberry.jpg", "alt": "パッケージ" }]
+    },
+    {
+      "id": "br-amarelo-bourbon",
+      "slug": "amarelo-bourbon",
+      "country_id": "br",
+      "name": "アマレロブルボン",
+      "name_localized": { "en": "Amarelo Bourbon" },
+      "description": "豆の特徴を記入。例：黄果実の甘さ、キャラメル、まろやかな口当たり。",
+      "taste": { "acidity": 3, "bitterness": 2, "aroma": 4, "body": 3 },
+      "roast_level": "medium",
+      "process": "washed",
+      "varietal": ["Bourbon Amarelo"],
+      "availability": { "status": "limited" },
+      "price_jpy": { "200": 1480 },
+      "images": [{ "type": "bean", "src": "/img/coffee/br-amarelo-bourbon.jpg", "alt": "豆の外観" }]
+    }
+  ]

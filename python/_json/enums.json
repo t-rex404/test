@@ -1,0 +1,10 @@
+{
+    "taste_scales": {
+      "min": 1,
+      "max": 5,
+      "labels": { "1": "弱い", "5": "強い" }
+    },
+    "taste_axes": ["acidity", "bitterness", "aroma", "body", "sweetness"],
+    "roast_levels": ["light", "medium", "medium-dark", "dark"],
+    "process_methods": ["washed", "natural", "honey", "anaerobic", "other"]
+  }

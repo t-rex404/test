@@ -1,0 +1,18 @@
+[
+    {
+      "id": "br",
+      "slug": "brazil",
+      "name": "ブラジル",
+      "name_localized": { "en": "Brazil" },
+      "area_id": "sa",
+      "order": 100
+    },
+    {
+      "id": "co",
+      "slug": "colombia",
+      "name": "コロンビア",
+      "name_localized": { "en": "Colombia" },
+      "area_id": "sa",
+      "order": 110
+    }
+  ]
