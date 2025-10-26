@@ -2401,9 +2401,10 @@
                 });
 
                 // 3秒後にページをリフレッシュ
-                //setTimeout(() => {
-                //    window.location.reload();
-                //}, 3000);
+                setTimeout(() => {
+                    window.location.reload();
+                    //}, 3000);
+                }, 60000);
 
             } catch (error) {
                 console.error('エラーが発生しました:', error);
