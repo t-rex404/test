@@ -148,27 +148,16 @@ class Common : IDisposable
     }
     
     # 共通のエラーハンドリング関数（拡張版）
-    [void] HandleError([string]$errorCode, [string]$message, [string]$module = "Common", [string]$logFile = "")
+    #[void] HandleError([string]$errorCode, [string]$message, [string]$module = "Common", [string]$logFile = "")
+    [void] HandleError([string]$errorCode, [string]$message, [string]$module = "Common")
     {
         $timestamp = $(Get-Date).ToString('yyyy/MM/dd HH:mm:ss')
         
         # エラータイトルを取得
         $error_title = $this.GetErrorTitle($errorCode, $module)
         
-        # ログファイル名を決定（一時ディレクトリ配下、インスタンス生成時の命名に従う）
-        if ([string]::IsNullOrEmpty($logFile))
-        {
-            $logFile = $this.ErrorLogFilePath
-            if ([string]::IsNullOrEmpty($logFile))
-            {
-                $logFile = $this.LogFilePath
-                if ([string]::IsNullOrEmpty($logFile))
-                {
-                    $logFile = ".\Common_Error.log"
-                }
-            }
-        }
-        
+        $logFile = $this.ErrorLogFilePath
+
         $errorMessage = "[$timestamp], ERROR_CODE:$errorCode, ERROR_TITLE:$error_title, MODULE:$module, ERROR_MESSAGE:$message"
         
         # ログファイルに書き込み
