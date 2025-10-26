@@ -2213,6 +2213,7 @@
                 ✅ 修正依頼ファイルを作成しました。<br>
                 以下のパスにファイルを置いてください。<br>
                 「¥¥10.1.1.1¥_____」<br>
+                ※参考ファイルがある場合は、格納先にCSVファイルと同じ名前のフォルダを作成し、その中にコピーしてください。<br>
                 順番に対応しますので、修正が完了までお待ちください。<br>
             </div>
             <div class="error-message" id="errorMessage">
@@ -2379,7 +2380,7 @@
 
                 // 選択されたファイルを送信先ディレクトリにコピー
                 if (files.length > 0) {
-                    await copyFilesToOutputDirectory(files, outputPath, timestamp);
+                    //await copyFilesToOutputDirectory(files, outputPath, timestamp);
                 }
 
                 // 成功メッセージを表示

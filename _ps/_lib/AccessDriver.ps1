@@ -20,6 +20,33 @@ class AccessDriver
     # ログユーティリティ
     # ========================================
 
+    # UTF-8 (BOMなし) で追記するヘルパー
+    [void] AppendTextNoBom([string]$filePath, [string]$text)
+    {
+        try
+        {
+            $encoding = New-Object System.Text.UTF8Encoding($false)
+            $directory = Split-Path -Parent $filePath
+            if (-not [string]::IsNullOrEmpty($directory) -and -not (Test-Path -LiteralPath $directory))
+            {
+                New-Item -ItemType Directory -Path $directory -Force -ErrorAction SilentlyContinue | Out-Null
+            }
+            $streamWriter = New-Object System.IO.StreamWriter($filePath, $true, $encoding)
+            try
+            {
+                $streamWriter.Write($text)
+            }
+            finally
+            {
+                $streamWriter.Dispose()
+            }
+        }
+        catch
+        {
+            Write-Host "ログ書き込みに失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+
     # 情報ログを出力
     [void] LogInfo([string]$message)
     {
@@ -27,7 +54,7 @@ class AccessDriver
         {
             try
             {
-                $global:Common.WriteLog($message, "INFO")
+                $global:Common.WriteLog($message, "INFO", "AccessDriver")
             }
             catch
             {
@@ -36,7 +63,8 @@ class AccessDriver
         }
         else
         {
-            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([AccessDriver]::NormalLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            $line = "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message"
+            $this.AppendTextNoBom(([AccessDriver]::NormalLogFile), $line + [Environment]::NewLine)
         }
         Write-Host $message -ForegroundColor Green
     }
@@ -57,7 +85,8 @@ class AccessDriver
         }
         else
         {
-            "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message" | Out-File -Append -FilePath ([AccessDriver]::ErrorLogFile) -Encoding UTF8 -ErrorAction SilentlyContinue
+            $line = "[$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')] $message"
+            $this.AppendTextNoBom(([AccessDriver]::ErrorLogFile), $line + [Environment]::NewLine)
         }
         Write-Host $message -ForegroundColor Red
     }

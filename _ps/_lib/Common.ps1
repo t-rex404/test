@@ -36,10 +36,10 @@ class Common : IDisposable
     }
 
     # 共通のログ出力関数
-    [void] WriteLog([string]$message, [string]$level = "INFO")
+    [void] WriteLog([string]$message, [string]$level = "INFO", [string]$module = "")
     {
         $timestamp = $(Get-Date).ToString('yyyy/MM/dd HH:mm:ss')
-        $logMessage = "[$timestamp] [$level] $message"
+        $logMessage = "[$timestamp] [$level] [$module] $message"
         
         # コンソールに出力
         switch ($level.ToUpper())
