@@ -57,7 +57,34 @@ class Common : IDisposable
         {
             $logFile = ".\Common_Info.log"
         }
-        $logMessage | Out-File -Append -FilePath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+        $this.AppendTextNoBom($logFile, $logMessage + [Environment]::NewLine)
+    }
+
+    # UTF-8 (BOMなし) で追記するヘルパー
+    [void] AppendTextNoBom([string]$filePath, [string]$text)
+    {
+        try
+        {
+            $encoding = New-Object System.Text.UTF8Encoding($false)
+            $directory = Split-Path -Parent $filePath
+            if (-not [string]::IsNullOrEmpty($directory) -and -not (Test-Path -LiteralPath $directory))
+            {
+                New-Item -ItemType Directory -Path $directory -Force -ErrorAction SilentlyContinue | Out-Null
+            }
+            $streamWriter = New-Object System.IO.StreamWriter($filePath, $true, $encoding)
+            try
+            {
+                $streamWriter.Write($text)
+            }
+            finally
+            {
+                $streamWriter.Dispose()
+            }
+        }
+        catch
+        {
+            Write-Host "ログ書き込みに失敗しました: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
     }
 
     # リソース解放とログ退避
@@ -160,8 +187,8 @@ class Common : IDisposable
 
         $errorMessage = "[$timestamp], ERROR_CODE:$errorCode, ERROR_TITLE:$error_title, MODULE:$module, ERROR_MESSAGE:$message"
         
-        # ログファイルに書き込み
-        $errorMessage | Out-File -Append -FilePath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+        # ログファイルに書き込み（BOMなしUTF-8）
+        $this.AppendTextNoBom($logFile, $errorMessage + [Environment]::NewLine)
         
         # コンソールにエラーを表示
         Write-Error $errorMessage
@@ -178,7 +205,7 @@ class Common : IDisposable
 - 実行パス: $PWD
 "@
         
-        $debugInfo | Out-File -Append -FilePath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+        $this.AppendTextNoBom($logFile, $debugInfo + [Environment]::NewLine)
     }
 
     # 一時ディレクトリを初期化
