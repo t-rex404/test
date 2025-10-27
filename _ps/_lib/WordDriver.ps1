@@ -111,7 +111,7 @@ class WordDriver
             $this.CreateNewDocument()
             
             # フッターに総ページと現在のページを設定
-            $this.SetupFooterWithPageNumbers()
+            $this.SetupFooterWithPageNumbers($false) # セクションごとにページ番号をリスタートしない
             
             $this.is_initialized = $true
             Write-Host "WordDriverの初期化が完了しました。"
@@ -300,7 +300,7 @@ class WordDriver
     }
 
     # フッターに総ページと現在のページを設定
-    [void] SetupFooterWithPageNumbers()
+    [void] SetupFooterWithPageNumbers([bool]$restartPerSection = $false)
     {
         try
         {
@@ -339,77 +339,73 @@ class WordDriver
                         continue
                     }
 
-                    # フッターの内容をクリア
-                    $footer.Range.Text = ""
-
-                    # フッターの最後に移動
-                    $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
-                    
-                    # Wordのクイックパーツ機能を使用してページ番号を挿入
+                    # 既にページ番号フィールドが存在するかチェック
+                    $hasPageField = $false
                     try
                     {
-                        # ページ番号フィールドを挿入
-                        $pageField = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage, $null, $true)
-                        $pageField.Update()
-                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
-                        
-                        ## " / " を挿入
-                        #$footer.Range.InsertAfter(" / ")
-                        #$footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
-                        #
-                        ## 総ページ数フィールドを挿入
-                        #$numPagesField = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages, $null, $true)
-                        #$numPagesField.Update()
-                        #$footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
-
-                        # フッター内のフィールドを更新
-                        $footer.Range.Fields.Update()
-                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null    
-
-                        ## フィールドを更新
-                        #$pageField.Update()
-                        #$numPagesField.Update()
-                        #$footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
-
-                    }
-                    catch
-                    {
-                        Write-Host "クイックパーツ機能でのページ番号挿入でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                        
-                        # フォールバック: フィールドコードを直接挿入
-                        Write-Host "フォールバック方法でページ番号を挿入します..." -ForegroundColor Yellow
-                        $footer.Range.InsertAfter("PAGE / NUMPAGES")
-                        $footer.Range.Fields.Update()
-
-                    }
-
-                    # 中央揃えでページ番号を挿入
-                    $footer.Range.ParagraphFormat.Alignment = [Microsoft.Office.Interop.Word.WdParagraphAlignment]::wdAlignParagraphCenter
-                    
-                    # フィールドの表示を確実にするための処理
-                    try
-                    {
-                        if ($footer.Range.Fields.Count -gt 0)
+                        foreach ($field in $footer.Range.Fields)
                         {
-                            Write-Host "フィールド数: $($footer.Range.Fields.Count)" -ForegroundColor Cyan
-                            # 各フィールドを個別に更新
-                            foreach ($field in $footer.Range.Fields)
+                            if ($null -ne $field -and $field.Type -eq [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage)
                             {
-                                if ($null -ne $field)
-                                {
-                                    $field.Update()
-                                }
+                                $hasPageField = $true
+                                break
                             }
                         }
-                        else
-                        {
-                            Write-Host "フィールドが挿入されていません。" -ForegroundColor Yellow
-                        }
                     }
                     catch
                     {
-                        Write-Host "フィールドの更新でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                        Write-Host "フィールド検査でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
                     }
+
+                    if (-not $hasPageField)
+                    {
+                        # セクション固有に編集できるよう、必要時のみ前セクションとのリンクを解除
+                        try { $footer.LinkToPrevious = $false } catch { Write-Host "LinkToPrevious の変更に失敗: $($_.Exception.Message)" -ForegroundColor Yellow }
+
+                        # フッターの最後に移動
+                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+
+                        # Wordのクイックパーツ機能を使用してページ番号を挿入（未挿入時のみ）
+                        try
+                        {
+                            $null = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldPage, $null, $true)
+                            $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        }
+                        catch
+                        {
+                            Write-Host "クイックパーツ機能でのページ番号挿入でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
+                            # フォールバック: テキストとして挿入（フィールドでないことに注意）
+                            Write-Host "フォールバック方法でページ番号を挿入します..." -ForegroundColor Yellow
+                            $footer.Range.InsertAfter("PAGE")
+                        }
+                    }
+
+                    # リスタート指定があるときは、セクションごとにページ番号を振りなおす
+                    if ($restartPerSection)
+                    {
+                        try
+                        {
+                            $footer.LinkToPrevious = $false
+                        }
+                        catch
+                        {
+                            Write-Host "LinkToPrevious の変更に失敗: $($_.Exception.Message)" -ForegroundColor Yellow
+                        }
+                        try
+                        {
+                            $footer.PageNumbers.RestartNumberingAtSection = $true
+                            $footer.PageNumbers.StartingNumber = 1
+                        }
+                        catch
+                        {
+                            Write-Host "ページ番号のリスタート設定に失敗: $($_.Exception.Message)" -ForegroundColor Yellow
+                        }
+                    }
+
+                    # 中央揃え（常に設定しても影響は軽微）
+                    $footer.Range.ParagraphFormat.Alignment = [Microsoft.Office.Interop.Word.WdParagraphAlignment]::wdAlignParagraphCenter
+                    
+                    # 個別フィールド更新は不要（後続で文書全体を更新）
                     
                     Write-Host "セクション $i のフッター設定完了" -ForegroundColor Green
                 }
@@ -420,56 +416,13 @@ class WordDriver
                 }
             }
             
-            # ドキュメント全体のフィールドを更新
-            Write-Host "ドキュメント全体のフィールドを更新中..." -ForegroundColor Cyan
-            $this.word_document.Fields.Update()
-            
             # ドキュメントを再計算
             Write-Host "ドキュメントを再計算中..." -ForegroundColor Cyan
             $this.word_document.Repaginate()
             
-            # フィールドの表示を確実にするために少し待機
-            Start-Sleep -Milliseconds 500
-            
-            # 再度フィールドを更新（確実性のため）
+            # ドキュメント全体のフィールドを更新（1回のみ）
+            Write-Host "ドキュメント全体のフィールドを更新中..." -ForegroundColor Cyan
             $this.word_document.Fields.Update()
-            
-            # フィールドの表示を確実にするための追加設定
-            try
-            {
-                # 各セクションのフッター内のフィールドを個別に更新
-                for ($i = 1; $i -le $sectionCount; $i++)
-                {
-                    try
-                    {
-                        $section = $this.word_document.Sections.Item($i)
-                        if ($null -ne $section)
-                        {
-                            $footer = $section.Footers.Item([Microsoft.Office.Interop.Word.WdHeaderFooterIndex]::wdHeaderFooterPrimary)
-                            if ($null -ne $footer -and $footer.Range.Fields.Count -gt 0)
-                            {
-                                foreach ($field in $footer.Range.Fields)
-                                {
-                                    if ($null -ne $field)
-                                    {
-                                        $field.Update()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Write-Host "セクション $i のフィールド更新でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
-                    }
-                }
-                
-                Write-Host "フィールドの個別更新が完了しました。" -ForegroundColor Green
-            }
-            catch
-            {
-                Write-Host "フィールドの個別更新でエラーが発生しました: $($_.Exception.Message)" -ForegroundColor Yellow
-            }
             
             Write-Host "フィールドの更新が完了しました。" -ForegroundColor Green
             
