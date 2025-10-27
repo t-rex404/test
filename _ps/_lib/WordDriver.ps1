@@ -18,7 +18,7 @@ class WordDriver
     # ========================================
     # ログユーティリティ
     # ========================================
-
+	
     # UTF-8 (BOMなし) で追記するヘルパー
     [void] AppendTextNoBom([string]$filePath, [string]$text)
     {
@@ -353,14 +353,14 @@ class WordDriver
                         $pageField.Update()
                         $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
                         
-                        # " / " を挿入
-                        $footer.Range.InsertAfter(" / ")
-                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
-                        
-                        # 総ページ数フィールドを挿入
-                        $numPagesField = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages, $null, $true)
-                        $numPagesField.Update()
-                        $footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        ## " / " を挿入
+                        #$footer.Range.InsertAfter(" / ")
+                        #$footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
+                        #
+                        ## 総ページ数フィールドを挿入
+                        #$numPagesField = $footer.Range.Fields.Add($footer.Range.Duplicate, [Microsoft.Office.Interop.Word.WdFieldType]::wdFieldNumPages, $null, $true)
+                        #$numPagesField.Update()
+                        #$footer.Range.Collapse([Microsoft.Office.Interop.Word.WdCollapseDirection]::wdCollapseEnd) | Out-Null
 
                         # フッター内のフィールドを更新
                         $footer.Range.Fields.Update()
