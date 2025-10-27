@@ -425,7 +425,8 @@ class WebDriver
             $this.web_socket.SendAsync($buffer, [System.Net.WebSockets.WebSocketMessageType]::Text, $true, $cancellationTokenSource.Token).Wait()
 
             # 正常ログ出力
-            $this.LogInfo("WebSocketメッセージを送信しました: $method")
+            #$this.LogInfo("WebSocketメッセージを送信しました: $method")
+            $this.LogInfo("WebSocketメッセージを送信しました: $message")
         }
         catch
         {
@@ -517,7 +518,8 @@ class WebDriver
                         if ($response_json_object.id -eq $this.message_id)
                         {
                             # 正常ログ出力
-                            $this.LogInfo("WebSocketメッセージを受信しました: id=$($response_json_object.id)")
+                            #$this.LogInfo("WebSocketメッセージを受信しました: id=$($response_json_object.id)")
+                            $this.LogInfo("WebSocketメッセージを受信しました: $response_json")
                             return $response_json
                         }
                     }
