@@ -95,6 +95,54 @@ class OracleDriver
         Write-Host $message -ForegroundColor Red
     }
 
+    # Remove SQL*Plus-only terminators that cause ORA-00911 when passed to OracleCommand
+    # SQL*Plus専用の終端記号（; /）を安全に除去し、OracleCommandに渡せる形へ正規化する
+    # パラメータ: $sql - 入力SQL文字列（ユーザー入力やファイル由来を想定）
+    # 戻り値: 正規化済みSQL文字列（不要な終端記号を除去、PL/SQLに必要なセミコロンは保持）
+    [string] NormalizeSql([string]$sql)
+    {
+        # 入力がNULL/空白のみの場合は、そのまま返す（以降の処理は不要）
+        if ([string]::IsNullOrWhiteSpace($sql))
+        {
+            return $sql
+        }
+
+        # 前後の空白を削除
+        $normalizedSql = $sql.Trim()
+
+        # 末尾のスラッシュ（/）はSQL*Plusのブロック実行用終端のため、すべて除去
+        while ($normalizedSql.Length -gt 0 -and $normalizedSql.EndsWith("/"))
+        {
+            $normalizedSql = $normalizedSql.Substring(0, $normalizedSql.Length - 1).TrimEnd()
+        }
+
+        # 末尾のセミコロン（;）は基本的に不要なので除去する
+        # ただし、PL/SQLブロックのEND; は必須のため保持する（END または END <識別子> で終わる場合）
+        if ($normalizedSql.Length -gt 0 -and $normalizedSql.EndsWith(";"))
+        {
+            $candidate = $normalizedSql.Substring(0, $normalizedSql.Length - 1).TrimEnd()
+
+            if ($candidate.Length -eq 0)
+            {
+                $normalizedSql = $candidate
+            }
+            else
+            {
+                $upperCandidate = $candidate.ToUpperInvariant()
+                # END または END <識別子>（例: END P1）の末尾かを判定する正規表現
+                $pattern = 'END(\s+[A-Z0-9_$#]+)?$'
+
+                if (-not [System.Text.RegularExpressions.Regex]::IsMatch($upperCandidate, $pattern))
+                {
+                    $normalizedSql = $candidate
+                }
+            }
+        }
+
+        # 正規化したSQLを返す
+        return $normalizedSql
+    }
+
     # ========================================
     # 初期化・接続関連
     # ========================================
@@ -723,7 +771,8 @@ class OracleDriver
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             
             # パラメータを追加
             foreach ($key in $parameters.Keys)
@@ -761,7 +810,8 @@ class OracleDriver
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             
             # パラメータを追加
             foreach ($key in $parameters.Keys)
@@ -797,7 +847,8 @@ class OracleDriver
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             
             # パラメータを追加
             foreach ($key in $parameters.Keys)
@@ -833,7 +884,8 @@ class OracleDriver
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             
             # パラメータを追加
             foreach ($key in $parameters.Keys)
@@ -869,7 +921,8 @@ class OracleDriver
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             
             # パラメータを追加
             foreach ($key in $parameters.Keys)
@@ -940,8 +993,10 @@ class OracleDriver
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
+            $sqlToExplain = $this.NormalizeSql($sql)
+
             # EXPLAIN PLANを実行
-            $explainSql = "EXPLAIN PLAN SET STATEMENT_ID = '$statementId' FOR $sql"
+            $explainSql = "EXPLAIN PLAN SET STATEMENT_ID = '$statementId' FOR $sqlToExplain"
             $command = New-Object System.Data.OracleClient.OracleCommand($explainSql, $this.Connection)
             $command.ExecuteNonQuery()
 
@@ -1002,7 +1057,8 @@ ORDER SIBLINGS BY ID
                 $this.BeginTransaction()
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection, $this.Transaction)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection, $this.Transaction)
             $command.ExecuteNonQuery()
 
             Write-Host "LOCK TABLEを実行しました。テーブル: $tableName, モード: $lockMode" -ForegroundColor Green
@@ -1034,7 +1090,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "CREATE TABLE文を実行しました。" -ForegroundColor Green
@@ -1061,7 +1118,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "ALTER TABLE文を実行しました。" -ForegroundColor Green
@@ -1089,7 +1147,8 @@ ORDER SIBLINGS BY ID
             }
 
             $sql = "DROP TABLE $tableName"
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "DROP TABLE文を実行しました。テーブル: $tableName" -ForegroundColor Green
@@ -1116,7 +1175,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "CREATE INDEX文を実行しました。" -ForegroundColor Green
@@ -1143,7 +1203,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "CREATE VIEW文を実行しました。" -ForegroundColor Green
@@ -1170,7 +1231,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "CREATE SEQUENCE文を実行しました。" -ForegroundColor Green
@@ -1198,7 +1260,8 @@ ORDER SIBLINGS BY ID
             }
 
             $sql = "TRUNCATE TABLE $tableName"
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "TRUNCATE TABLEを実行しました。テーブル: $tableName" -ForegroundColor Green
@@ -1226,7 +1289,8 @@ ORDER SIBLINGS BY ID
             }
 
             $sql = "RENAME $oldName TO $newName"
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "RENAMEを実行しました。$oldName -> $newName" -ForegroundColor Green
@@ -1258,7 +1322,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "GRANT文を実行しました。" -ForegroundColor Green
@@ -1285,7 +1350,8 @@ ORDER SIBLINGS BY ID
                 throw "データベースに接続されていません。Connect()を先に実行してください。"
             }
 
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "REVOKE文を実行しました。" -ForegroundColor Green
@@ -1409,7 +1475,8 @@ ORDER SIBLINGS BY ID
             }
 
             $sql = "SAVEPOINT $savepointName"
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection, $this.Transaction)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection, $this.Transaction)
             $command.ExecuteNonQuery()
 
             Write-Host "SAVEPOINTを作成しました: $savepointName" -ForegroundColor Green
@@ -1437,7 +1504,8 @@ ORDER SIBLINGS BY ID
             }
 
             $sql = "ROLLBACK TO SAVEPOINT $savepointName"
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection, $this.Transaction)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection, $this.Transaction)
             $command.ExecuteNonQuery()
 
             Write-Host "SAVEPOINTにロールバックしました: $savepointName" -ForegroundColor Yellow
@@ -1470,7 +1538,8 @@ ORDER SIBLINGS BY ID
             }
 
             $sql = "SET TRANSACTION ISOLATION LEVEL $isolationLevel"
-            $command = New-Object System.Data.OracleClient.OracleCommand($sql, $this.Connection)
+            $sqlToExecute = $this.NormalizeSql($sql)
+            $command = New-Object System.Data.OracleClient.OracleCommand($sqlToExecute, $this.Connection)
             $command.ExecuteNonQuery()
 
             Write-Host "SET TRANSACTIONを実行しました。分離レベル: $isolationLevel" -ForegroundColor Green
