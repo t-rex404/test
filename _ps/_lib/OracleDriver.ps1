@@ -1,7 +1,7 @@
 # ORACLEデータベース操作クラス
 # Oracle.ManagedDataAccess.Clientを使用してORACLEデータベースに接続・操作
 
-Add-Type -AssemblyName "System.Data.OracleClient"
+Add-Type -AssemblyName System.Data.OracleClient
 
 class OracleDriver
 {
