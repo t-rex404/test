@@ -1,0 +1,68 @@
+Metadata-Version: 2.1
+Name: pytk
+Version: 0.0.2.1
+Summary: A thin Pythonic layer on top of TkInter GUI.
+Home-page: https://github.com/norok2/pytk
+Author: Riccardo Metere
+Author-email: rick@metere.it
+License: GPLv3+
+Keywords: automatic,ui,user interface,user-interface,gui,graphical user-interface,tui
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Education
+Classifier: Natural Language :: English
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Utilities
+Classifier: Operating System :: POSIX
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Requires-Dist: flyingcircus
+
+PyTK - Python ToolKit
+=====================
+
+**PyTK** - Python ToolKit:
+A thin Pythonic layer on top of TkInter GUI.
+
+This Python library intend to provide a thin Pythonic abstraction layer on top
+of the most widely used ``tkinter`` functionalities.
+
+The widget semantic follows, when possible, HTML conventions.
+
+
+Installation
+------------
+The recommended way of installing the software is through
+`PyPI <https://pypi.python.org/pypi/pytk>`_:
+
+.. code:: shell
+
+    $ pip install pytk
+
+Alternatively, you can clone the source repository from
+`GitHub <https://github.com/norok2/pytk>`_:
+
+.. code:: shell
+
+    $ mkdir pytk
+    $ cd pytk
+    $ git clone git@github.com:norok2/pytk.git
+    $ python setup.py install
+
+(some steps may require additional permissions depending on your configuration)
+
+The software does not have additional dependencies beyond Python and its
+standard library.
+
+It was tested with Python 2.7 and 3.5.
+Other version were not tested.
+
+
