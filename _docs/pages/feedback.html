@@ -2288,6 +2288,14 @@
             input.dispatchEvent(event);
         }
 
+        // 改行コードをCRLFに正規化
+        function normalizeCRLF(input) {
+            if (input === null || input === undefined) {
+                return '';
+            }
+            return String(input).replace(/\r?\n/g, '\r\n');
+        }
+
         // フォーム送信処理
         document.getElementById('feedbackForm').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -2347,16 +2355,17 @@
                 }).join('; ');
 
                 // CSVデータを作成（ファイルの詳細情報とフルパスを含む）
-                const csvData = [
+                const fields = [
                     driver,
                     method,
                     improvementContent,
                     fileDetails,
                     ipAddress,
                     timestamp
-                ].map(field => `"${field}"`).join(',');
+                ].map(normalizeCRLF);
+                const csvData = fields.map(field => `"${field}"`).join(',');
 
-                const csvContent = '修正してほしい機能,修正してほしいメソッド,修正または改善してほしい内容,参考ファイル詳細（パス含む）,IPアドレス,作成時間\n' + csvData;
+                const csvContent = '修正してほしい機能,修正してほしいメソッド,修正または改善してほしい内容,参考ファイル詳細（パス含む）,IPアドレス,作成時間\r\n' + csvData + '\r\n';
 
                 // 出力先パスを取得
                 const outputPath = document.getElementById('outputPath').value.trim();

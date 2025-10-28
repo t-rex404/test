@@ -1,0 +1,182 @@
+---
+globs: *.html,*.css,*.js
+description: HTMLドキュメント生成とWebインターフェースの規約
+---
+
+# HTML ドキュメント生成規約
+
+このプロジェクトのHTMLドキュメントは以下の規約に従ってください。
+
+## 基本構造
+
+### HTML5テンプレート
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ページタイトル</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- コンテンツ -->
+    <script src="js/script.js"></script>
+</body>
+</html>
+```
+
+## ページ構造
+
+### メインページ ([index.html](mdc:_docs/index.html))
+- ヘッダー: タイトル、サブタイトル、ダークモード切り替え
+- 検索ボックス: クラス名やメソッド名の検索機能
+- クラス一覧: 各ドライバークラスのカード表示
+- ゲームセクション: インベーダー、ブロック崩し、テトリス
+- エラーコード一覧: エラーコードの説明
+- フィードバックセクション: 改善案フォーム
+
+### ドライバーページ (`pages/*.html`)
+- クラス概要: 目的、機能、特徴
+- メソッド一覧: 各メソッドの詳細説明
+- 使用例: コードサンプル
+- エラーコード: そのドライバー固有のエラーコード
+
+## CSS規約
+
+### クラス命名規則
+- コンテナ: `.container`
+- カード: `.class-card`, `.game-card`
+- ボタン: `.btn`, `.primary-btn`, `.secondary-btn`
+- セクション: `.section`, `.class-overview`
+- アイコン: `.icon`, `.card-icon`, `.game-icon`
+
+### カラーパレット
+```css
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+```
+
+### レスポンシブデザイン
+- モバイルファーストアプローチ
+- ブレークポイント: 768px, 992px, 1200px
+- フレックスボックスとグリッドレイアウトの活用
+
+## JavaScript規約
+
+### 機能別モジュール
+- 検索機能: `searchFunctionality()`
+- ダークモード: `darkModeToggle()`
+- チャットボット: `chatbotFunctionality()`
+- ゲーム: `gameFunctionality()`
+
+### イベントハンドリング
+```javascript
+// DOM読み込み完了後に実行
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSearch();
+    initializeDarkMode();
+    initializeChatbot();
+});
+```
+
+## コンテンツ規約
+
+### クラスカード構造
+```html
+<div class="class-card" data-searchable="検索キーワード">
+    <div class="card-header">
+        <span class="card-icon">🎯</span>
+        <h3>クラス名</h3>
+    </div>
+    <p class="card-description">クラスの説明</p>
+    <div class="card-features">
+        <span class="feature-tag">機能1</span>
+        <span class="feature-tag">機能2</span>
+    </div>
+    <a href="pages/classname.html" class="card-link">詳細を見る →</a>
+</div>
+```
+
+### メソッド説明構造
+```html
+<div class="method-item">
+    <h4 class="method-name">MethodName</h4>
+    <p class="method-description">メソッドの説明</p>
+    <div class="method-parameters">
+        <h5>パラメータ</h5>
+        <ul>
+            <li><code>parameter</code> - パラメータの説明</li>
+        </ul>
+    </div>
+    <div class="method-returns">
+        <h5>戻り値</h5>
+        <p>戻り値の説明</p>
+    </div>
+    <div class="method-example">
+        <h5>使用例</h5>
+        <pre><code>コードサンプル</code></pre>
+    </div>
+</div>
+```
+
+## アクセシビリティ
+
+### 必須要素
+- `alt`属性: すべての画像に適切なalt属性
+- `aria-label`: アイコンボタンにaria-label
+- `role`属性: セマンティックなHTML要素の使用
+- キーボードナビゲーション: すべてのインタラクティブ要素がキーボードで操作可能
+
+### セマンティックHTML
+```html
+<header>ヘッダー</header>
+<main>メインコンテンツ</main>
+<section>セクション</section>
+<article>記事</article>
+<aside>サイドバー</aside>
+<footer>フッター</footer>
+```
+
+## パフォーマンス
+
+### 最適化
+- CSS/JSファイルの最小化
+- 画像の最適化（WebP形式の使用）
+- 遅延読み込み（lazy loading）
+- キャッシュ戦略の実装
+
+### 読み込み順序
+1. クリティカルCSS
+2. HTMLコンテンツ
+3. 非クリティカルCSS
+4. JavaScript
+
+## 国際化
+
+### 日本語対応
+- `lang="ja"`属性の設定
+- 日本語フォントの指定
+- 文字エンコーディング: UTF-8
+- 日本語の改行処理
+
+## ブラウザサポート
+
+### 対象ブラウザ
+- Chrome 90+
+- Firefox 88+
+- Edge 90+
+- Safari 14+
+
+### フォールバック
+- CSS Gridのフォールバック（Flexbox）
+- カスタムプロパティのフォールバック
+- JavaScript機能のプログレッシブエンハンスメント

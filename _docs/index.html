@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PowerShell Driver Classes Documentation 🚀</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -16,7 +18,7 @@
                 <span class="emoji">✨</span>
             </h1>
             <p class="subtitle">PowerShellで様々なアプリケーションを操作するための魔法のツールセット 🪄</p>
-            
+
             <!-- Dark Mode Toggle -->
             <div class="theme-toggle">
                 <button id="themeToggle" class="theme-btn">
@@ -39,7 +41,7 @@
             <h2 class="section-title">
                 <span class="icon">📚</span> クラス一覧
             </h2>
-            
+
             <div class="class-grid">
                 <!-- WebDriver -->
                 <div class="class-card" data-searchable="WebDriver ウェブドライバー ブラウザ操作">
@@ -108,7 +110,7 @@
                     </div>
                     <a href="pages/worddriver.html" class="card-link">詳細を見る →</a>
                 </div>
-                
+
                 <!-- ExcelDriver -->
                 <div class="class-card" data-searchable="ExcelDriver エクセルドライバー Excel操作">
                     <div class="card-header">
@@ -267,7 +269,7 @@
             <section class="section">
                 <h2>🎮 ゲームで遊ぼう！</h2>
                 <p>ドキュメントを読んだ後は、楽しいゲームでリフレッシュしましょう！</p>
-                
+
                 <div class="games-grid">
                     <!-- インベーダーゲーム -->
                     <div class="game-card" data-searchable="インベーダーゲーム スペースシューティング ゲーム">
@@ -328,7 +330,7 @@
             <h2 class="section-title">
                 <span class="icon">⚠️</span> 重要な注意事項
             </h2>
-            
+
             <div class="note-cards">
                 <div class="note-card warning">
                     <h3>🔐 セキュリティについて</h3>
@@ -445,7 +447,7 @@
             <h2 class="section-title">
                 <span class="icon">🚨</span> エラーコード一覧
             </h2>
-            
+
             <div class="error-summary">
                 <p>各ドライバークラスには固有のエラーコードが設定されています。エラーコードを確認することで、問題の原因を特定しやすくなります。</p>
             </div>
@@ -512,12 +514,26 @@
                 <div class="error-handling-tips">
                     <h3>🔧 エラー対処のヒント</h3>
                     <ol>
-                        <li>エラーコードを確認して原因を特定</li>
-                        <li>AllDrivers_Error.logファイルで詳細を確認</li>
-                        <li>必要に応じて再試行ロジックを実装</li>
-                        <li>リソースの解放を確実に実行</li>
+                        <li><strong>Common.ps1 を必ず読み込む</strong>（統一ログ/エラー処理）:
+                            <code>. "$PSScriptRoot\_lib\Common.ps1"</code>
+                        </li>
+                        <li><strong>エラーコードで原因特定</strong>: 例 <code>ChromeDriverError_0010</code> →
+                            <code>$global:Common.GetErrorTitle(code, module)</code> や <code>_json/ErrorCode.json</code>
+                            を参照
+                        </li>
+                        <li><strong>ログの場所</strong>: 実行中は Common の一時ディレクトリに <code>*_error.log</code> 出力 →
+                            <code>Dispose()</code> 後に実行ディレクトリの <code>_log\*_error.log</code> と <code>_log\*.log</code>
+                            に退避
+                        </li>
+                        <li><strong>フォールバック出力</strong>（Common未使用時）: 各ドライバーは <code><Driver>_<ユーザー名>_Error.log</code> /
+                            <code><Driver>_<ユーザー名>_Normal.log</code> に直接出力
+                        </li>
+                        <li><strong>再試行とリソース解放</strong>: リトライを実装し、処理後は各ドライバーの <code>Dispose()</code> を必ず実行</li>
+                        <li><strong>ErrorCode.json 更新時</strong>: 変更後は <code>$global:Common.LoadErrorCodes()</code>
+                            を再実行して反映</li>
                     </ol>
                 </div>
+
             </div>
         </section>
 
@@ -526,18 +542,18 @@
             <h2 class="section-title">
                 <span class="icon">💬</span> フィードバック・改善案
             </h2>
-            
+
             <div class="feedback-content">
                 <p>PowerShell Driver Classesをより良くするために、あなたのご意見をお聞かせください！</p>
                 <p>バグの報告、機能の改善案、使いにくい点など、どんなことでも構いません。</p>
-                
+
                 <div class="feedback-actions">
                     <a href="pages/feedback.html" class="feedback-button">
                         <span class="button-icon">📝</span>
                         <span class="button-text">改善案フォームを開く</span>
                     </a>
                 </div>
-                
+
                 <div class="feedback-features">
                     <div class="feature-item">
                         <span class="feature-icon">🎯</span>
@@ -568,10 +584,12 @@
         </footer>
 
         <!-- フローティングアクションボタン -->
+        <!--
         <div class="floating-action-button" id="floatingActionButton">
             <span class="fab-icon">💬</span>
             <span class="fab-tooltip">PS1ファイルの使い方を質問</span>
         </div>
+        -->
 
         <!-- チャットボットモーダル -->
         <div class="chatbot-modal" id="chatbotModal">
@@ -595,7 +613,7 @@
                     <input type="text" id="chatbotInput" placeholder="質問を入力してください..." />
                     <button id="sendMessage">送信</button>
                 </div>
-                
+
                 <!-- 設定パネル -->
                 <div class="chatbot-settings" id="chatbotSettingsPanel">
                     <div class="settings-header">
@@ -609,7 +627,7 @@
                                 ローカルLLMを有効にする
                             </label>
                         </div>
-                        
+
                         <div class="setting-group">
                             <label for="llmType">LLMタイプ:</label>
                             <select id="llmType">
@@ -618,29 +636,29 @@
                                 <!--<option value="llamacpp">llama.cpp</option>-->
                             </select>
                         </div>
-                        
+
                         <div class="setting-group">
                             <label for="llmEndpoint">エンドポイント:</label>
                             <input type="text" id="llmEndpoint" placeholder="http://localhost:11434" />
                         </div>
-                        
+
                         <div class="setting-group">
                             <label for="llmModel">モデル:</label>
                             <input type="text" id="llmModel" placeholder="gpt-oss:20b" />
                         </div>
-                        
+
                         <div class="setting-group">
                             <label>
                                 <input type="checkbox" id="fallbackToLocal" checked />
                                 ローカルLLM失敗時にフォールバック
                             </label>
                         </div>
-                        
+
                         <div class="setting-actions">
                             <button id="testConnection" class="test-btn">接続テスト</button>
                             <button id="saveSettings" class="save-btn">設定保存</button>
                         </div>
-                        
+
                         <div class="connection-status" id="connectionStatus">
                             <span class="status-indicator" id="statusIndicator">●</span>
                             <span class="status-text" id="statusText">未接続</span>
@@ -653,4 +671,5 @@
 
     <script src="js/script.js"></script>
 </body>
+
 </html>

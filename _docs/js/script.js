@@ -17,11 +17,11 @@ if (savedTheme === 'dark') {
 themeToggle?.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
     updateThemeButton();
-    
+
     // テーマ設定を保存
     const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
     localStorage.setItem('theme', currentTheme);
-    
+
     // アニメーション効果
     animateThemeChange();
 });
@@ -58,16 +58,16 @@ const noteCards = document.querySelectorAll('.note-card');
 // 検索入力のイベントリスナー
 searchInput?.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase().trim();
-    
+
     // 検索文字列が空の場合は全て表示
     if (searchTerm === '') {
         showAllCards();
         return;
     }
-    
+
     // カードをフィルタリング
     filterCards(searchTerm);
-    
+
     // 検索結果をハイライト
     highlightSearchResults(searchTerm);
 });
@@ -84,16 +84,16 @@ function showAllCards() {
 // カードをフィルタリング
 function filterCards(searchTerm) {
     let visibleCount = 0;
-    
+
     classCards.forEach(card => {
         const searchableText = card.getAttribute('data-searchable') || '';
         const cardText = (card.textContent + ' ' + searchableText).toLowerCase();
-        
+
         if (cardText.includes(searchTerm)) {
             card.classList.remove('hidden');
             card.style.opacity = '1';
             visibleCount++;
-            
+
             // マッチしたカードにアニメーションを追加
             card.style.animation = 'none';
             setTimeout(() => {
@@ -104,7 +104,7 @@ function filterCards(searchTerm) {
             card.style.opacity = '0.3';
         }
     });
-    
+
     // 検索結果が0件の場合のメッセージ表示
     showNoResultsMessage(visibleCount);
 }
@@ -122,7 +122,7 @@ function highlightSearchResults(searchTerm) {
 function highlightTextInElement(element, searchTerm) {
     // 既存のハイライトを削除
     removeHighlights(element);
-    
+
     // テキストノードを検索してハイライト
     const walker = document.createTreeWalker(
         element,
@@ -130,16 +130,16 @@ function highlightTextInElement(element, searchTerm) {
         null,
         false
     );
-    
+
     const textNodes = [];
     let node;
-    
+
     while (node = walker.nextNode()) {
         if (node.nodeValue.toLowerCase().includes(searchTerm)) {
             textNodes.push(node);
         }
     }
-    
+
     textNodes.forEach(textNode => {
         const span = document.createElement('span');
         span.className = 'search-highlight';
@@ -147,10 +147,10 @@ function highlightTextInElement(element, searchTerm) {
         span.style.color = 'white';
         span.style.padding = '2px 4px';
         span.style.borderRadius = '4px';
-        
+
         const regex = new RegExp(`(${searchTerm})`, 'gi');
         const parts = textNode.nodeValue.split(regex);
-        
+
         parts.forEach(part => {
             if (part.toLowerCase() === searchTerm) {
                 const highlight = span.cloneNode();
@@ -161,7 +161,7 @@ function highlightTextInElement(element, searchTerm) {
                 textNode.parentNode.insertBefore(text, textNode);
             }
         });
-        
+
         textNode.parentNode.removeChild(textNode);
     });
 }
@@ -181,7 +181,7 @@ function removeHighlights(element) {
 // 検索結果が0件の場合のメッセージ
 function showNoResultsMessage(count) {
     const existingMessage = document.querySelector('.no-results-message');
-    
+
     if (count === 0) {
         if (!existingMessage) {
             const message = document.createElement('div');
@@ -201,7 +201,7 @@ function showNoResultsMessage(count) {
                 <p>検索結果が見つかりませんでした</p>
                 <p style="font-size: 0.9em; margin-top: 10px;">別のキーワードで検索してみてください</p>
             `;
-            
+
             const classGrid = document.querySelector('.class-grid');
             classGrid.parentNode.insertBefore(message, classGrid.nextSibling);
         }
@@ -218,16 +218,16 @@ function showNoResultsMessage(count) {
 document.addEventListener('DOMContentLoaded', () => {
     // 初期アニメーション
     animateOnLoad();
-    
+
     // スムーススクロール
     initSmoothScroll();
-    
+
     // ツールチップ初期化
     initTooltips();
-    
+
     // リンクデバッグ用のコードを追加
     initLinkDebug();
-    
+
     // パーティクル効果（オプション）
     // initParticles();
 });
@@ -238,7 +238,7 @@ function animateOnLoad() {
     elements.forEach((element, index) => {
         element.style.opacity = '0';
         element.style.transform = 'translateY(20px)';
-        
+
         setTimeout(() => {
             element.style.transition = 'all 0.6s ease-out';
             element.style.opacity = '1';
@@ -266,7 +266,7 @@ function initSmoothScroll() {
 // ツールチップの初期化
 function initTooltips() {
     const tooltipElements = document.querySelectorAll('[data-tooltip]');
-    
+
     tooltipElements.forEach(element => {
         element.addEventListener('mouseenter', (e) => {
             const tooltip = document.createElement('div');
@@ -284,17 +284,17 @@ function initTooltips() {
                 opacity: 0;
                 transition: opacity 0.3s ease;
             `;
-            
+
             document.body.appendChild(tooltip);
-            
+
             const rect = e.target.getBoundingClientRect();
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
             tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + 'px';
-            
+
             setTimeout(() => {
                 tooltip.style.opacity = '1';
             }, 10);
-            
+
             e.target.addEventListener('mouseleave', () => {
                 tooltip.style.opacity = '0';
                 setTimeout(() => {
@@ -310,17 +310,17 @@ function initLinkDebug() {
     // 全てのリンクにクリックイベントリスナーを追加
     const allLinks = document.querySelectorAll('a[href]');
     console.log(`Found ${allLinks.length} links on the page`);
-    
+
     allLinks.forEach((link, index) => {
         console.log(`Link ${index + 1}:`, link.href, link.textContent);
-        
+
         link.addEventListener('click', (e) => {
             console.log(`Link clicked:`, link.href, link.textContent);
-            
+
             // 外部リンクやハッシュリンクでない場合は、リンクの動作を確認
             if (!link.href.startsWith('http') && !link.href.startsWith('#')) {
                 console.log(`Internal link clicked:`, link.href);
-                
+
                 // リンク先のファイルが存在するかを確認
                 fetch(link.href)
                     .then(response => {
@@ -366,7 +366,7 @@ if (searchInput) {
             highlightSearchResults(searchTerm);
         }
     }, 300);
-    
+
     searchInput.addEventListener('input', debouncedSearch);
 }
 
@@ -422,13 +422,13 @@ function getSettingsElements() {
         statusIndicator: document.getElementById('statusIndicator'),
         statusText: document.getElementById('statusText')
     };
-    
+
     // デバッグ用：要素の存在確認
     console.log('設定関連要素の確認:');
     Object.entries(elements).forEach(([name, element]) => {
         console.log(`${name}:`, element);
     });
-    
+
     return elements;
 }
 
@@ -438,7 +438,7 @@ let settingsElements = {};
 // 設定パネルの表示/非表示
 function setupSettingsEventListeners() {
     settingsElements = getSettingsElements();
-    
+
     if (settingsElements.openChatbotSettings) {
         console.log('設定ボタンのイベントリスナーを設定中...');
         settingsElements.openChatbotSettings.addEventListener('click', () => {
@@ -475,7 +475,7 @@ function loadSettingsToForm() {
         settingsElements.llmEndpoint.value = localLLMConfig.endpoint;
         settingsElements.llmModel.value = localLLMConfig.model;
         settingsElements.fallbackToLocal.checked = localLLMConfig.fallbackToLocal;
-        
+
         updateConnectionStatus();
     } else {
         console.error('設定フォームの要素が見つかりません');
@@ -491,21 +491,21 @@ function setupSaveSettingsListener() {
             localLLMConfig.endpoint = settingsElements.llmEndpoint.value;
             localLLMConfig.model = settingsElements.llmModel.value;
             localLLMConfig.fallbackToLocal = settingsElements.fallbackToLocal.checked;
-            
+
             // ローカルストレージに保存
             localStorage.setItem('localLLMConfig', JSON.stringify(localLLMConfig));
-            
+
             console.log('設定を保存しました:', localLLMConfig);
-            
+
             // 設定パネルを閉じる
             if (settingsElements.chatbotSettingsPanel) {
                 settingsElements.chatbotSettingsPanel.classList.remove('show');
                 console.log('設定パネルを閉じました');
             }
-            
+
             // 接続状態を更新
             updateConnectionStatus();
-            
+
             // 成功メッセージを表示
             showNotification('設定を保存しました！', 'success');
         });
@@ -519,7 +519,7 @@ function setupTestConnectionListener() {
     if (settingsElements.testConnection) {
         settingsElements.testConnection.addEventListener('click', async () => {
             setConnectionStatus('connecting', '接続テスト中...');
-            
+
             try {
                 const isConnected = await testLocalLLMConnection();
                 if (isConnected) {
@@ -563,7 +563,7 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
-    
+
     // 通知のスタイルを設定
     notification.style.cssText = `
         position: fixed;
@@ -577,7 +577,7 @@ function showNotification(message, type = 'info') {
         animation: slideInRight 0.3s ease;
         max-width: 300px;
     `;
-    
+
     // タイプ別の背景色
     switch (type) {
         case 'success':
@@ -589,9 +589,9 @@ function showNotification(message, type = 'info') {
         default:
             notification.style.background = 'var(--primary-color)';
     }
-    
+
     document.body.appendChild(notification);
-    
+
     // 3秒後に自動削除
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
@@ -604,7 +604,7 @@ function loadSettingsFromStorage() {
     const savedConfig = localStorage.getItem('localLLMConfig');
     console.log('ローカルストレージから設定を読み込み中...');
     console.log('保存された設定:', savedConfig);
-    
+
     if (savedConfig) {
         try {
             const config = JSON.parse(savedConfig);
@@ -675,10 +675,10 @@ const ps1FileDatabase = {
 async function callLocalLLM(userMessage, context) {
     try {
         console.log('callLocalLLM呼び出し:', { userMessage, context, config: localLLMConfig });
-        
+
         const prompt = generatePrompt(userMessage, context);
         console.log('生成されたプロンプト:', prompt);
-        
+
         let result;
         switch (localLLMConfig.type) {
             case 'ollama':
@@ -696,7 +696,7 @@ async function callLocalLLM(userMessage, context) {
             default:
                 throw new Error('サポートされていないLLMタイプです');
         }
-        
+
         console.log('LLM応答結果:', result);
         return result;
     } catch (error) {
@@ -713,7 +713,7 @@ async function callOllama(prompt) {
             model: localLLMConfig.model,
             prompt: prompt
         });
-        
+
         const requestBody = {
             model: localLLMConfig.model,
             prompt: prompt,
@@ -724,9 +724,9 @@ async function callOllama(prompt) {
                 max_tokens: 1000
             }
         };
-        
+
         console.log('Ollama API リクエスト:', requestBody);
-        
+
         // CORSエラーを回避するため、XMLHttpRequestを使用
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -734,8 +734,8 @@ async function callOllama(prompt) {
                 xhr.abort();
                 reject(new Error('Ollama API呼び出しがタイムアウトしました。'));
             }, localLLMConfig.timeout || 30000);
-            
-            xhr.onload = function() {
+
+            xhr.onload = function () {
                 clearTimeout(timeoutId);
                 if (xhr.status === 200) {
                     try {
@@ -749,25 +749,25 @@ async function callOllama(prompt) {
                     reject(new Error(`Ollama API エラー: ${xhr.status} ${xhr.statusText}`));
                 }
             };
-            
-            xhr.onerror = function() {
+
+            xhr.onerror = function () {
                 clearTimeout(timeoutId);
                 reject(new Error('ネットワークエラーが発生しました。'));
             };
-            
-            xhr.ontimeout = function() {
+
+            xhr.ontimeout = function () {
                 clearTimeout(timeoutId);
                 reject(new Error('リクエストがタイムアウトしました。'));
             };
-            
+
             xhr.open('POST', `${localLLMConfig.endpoint}/api/generate`, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(requestBody));
         });
-        
+
     } catch (error) {
         console.error('Ollama API呼び出しエラー:', error);
-        
+
         // エラーの種類に応じて詳細なメッセージを生成
         let errorMessage = 'Ollama API呼び出しエラー';
         if (error.message.includes('タイムアウト')) {
@@ -775,7 +775,7 @@ async function callOllama(prompt) {
         } else if (error.message.includes('ネットワークエラー')) {
             errorMessage = 'Ollamaサービスに接続できません。サービスが起動しているか確認してください。';
         }
-        
+
         const enhancedError = new Error(errorMessage);
         enhancedError.originalError = error;
         throw enhancedError;
@@ -843,9 +843,9 @@ function generatePrompt(userMessage, context) {
     return `あなたはPowerShell Driver Classesの専門家です。
 
 利用可能なクラス情報:
-${Object.entries(ps1FileDatabase).map(([name, info]) => 
-    `${name}: ${info.description} - 主なメソッド: ${info.methods.join(', ')}`
-).join('\n')}
+${Object.entries(ps1FileDatabase).map(([name, info]) =>
+        `${name}: ${info.description} - 主なメソッド: ${info.methods.join(', ')}`
+    ).join('\n')}
 
 ユーザーの質問: ${userMessage}
 
@@ -886,25 +886,25 @@ sendMessage?.addEventListener('click', sendUserMessage);
 async function sendUserMessage() {
     const message = chatbotInput.value.trim();
     if (!message) return;
-    
+
     // ユーザーメッセージを表示
     addMessage(message, 'user');
     chatbotInput.value = '';
-    
+
     // 入力フィールドを無効化
     chatbotInput.disabled = true;
     sendMessage.disabled = true;
-    
+
     // タイピングインジケーターを表示
     addTypingIndicator();
-    
+
     // デバッグ情報を表示
     console.log('ローカルLLM設定:', localLLMConfig);
     console.log('質問内容:', message);
-    
+
     try {
         let response;
-        
+
         // ローカルLLMが有効で、設定されている場合
         if (localLLMConfig.enabled) {
             console.log('ローカルLLMを呼び出し中...');
@@ -914,24 +914,24 @@ async function sendUserMessage() {
         } else {
             console.log('ローカルLLMが無効です。設定を確認してください。');
         }
-        
+
         // ローカルLLMが失敗した場合、または無効な場合はローカル回答を使用
         if (!response && localLLMConfig.fallbackToLocal) {
             console.log('ローカル回答を使用します。');
             response = generateBotResponse(message);
         }
-        
+
         // タイピングインジケーターを削除
         removeTypingIndicator();
-        
+
         // 応答を表示
         addMessage(response || '申し訳ございません。回答を生成できませんでした。', 'bot');
-        
+
     } catch (error) {
         console.error('エラー:', error);
         removeTypingIndicator();
         addMessage('エラーが発生しました。ローカル回答を使用します。', 'bot');
-        
+
         // フォールバックとしてローカル回答を使用
         setTimeout(() => {
             const localResponse = generateBotResponse(message);
@@ -950,11 +950,11 @@ function addTypingIndicator() {
     const typingDiv = document.createElement('div');
     typingDiv.className = 'message bot-message typing-indicator';
     typingDiv.id = 'typingIndicator';
-    
+
     const typingContent = document.createElement('div');
     typingContent.className = 'message-content';
     typingContent.innerHTML = '<p>🤖 考え中...</p>';
-    
+
     typingDiv.appendChild(typingContent);
     chatbotMessages.appendChild(typingDiv);
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
@@ -972,19 +972,19 @@ function removeTypingIndicator() {
 function addMessage(content, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
-    
+
     const messageContent = document.createElement('div');
     messageContent.className = 'message-content';
-    
+
     if (typeof content === 'string') {
         messageContent.innerHTML = `<p>${content}</p>`;
     } else {
         messageContent.innerHTML = content;
     }
-    
+
     messageDiv.appendChild(messageContent);
     chatbotMessages.appendChild(messageDiv);
-    
+
     // スクロールを最下部に
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
@@ -992,40 +992,40 @@ function addMessage(content, sender) {
 // ボットの応答を生成（ローカルフォールバック用）
 function generateBotResponse(userMessage) {
     const message = userMessage.toLowerCase();
-    
+
     // 特定のキーワードに対する応答
     if (message.includes('こんにちは') || message.includes('hello')) {
         return 'こんにちは！PowerShell Driver Classesについて何でもお聞きください。';
     }
-    
+
     if (message.includes('使い方') || message.includes('how to use')) {
         return 'どのクラスの使い方を知りたいですか？例えば「ChromeDriverの使い方を教えて」のように質問してください。';
     }
-    
+
     if (message.includes('メソッド') || message.includes('method')) {
         return 'どのクラスのメソッドについて知りたいですか？具体的なクラス名を教えてください。';
     }
-    
+
     // 各ドライバークラスに関する質問
     for (const [className, info] of Object.entries(ps1FileDatabase)) {
         if (message.includes(className.toLowerCase()) || message.includes(className.replace('Driver', '').toLowerCase())) {
             return generateClassInfo(className, info);
         }
     }
-    
+
     // 一般的な質問に対する応答
     if (message.includes('エラー') || message.includes('error')) {
         return 'エラーが発生した場合は、CommonクラスのWriteLogメソッドでログを確認し、GetErrorCodeでエラーコードを取得してください。';
     }
-    
+
     if (message.includes('ログ') || message.includes('log')) {
         return 'ログ出力にはCommonクラスのWriteLogメソッドを使用します。詳細なログでデバッグを効率化できます。';
     }
-    
+
     if (message.includes('インストール') || message.includes('install')) {
         return 'PowerShell 5.1以上が必要です。各ドライバークラスを使用するには、対応するアプリケーション（Chrome、Office等）のインストールが必要です。';
     }
-    
+
     // デフォルト応答
     return '申し訳ございません。もう少し具体的に質問していただけますか？例えば「ChromeDriverの使い方」「WordDriverで文書を作成する方法」など。';
 }
@@ -1054,26 +1054,26 @@ function updateLocalLLMConfig(newConfig) {
 async function testLocalLLMConnection() {
     try {
         console.log('ローカルLLM接続テスト開始...');
-        
+
         // まず基本的なAPI接続をテスト
         const testResponse = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.status === 200) {
                     resolve(xhr);
                 } else {
                     reject(new Error(`API接続テスト失敗: ${xhr.status} ${xhr.statusText}`));
                 }
             };
-            xhr.onerror = function() {
+            xhr.onerror = function () {
                 reject(new Error('API接続テストでネットワークエラーが発生しました。'));
             };
             xhr.open('GET', `${localLLMConfig.endpoint}/api/tags`, true);
             xhr.send();
         });
-        
+
         console.log('API接続テスト成功');
-        
+
         // 次に実際のLLM呼び出しをテスト
         const response = await callLocalLLM('テスト接続', '接続テスト');
         console.log('ローカルLLM接続成功:', response);
@@ -1087,22 +1087,22 @@ async function testLocalLLMConnection() {
 // ページ読み込み完了時の初期化
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('ページ初期化開始...');
-    
+
     // 既存の初期化処理はそのまま
     initLinkDebug();
-    
+
     // 保存された設定を読み込み
     loadSettingsFromStorage();
-    
+
     // 設定パネルのイベントリスナーを設定
     setupSettingsEventListeners();
     setupSaveSettingsListener();
     setupTestConnectionListener();
-    
+
     // チャットボットの初期化
     if (floatingActionButton && chatbotModal) {
         console.log('チャットボットが初期化されました');
-        
+
         // ローカルLLM接続テスト（オプション）
         if (localLLMConfig.enabled) {
             console.log('ローカルLLMが有効です。接続テストを実行中...');
@@ -1119,11 +1119,150 @@ document.addEventListener('DOMContentLoaded', async () => {
             addMessage('ℹ️ ローカルLLMを使用するには、設定で有効化してください。', 'bot');
         }
     }
-    
+
     // グローバル関数として公開（デバッグ用）
     window.PowerShellDocs.updateLocalLLMConfig = updateLocalLLMConfig;
     window.PowerShellDocs.testLocalLLMConnection = testLocalLLMConnection;
     window.PowerShellDocs.localLLMConfig = localLLMConfig;
-    
+
     console.log('初期化完了。現在の設定:', localLLMConfig);
+});
+
+// ========================================
+// PS1クラス/メソッド自動インデックス
+// ========================================
+
+// 解析対象のPS1ファイル（_docs/index.html からの相対パス）
+const ps1FilesToScan = [
+    '../_ps/_lib/WebDriver.ps1',
+    '../_ps/_lib/ChromeDriver.ps1',
+    '../_ps/_lib/EdgeDriver.ps1',
+    '../_ps/_lib/WordDriver.ps1',
+    '../_ps/_lib/ExcelDriver.ps1',
+    '../_ps/_lib/PowerPointDriver.ps1',
+    '../_ps/_lib/AccessDriver.ps1',
+    '../_ps/_lib/OracleDriver.ps1',
+    '../_ps/_lib/WinSCPDriver.ps1',
+    '../_ps/_lib/TeraTermDriver.ps1',
+    '../_ps/_lib/GUIDriver.ps1',
+    '../_ps/_lib/UIAutomationDriver.ps1'
+];
+
+// PS1テキストからクラス名・基底クラス・メソッド名を抽出
+function parsePs1ClassInfo(content) {
+    const classInfo = { className: null, baseClass: null, methods: [] };
+
+    try {
+        // class 定義: class ClassName [: BaseClass]
+        const classMatch = content.match(/^[\t ]*class[\t ]+([A-Za-z_][A-Za-z0-9_]*)[\t ]*(?::[\t ]*([A-Za-z_][A-Za-z0-9_]*))?/m);
+        if (classMatch) {
+            classInfo.className = classMatch[1];
+            classInfo.baseClass = classMatch[2] || null;
+        }
+
+        // メソッド定義: [return] MethodName(
+        const methodRegex = /^[\t ]*\[[^\]]+\][\t ]+([A-Za-z_][A-Za-z0-9_]*)[\t ]*\(/gm;
+        let m;
+        const methods = new Set();
+        while ((m = methodRegex.exec(content)) !== null) {
+            const name = m[1];
+            // コンストラクタ（クラス名と同名・戻り値なし）は本正規表現では基本拾わないが、安全に除外
+            if (classInfo.className && name === classInfo.className) continue;
+            methods.add(name);
+        }
+        classInfo.methods = Array.from(methods);
+    } catch (e) {
+        console.error('PS1解析でエラーが発生しました:', e);
+    }
+
+    return classInfo;
+}
+
+async function fetchText(path) {
+    const url = `${path}?_=${Date.now()}`; // キャッシュ回避
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+}
+
+async function buildPs1Index() {
+    const index = {};
+    for (const path of ps1FilesToScan) {
+        try {
+            const text = await fetchText(path);
+            const info = parsePs1ClassInfo(text);
+            if (info.className) {
+                index[info.className] = info;
+            }
+        } catch (err) {
+            console.warn('PS1の読み込みに失敗:', path, err);
+        }
+    }
+    return index;
+}
+
+function applyPs1IndexToPage(ps1Index) {
+    if (!ps1Index || Object.keys(ps1Index).length === 0) return;
+
+    // 既存の簡易DBを上書き（フォールバック用）
+    try {
+        for (const [cls, info] of Object.entries(ps1Index)) {
+            ps1FileDatabase[cls] = ps1FileDatabase[cls] || {};
+            ps1FileDatabase[cls].methods = info.methods;
+            ps1FileDatabase[cls].description = ps1FileDatabase[cls].description || `${cls} の自動抽出メタデータ`;
+        }
+    } catch (e) {
+        console.warn('ローカルDBへの反映に失敗しました:', e);
+    }
+
+    // カードへ反映
+    const cards = document.querySelectorAll('.class-card');
+    cards.forEach(card => {
+        const title = card.querySelector('.card-header h3')?.textContent?.trim();
+        if (!title || !ps1Index[title]) return;
+        const info = ps1Index[title];
+
+        // data-searchable にメソッド名を付加
+        const existing = card.getAttribute('data-searchable') || '';
+        const extra = info.methods.join(' ');
+        card.setAttribute('data-searchable', `${existing} ${extra}`.trim());
+
+        // 機能タグを追加/更新
+        const features = card.querySelector('.card-features');
+        if (features) {
+            // メソッド数
+            let countTag = features.querySelector('.feature-tag.ps1-method-count');
+            if (!countTag) {
+                countTag = document.createElement('span');
+                countTag.className = 'feature-tag ps1-method-count';
+                features.appendChild(countTag);
+            }
+            countTag.textContent = `🧩 メソッド ${info.methods.length}件`;
+
+            // 基底クラス
+            if (info.baseClass) {
+                let baseTag = features.querySelector('.feature-tag.ps1-base-class');
+                if (!baseTag) {
+                    baseTag = document.createElement('span');
+                    baseTag.className = 'feature-tag ps1-base-class';
+                    features.appendChild(baseTag);
+                }
+                baseTag.textContent = `🧱 基底: ${info.baseClass}`;
+            }
+        }
+    });
+
+    // デバッグ用に公開
+    window.PowerShellDocs.ps1Index = ps1Index;
+}
+
+// 起動時にPS1を解析し、カードへ反映
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const index = await buildPs1Index();
+        applyPs1IndexToPage(index);
+        console.log('PS1インデックスを適用しました:', index);
+    } catch (e) {
+        console.warn('PS1インデックスの構築に失敗しました。ページはフォールバック動作を継続します。', e);
+    }
 });
